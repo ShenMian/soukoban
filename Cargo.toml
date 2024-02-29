@@ -17,6 +17,10 @@ categories = ["algorithms"]
 name = "benchmark"
 harness = false
 
+# https://bheisler.github.io/criterion.rs/book/faq.html#cargo-bench-gives-unrecognized-option-errors-for-valid-command-line-options
+[lib]
+bench = false
+
 [dependencies]
 bitflags = "2.4"
 itertools = "0.12"
