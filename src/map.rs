@@ -520,8 +520,7 @@ impl Map {
 
     /// Normalizes the position of the player on the map.
     fn normalize_player_position(&mut self) {
-        let player_reachable_area =
-            reachable_area(self.player_position, |position| self.can_move(position));
+        let player_reachable_area = reachable_area(self.player_position, |pos| self.can_move(pos));
         self.set_player_position(normalized_area(&player_reachable_area).unwrap());
     }
 

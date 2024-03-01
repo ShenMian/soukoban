@@ -214,7 +214,7 @@ impl Level {
 
     /// Returns the reachable area for the player.
     pub fn player_reachable_area(&self) -> HashSet<Vector2<i32>> {
-        reachable_area(self.player_position(), |position| self.can_move(position))
+        reachable_area(self.player_position(), |pos| self.can_move(pos))
     }
 
     /// Loads levels from XSB format string.
