@@ -33,13 +33,17 @@ impl Level {
     ///
     /// Reads level map and metadata from XSB formatted strings.
     pub fn from_str(str: &str) -> Result<Self, ParseLevelError> {
-        let mut map_string = String::new();
-        let mut metadata = HashMap::<String, String>::new();
+        let mut map_offset = 0;
+        let mut map_len = 0;
+        let mut metadata = HashMap::new();
         let mut comments = String::new();
         let mut in_block_comment = false;
-        for line in str.split(['\n', '|']) {
-            let trimmed_end_line = line.trim_end();
-            let trimmed_line = trimmed_end_line.trim_start();
+        for line in str.split_inclusive(['\n', '|']) {
+            if map_len == 0 {
+                map_offset += line.len();
+            }
+
+            let trimmed_line = line.trim();
             if trimmed_line.is_empty() {
                 continue;
             }
@@ -84,10 +88,10 @@ impl Level {
             }
 
             // Discard line that are not map data (with RLE)
-            if !is_xsb_string(trimmed_end_line) {
-                if !map_string.is_empty() {
+            if !is_xsb_string(trimmed_line) {
+                if map_len != 0 {
                     return Err(ParseMapError::InvalidCharacter(
-                        trimmed_end_line
+                        trimmed_line
                             .chars()
                             .find(|&c| !is_xsb_symbol_with_rle(c))
                             .unwrap(),
@@ -97,8 +101,10 @@ impl Level {
                 continue;
             }
 
-            map_string += &trimmed_end_line;
-            map_string.push('\n');
+            if map_len == 0 {
+                map_offset -= line.len();
+            }
+            map_len += line.len();
         }
         if !comments.is_empty() {
             debug_assert!(!metadata.contains_key("comments"));
@@ -107,12 +113,12 @@ impl Level {
         if in_block_comment {
             return Err(ParseLevelError::UnterminatedBlockComment);
         }
-        if map_string.is_empty() {
+        if map_len == 0 {
             return Err(ParseLevelError::NoMap);
         }
 
         Ok(Self {
-            map: Map::from_str(&map_string)?,
+            map: Map::from_str(&str[map_offset..map_offset + map_len])?,
             metadata,
             actions: Actions::default(),
             undone_actions: Actions::default(),
@@ -321,5 +327,5 @@ fn is_xsb_symbol(char: char) -> bool {
 }
 
 fn is_xsb_symbol_with_rle(char: char) -> bool {
-    is_xsb_symbol(char) || char::is_ascii_digit(&char)
+    is_xsb_symbol(char) || char::is_ascii_digit(&char) || char == '|'
 }
