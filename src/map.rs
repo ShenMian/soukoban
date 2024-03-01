@@ -63,7 +63,7 @@ impl Map {
         let mut instance = Map::with_dimensions(dimensions);
 
         // Parse map data
-        let mut player_position: Option<Vector2<_>> = None;
+        let mut player_position = None;
         for (y, line) in buffer.lines().enumerate() {
             // Trim map indentation
             let line = &line[indent as usize..];
@@ -130,7 +130,7 @@ impl Map {
         let mut max_position = Vector2::<i32>::zeros();
 
         // Calculate the dimensions of the player's movement range
-        let mut player_position = Vector2::<i32>::zeros();
+        let mut player_position = Vector2::zeros();
         for action in &**actions {
             player_position += &action.direction().into();
             min_position = min_position.zip_map(&player_position, |a, b| a.min(b));
