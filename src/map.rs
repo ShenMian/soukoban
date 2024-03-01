@@ -606,6 +606,7 @@ impl Map {
 
 impl Index<Vector2<i32>> for Map {
     type Output = Tiles;
+    
     fn index(&self, position: Vector2<i32>) -> &Tiles {
         &self.data[(position.y * self.dimensions.x + position.x) as usize]
     }
