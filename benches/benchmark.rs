@@ -2,7 +2,12 @@ use std::{fs, path::Path};
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use nalgebra::Vector2;
-use soukoban::{deadlock::*, path_finding::box_move_waypoints, solver::Solver, Level, Map};
+use soukoban::{
+    deadlock::*,
+    path_finding::box_move_waypoints,
+    solver::{Solver, Strategy},
+    Level, Map,
+};
 
 pub fn load_level_from_file<P: AsRef<Path>>(path: P, id: usize) -> Level {
     debug_assert!(id >= 1);
@@ -110,7 +115,7 @@ pub const PATH: &str = r#"
 
 fn tunnel_benchmark(c: &mut Criterion) {
     let map = Map::from_str(PATH).unwrap();
-    let solver = Solver::new(map.clone());
+    let solver = Solver::new(map.clone(), Strategy::Fast);
     solver.lower_bounds();
     c.bench_function("calculate tunnels", |b| {
         let solver = solver.clone();
@@ -124,7 +129,7 @@ fn solver_benchmark(c: &mut Criterion) {
     let map = Map::from_str(PATH).unwrap();
     c.bench_function("solve level 'PATH'", |b| {
         b.iter(|| {
-            let solver = black_box(Solver::new(map.clone()));
+            let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
             black_box(solver.a_star_search(&map).unwrap());
         })
     });
@@ -133,7 +138,7 @@ fn solver_benchmark(c: &mut Criterion) {
         .clone();
     c.bench_function("solve level 'BoxWorld #3'", |b| {
         b.iter(|| {
-            let solver = black_box(Solver::new(map.clone()));
+            let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
             black_box(solver.a_star_search(&map).unwrap());
         })
     });

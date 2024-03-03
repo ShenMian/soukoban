@@ -13,19 +13,37 @@ use crate::{
     direction::Direction, path_finding::reachable_area, state::State, Map, SearchError, Tiles,
 };
 
+/// The strategy to use when searching for a solution.
+#[derive(Clone, Copy, Eq, PartialEq, Debug, Default)]
+pub enum Strategy {
+    /// Search for any solution as quickly as possible
+    #[default]
+    Fast,
+
+    /// Find the push optimal solution
+    OptimalPush,
+}
+
 #[derive(Clone, Eq, Debug)]
 struct Node {
     state: State,
     cost: i32,
     heuristic: i32,
+    priority: i32,
 }
 
 impl Node {
     pub fn new(state: State, cost: i32, solver: &Solver) -> Self {
+        let heuristic = state.heuristic(solver);
+        let priority = match solver.strategy() {
+            Strategy::Fast => heuristic,
+            Strategy::OptimalPush => cost + heuristic,
+        };
         Self {
-            heuristic: state.heuristic(solver),
+            heuristic,
             state,
             cost,
+            priority,
         }
     }
 }
@@ -38,10 +56,7 @@ impl PartialEq for Node {
 
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
-        // (self.cost + self.heuristic)
-        //     .cmp(&(other.cost + other.heuristic))
-        //     .reverse()
-        self.heuristic.cmp(&other.heuristic).reverse()
+        self.priority.cmp(&other.priority).reverse()
     }
 }
 
@@ -55,15 +70,17 @@ impl PartialOrd for Node {
 #[derive(Clone, Debug)]
 pub struct Solver {
     map: Map,
+    strategy: Strategy,
     lower_bounds: OnceCell<HashMap<Vector2<i32>, i32>>,
     tunnels: OnceCell<HashSet<(Vector2<i32>, Direction)>>,
 }
 
 impl Solver {
     /// Creates a new `Solver`.
-    pub fn new(map: Map) -> Self {
+    pub fn new(map: Map, strategy: Strategy) -> Self {
         Self {
             map,
+            strategy,
             lower_bounds: OnceCell::new(),
             tunnels: OnceCell::new(),
         }
@@ -137,6 +154,11 @@ impl Solver {
     /// Returns a reference to the map.
     pub fn map(&self) -> &Map {
         &self.map
+    }
+
+    /// Returns the strategy.
+    pub fn strategy(&self) -> Strategy {
+        self.strategy
     }
 
     /// Returns a reference to the set of lower bounds.

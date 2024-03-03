@@ -9,21 +9,21 @@ fn test_solver() {
     let map = load_level_from_file("assets/BoxWorld_100.xsb", 1)
         .map()
         .clone();
-    let solver = Solver::new(map.clone());
+    let solver = Solver::new(map.clone(), Strategy::Fast);
     assert!(solver.a_star_search(&map).is_ok());
     assert!(solver.ida_star_search(&map).is_ok());
 
     let map = load_level_from_file("assets/BoxWorld_100.xsb", 2)
         .map()
         .clone();
-    let solver = Solver::new(map.clone());
+    let solver = Solver::new(map.clone(), Strategy::Fast);
     assert!(solver.a_star_search(&map).is_ok());
     assert!(solver.ida_star_search(&map).is_ok());
 
     let map = load_level_from_file("assets/BoxWorld_100.xsb", 3)
         .map()
         .clone();
-    let solver = Solver::new(map.clone());
+    let solver = Solver::new(map.clone(), Strategy::Fast);
     assert!(solver.a_star_search(&map).is_ok());
     assert!(solver.ida_star_search(&map).is_ok());
 }
