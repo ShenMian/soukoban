@@ -151,17 +151,20 @@ impl Level {
     }
 
     /// Performs a sequence of actions on the level.
-    pub fn do_moves<I: IntoIterator<Item = Direction>>(&mut self, directions: I) -> Result<(), ()> {
+    pub fn do_actions<I: IntoIterator<Item = Direction>>(
+        &mut self,
+        directions: I,
+    ) -> Result<(), ()> {
         for direction in directions {
-            self.do_move(direction)?;
+            self.do_action(direction)?;
         }
         Ok(())
     }
 
     /// Moves the player in the specified direction.
-    pub fn do_move(&mut self, direction: Direction) -> Result<(), ()> {
+    pub fn do_action(&mut self, direction: Direction) -> Result<(), ()> {
         if self.actions.last() == Some(&Action::Move(-direction)) {
-            self.undo_move().unwrap();
+            self.undo_action().unwrap();
         }
 
         let new_player_position = self.player_position() + &direction.into();
@@ -183,8 +186,8 @@ impl Level {
         Ok(())
     }
 
-    /// Undoes the last move.
-    pub fn undo_move(&mut self) -> Result<(), ()> {
+    /// Undoes the last action.
+    pub fn undo_action(&mut self) -> Result<(), ()> {
         if let Some(last_action) = self.actions.pop() {
             if last_action.is_push() {
                 let box_position = self.player_position() + &last_action.direction().into();
@@ -200,11 +203,11 @@ impl Level {
         }
     }
 
-    /// Redoes the last move.
-    pub fn redo_move(&mut self) -> Result<(), ()> {
+    /// Redoes the last action.
+    pub fn redo_action(&mut self) -> Result<(), ()> {
         if let Some(last_undone_action) = self.undone_actions.pop() {
             let undone_actions = std::mem::take(&mut self.undone_actions);
-            self.do_move(last_undone_action.direction()).unwrap();
+            self.do_action(last_undone_action.direction()).unwrap();
             self.undone_actions = undone_actions;
             Ok(())
         } else {

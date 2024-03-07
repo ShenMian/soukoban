@@ -136,12 +136,12 @@ fn display() {
 }
 
 #[test]
-fn create_map_with_movements() {
-    let movements =
+fn create_map_with_actions() {
+    let actions =
         Actions::with_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
             .unwrap();
     assert_eq!(
-        Map::from_actions(&movements).unwrap(),
+        Map::from_actions(&actions).unwrap(),
         Map::from_str(
             r#"
             -----####-

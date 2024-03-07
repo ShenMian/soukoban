@@ -151,30 +151,29 @@ impl Map {
         let dimensions = min_position.abs() + max_position.abs() + Vector2::new(1, 1);
         let mut instance = Map::with_dimensions(dimensions);
 
-        // The initial position of boxes are the box positions, and the final position
-        // of boxes are the goal positions
         let mut initial_box_positions = HashSet::new();
-        let mut final_box_positions = HashSet::new();
-
-        let mut final_player_position = player_position;
+        let mut current_box_positions = HashSet::new();
+        let mut current_player_position = player_position;
         for action in &**actions {
-            instance[final_player_position] = Tiles::Floor;
-            final_player_position += &action.direction().into();
+            instance[current_player_position] = Tiles::Floor;
+            current_player_position += &action.direction().into();
             if action.is_push() {
                 // The player pushed the box when moving, which means there is a box at the
-                // player's current location
-                if !final_box_positions.contains(&final_player_position) {
-                    final_box_positions.insert(final_player_position);
-                    initial_box_positions.insert(final_player_position);
+                // player's current position
+                if !current_box_positions.contains(&current_player_position) {
+                    current_box_positions.insert(current_player_position);
+                    initial_box_positions.insert(current_player_position);
                 }
-                final_box_positions.remove(&final_player_position);
-                final_box_positions.insert(final_player_position + &action.direction().into());
+                current_box_positions.remove(&current_player_position);
+                current_box_positions.insert(current_player_position + &action.direction().into());
             }
         }
-        instance[final_player_position] = Tiles::Floor;
+        instance[current_player_position] = Tiles::Floor;
 
+        // The initial position of boxes are the box positions, and the current (final)
+        // position of boxes are the goal positions
         let box_positions = initial_box_positions;
-        let goal_positions = final_box_positions;
+        let goal_positions = current_box_positions;
         if box_positions.is_empty() {
             return Err(ParseMapError::NoBoxOrGoal);
         }
@@ -197,7 +196,7 @@ impl Map {
         let mut level = Level::from_map(instance.clone());
         for action in &**actions {
             level
-                .do_move(action.direction())
+                .do_action(action.direction())
                 .map_err(|_| ParseMapError::InvalidActions)?;
         }
 
@@ -606,7 +605,7 @@ impl Map {
 
 impl Index<Vector2<i32>> for Map {
     type Output = Tiles;
-    
+
     fn index(&self, position: Vector2<i32>) -> &Tiles {
         &self.data[(position.y * self.dimensions.x + position.x) as usize]
     }
