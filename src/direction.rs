@@ -23,6 +23,45 @@ impl Direction {
         use Direction::*;
         [Up, Down, Left, Right].iter().copied()
     }
+
+    /// Rotate the direction 90° clockwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use soukoban::direction::Direction;
+    /// assert_eq!(Direction::Up.rotate(), Direction::Right);
+    ///
+    /// // Rotate the direction 90° counter clockwis.
+    /// assert_eq!(-Direction::Right.rotate(), Direction::Up);
+    /// ```
+    pub fn rotate(self) -> Direction {
+        use Direction::*;
+        match self {
+            Up => Right,
+            Right => Down,
+            Down => Left,
+            Left => Up,
+        }
+    }
+
+    /// Flip the direction.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use soukoban::direction::Direction;
+    /// assert_eq!(Direction::Left.flip(), Direction::Right);
+    /// assert_eq!(Direction::Up.flip(), Direction::Down);
+    /// ```
+    pub fn flip(self) -> Direction {
+        match self {
+            Direction::Up => Direction::Down,
+            Direction::Down => Direction::Up,
+            Direction::Left => Direction::Right,
+            Direction::Right => Direction::Left,
+        }
+    }
 }
 
 impl Neg for Direction {
