@@ -15,9 +15,9 @@ pub struct Actions(pub Vec<Action>);
 
 impl Actions {
     /// Creates a new `Actions` with LURD format string.
-    pub fn with_str(str: &str) -> Result<Actions, ParseActionError> {
+    pub fn from_str(str: &str) -> Result<Actions, ParseActionError> {
         if str.contains(char::is_numeric) {
-            return Actions::with_str(&rle_decode(str).unwrap());
+            return Actions::from_str(&rle_decode(str).unwrap());
         }
         let mut instance = Actions::default();
         for char in str.chars() {

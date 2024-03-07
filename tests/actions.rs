@@ -3,7 +3,7 @@ use soukoban::{Actions, ParseActionError};
 #[test]
 fn parse_actions_error() {
     assert_eq!(
-        Actions::with_str("lUrDL!uRd").unwrap_err(),
+        Actions::from_str("lUrDL!uRd").unwrap_err(),
         ParseActionError::InvalidCharacter('!')
     );
 }
@@ -11,13 +11,13 @@ fn parse_actions_error() {
 #[test]
 fn rle_decode() {
     assert_eq!(
-        Actions::with_str("ruu4L4rddlUru3LulDrdd3luuRRDrdL3urDD")
+        Actions::from_str("ruu4L4rddlUru3LulDrdd3luuRRDrdL3urDD")
             .unwrap()
             .to_string(),
         "ruuLLLLrrrrddlUruLLLulDrddllluuRRDrdLuuurDD"
     );
     assert_eq!(
-        Actions::with_str("ullDullddrRuLu3rdLLrrddlUruL")
+        Actions::from_str("ullDullddrRuLu3rdLLrrddlUruL")
             .unwrap()
             .to_string(),
         "ullDullddrRuLurrrdLLrrddlUruL"
@@ -26,7 +26,7 @@ fn rle_decode() {
 
 #[test]
 fn scoring_metrics() {
-    let empty_actions = Actions::with_str("").unwrap();
+    let empty_actions = Actions::from_str("").unwrap();
     assert_eq!(empty_actions.moves(), 0);
     assert_eq!(empty_actions.pushes(), 0);
     let (box_lines, box_changes, pushing_sessions, player_lines) = empty_actions.secondary_values();
@@ -44,7 +44,7 @@ fn scoring_metrics() {
     // #########
     // box lines     : 8
     // pushing sessions: 7
-    let actions = Actions::with_str("ruuLLLLrrrrddlUruLLLulDrddllluuRRDrdLuuurDD").unwrap();
+    let actions = Actions::from_str("ruuLLLLrrrrddlUruLLLulDrddllluuRRDrdLuuurDD").unwrap();
     assert_eq!(actions.moves(), 43);
     assert_eq!(actions.pushes(), 15);
     let (box_lines, box_changes, pushing_sessions, player_lines) = actions.secondary_values();
@@ -62,7 +62,7 @@ fn scoring_metrics() {
     //     ####
     // box lines     : 6
     // pushing sessions: 6
-    let actions = Actions::with_str("ullDullddrRuLurrrdLLrrddlUruL").unwrap();
+    let actions = Actions::from_str("ullDullddrRuLurrrdLLrrddlUruL").unwrap();
     let (box_lines, box_changes, pushing_sessions, player_lines) = actions.secondary_values();
     assert_eq!(box_lines, 6);
     assert_eq!(box_changes, 4);

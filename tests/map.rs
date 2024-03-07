@@ -63,19 +63,19 @@ fn parse_map_error() {
     );
 
     assert_eq!(
-        Map::from_actions(&Actions::with_str("RddrU").unwrap()).unwrap_err(),
+        Map::from_actions(&Actions::from_str("RddrU").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(&Actions::with_str("RdU").unwrap()).unwrap_err(),
+        Map::from_actions(&Actions::from_str("RdU").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(&Actions::with_str("RL").unwrap()).unwrap_err(),
+        Map::from_actions(&Actions::from_str("RL").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(&Actions::with_str("llurldd").unwrap()).unwrap_err(),
+        Map::from_actions(&Actions::from_str("llurldd").unwrap()).unwrap_err(),
         ParseMapError::NoBoxOrGoal
     );
 }
@@ -138,7 +138,7 @@ fn display() {
 #[test]
 fn create_map_with_actions() {
     let actions =
-        Actions::with_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
+        Actions::from_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
             .unwrap();
     assert_eq!(
         Map::from_actions(&actions).unwrap(),
