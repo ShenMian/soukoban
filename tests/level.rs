@@ -108,12 +108,21 @@ fn metadata() {
 
 #[test]
 fn create_multiple_levels_with_xsb() {
-    let mut string = String::new();
     for entry in fs::read_dir("assets/").unwrap() {
         let path = entry.unwrap().path();
-        string += &(fs::read_to_string(path).unwrap() + "\n\n");
+        let count = path
+            .to_string_lossy()
+            .rsplit_terminator(['_', '.'])
+            .nth(1)
+            .unwrap()
+            .parse()
+            .unwrap();
+        dbg!(&path);
+        assert_eq!(
+            Level::load(&fs::read_to_string(path).unwrap()).count(),
+            count
+        );
     }
-    assert_eq!(Level::load(&string).count(), 3372);
 }
 
 #[test]

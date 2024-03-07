@@ -235,16 +235,16 @@ impl Level {
     /// (excluding empty line within block comment) and filter out groups
     /// without map data.
     fn to_groups(str: &str) -> impl Iterator<Item = &str> + '_ {
-        str.split_inclusive(['\n', '|']).filter_map({
+        str.split(['\n', '|']).filter_map({
             let mut offset = 0;
             let mut len = 0;
             let mut in_block_comment = false;
             let mut has_map_data = false;
             move |line| {
-                len += line.len();
+                len += line.len() + 1;
 
                 let trimmed_line = line.trim();
-                if !in_block_comment && (trimmed_line.is_empty() || !line.ends_with(['\n', '|'])) {
+                if !in_block_comment && (trimmed_line.is_empty() || offset + len == str.len() + 1) {
                     let group = &str[offset..offset + len - 1];
                     offset += len;
                     len = 0;
