@@ -13,7 +13,7 @@ use crate::{
     action::Action,
     actions::Actions,
     direction::Direction,
-    error::{ParseLevelError, ParseMapError},
+    error::{ActionError, ParseLevelError, ParseMapError},
     map::Map,
     path_finding::reachable_area,
     tiles::Tiles,
@@ -154,7 +154,7 @@ impl Level {
     pub fn do_actions<I: IntoIterator<Item = Direction>>(
         &mut self,
         directions: I,
-    ) -> Result<(), ()> {
+    ) -> Result<(), ActionError> {
         for direction in directions {
             self.do_action(direction)?;
         }
@@ -162,19 +162,19 @@ impl Level {
     }
 
     /// Moves the player in the specified direction.
-    pub fn do_action(&mut self, direction: Direction) -> Result<(), ()> {
+    pub fn do_action(&mut self, direction: Direction) -> Result<(), ActionError> {
         if self.actions.last() == Some(&Action::Move(-direction)) {
             self.undo_action().unwrap();
         }
 
         let new_player_position = self.player_position() + &direction.into();
         if self[new_player_position].intersects(Tiles::Wall) {
-            return Err(());
+            return Err(ActionError::MoveBlocked);
         }
         if self[new_player_position].intersects(Tiles::Box) {
             let new_box_position = new_player_position + &direction.into();
             if self[new_box_position].intersects(Tiles::Wall | Tiles::Box) {
-                return Err(());
+                return Err(ActionError::PushBlocked);
             }
             self.set_box_position(new_player_position, new_box_position);
             self.actions.push(Action::Push(direction));
@@ -187,7 +187,7 @@ impl Level {
     }
 
     /// Undoes the last action.
-    pub fn undo_action(&mut self) -> Result<(), ()> {
+    pub fn undo_action(&mut self) -> Result<(), ActionError> {
         if let Some(last_action) = self.actions.pop() {
             if last_action.is_push() {
                 let box_position = self.player_position() + &last_action.direction().into();
@@ -199,19 +199,19 @@ impl Level {
             self.undone_actions.push(last_action);
             Ok(())
         } else {
-            Err(())
+            Err(ActionError::NoActions)
         }
     }
 
     /// Redoes the last action.
-    pub fn redo_action(&mut self) -> Result<(), ()> {
+    pub fn redo_action(&mut self) -> Result<(), ActionError> {
         if let Some(last_undone_action) = self.undone_actions.pop() {
             let undone_actions = std::mem::take(&mut self.undone_actions);
             self.do_action(last_undone_action.direction()).unwrap();
             self.undone_actions = undone_actions;
             Ok(())
         } else {
-            Err(())
+            Err(ActionError::NoUndoneActions)
         }
     }
 

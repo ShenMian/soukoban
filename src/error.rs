@@ -81,3 +81,20 @@ pub enum SearchError {
     #[error("no solution found")]
     NoSolution,
 }
+
+/// An error which can be returned when level do/undo/redo actions.
+#[derive(Error, Clone, Eq, PartialEq, Debug)]
+pub enum ActionError {
+    /// Movement in the specified direction is blocked.
+    #[error("movement in the specified direction is blocked")]
+    MoveBlocked,
+    /// Push in the specified direction is blocked.
+    #[error("push in the specified direction is blocked")]
+    PushBlocked,
+    /// No actions.
+    #[error("no actions")]
+    NoActions,
+    /// No undone actions.
+    #[error("no undone actions")]
+    NoUndoneActions,
+}
