@@ -7,7 +7,7 @@ use std::{
 
 use nalgebra::Vector2;
 
-use crate::{direction::Direction, map::Map};
+use crate::{direction::Direction, map::Map, Tiles};
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
 struct Node {
@@ -212,6 +212,31 @@ pub fn construct_box_path(
     }
     path.push(from);
     path.reverse();
+    path
+}
+
+/// Constructs player path based on box path.
+pub fn construct_player_path(
+    map: &Map,
+    mut player_position: Vector2<i32>,
+    box_path: &Vec<Vector2<i32>>,
+) -> Vec<Vector2<i32>> {
+    let mut path = Vec::new();
+    let initial_box_position = *box_path.first().unwrap();
+    for box_positions in box_path.windows(2) {
+        let direction = box_positions[1] - box_positions[0];
+        let new_player_position = box_positions[0] - direction;
+        path.append(
+            &mut find_path(player_position, new_player_position, |position| {
+                (position == initial_box_position
+                    || !map[position].intersects(Tiles::Wall | Tiles::Box))
+                    && position != box_positions[0]
+            })
+            .unwrap(),
+        );
+        player_position = box_positions[0];
+    }
+    path.push(player_position);
     path
 }
 
