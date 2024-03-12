@@ -98,11 +98,13 @@ fn metadata() {
     assert_eq!(level.metadata()["author"], "level author");
     assert_eq!(
         level.metadata()["comments"],
-        "Level 1\n\
-        single line comment\n\
-        multi\n\
-        line\n\
-        comment\n"
+        indoc! {"
+            Level 1
+            single line comment
+            multi
+            line
+            comment
+        "}
     );
 }
 
@@ -118,7 +120,9 @@ fn create_multiple_levels_with_xsb() {
             .parse()
             .unwrap();
         assert_eq!(
-            Level::load(&fs::read_to_string(path).unwrap()).count(),
+            Level::load(&fs::read_to_string(path).unwrap())
+                .filter_map(Result::ok)
+                .count(),
             count
         );
     }
