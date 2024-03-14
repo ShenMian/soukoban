@@ -607,12 +607,14 @@ impl Index<Vector2<i32>> for Map {
     type Output = Tiles;
 
     fn index(&self, position: Vector2<i32>) -> &Tiles {
+        assert!(0 <= position.x && position.x < self.dimensions.x && 0 <= position.y);
         &self.data[(position.y * self.dimensions.x + position.x) as usize]
     }
 }
 
 impl IndexMut<Vector2<i32>> for Map {
     fn index_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
+        assert!(0 <= position.x && position.x < self.dimensions.x && 0 <= position.y);
         &mut self.data[(position.y * self.dimensions.x + position.x) as usize]
     }
 }
