@@ -5,4 +5,16 @@
 
 A library provides the implementation of some algorithms and data structures related to [Sokoban].
 
+## License
+
+Licensed under either of
+
+- [Apache License, Version 2.0](LICENSE-APACHE)
+- [MIT license](LICENSE-MIT)
+
+at your option.
+
+The level files in the `assets` directory are licensed solely under
+their respective licenses, available in the `LICENSE` file in the directory.
+
 [sokoban]: https://en.wikipedia.org/wiki/Sokoban

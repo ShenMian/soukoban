@@ -112,6 +112,9 @@ fn metadata() {
 fn create_multiple_levels_with_xsb() {
     for entry in fs::read_dir("assets/").unwrap() {
         let path = entry.unwrap().path();
+        if path.extension() != Some(std::ffi::OsStr::new(".xsb")) {
+            continue;
+        }
         let count = path
             .to_string_lossy()
             .rsplit_terminator(['_', '.'])
