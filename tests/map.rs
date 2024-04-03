@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use indoc::indoc;
 use nalgebra::Vector2;
 use soukoban::{tiles::Tiles, Actions, Map, ParseMapError};

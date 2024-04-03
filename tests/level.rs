@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, str::FromStr};
 
 use indoc::indoc;
 use soukoban::{Level, ParseLevelError, ParseMapError};

@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{fs, path::Path, str::FromStr};
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use nalgebra::Vector2;

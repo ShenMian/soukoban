@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use soukoban::{Actions, ParseActionError};
 
 #[test]

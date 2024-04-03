@@ -3,6 +3,7 @@
 use std::{
     fmt,
     ops::{Deref, DerefMut},
+    str::FromStr,
 };
 
 use nalgebra::Vector2;
@@ -14,18 +15,6 @@ use crate::{action::Action, error::ParseActionError, run_length::rle_decode};
 pub struct Actions(pub Vec<Action>);
 
 impl Actions {
-    /// Creates a new `Actions` with LURD format string.
-    pub fn from_str(str: &str) -> Result<Actions, ParseActionError> {
-        if str.contains(char::is_numeric) {
-            return Actions::from_str(&rle_decode(str).unwrap());
-        }
-        let mut instance = Actions::default();
-        for char in str.chars() {
-            instance.push(Action::try_from(char)?);
-        }
-        Ok(instance)
-    }
-
     /// Returns the total number of moves.
     pub fn moves(&self) -> usize {
         self.len()
@@ -74,6 +63,22 @@ impl Actions {
             box_changes += 1;
         }
         (box_lines, box_changes, pushing_sessions, player_lines)
+    }
+}
+
+impl FromStr for Actions {
+    type Err = ParseActionError;
+
+    /// Creates a new `Actions` with LURD format string.
+    fn from_str(lurd: &str) -> Result<Self, Self::Err> {
+        if lurd.contains(char::is_numeric) {
+            return Actions::from_str(&rle_decode(lurd).unwrap());
+        }
+        let mut instance = Actions::default();
+        for char in lurd.chars() {
+            instance.push(Action::try_from(char)?);
+        }
+        Ok(instance)
     }
 }
 

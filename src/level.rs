@@ -4,6 +4,7 @@ use std::{
     collections::{HashMap, HashSet},
     fmt,
     ops::{Deref, DerefMut},
+    str::FromStr,
 };
 
 use itertools::Itertools;
@@ -29,102 +30,6 @@ pub struct Level {
 }
 
 impl Level {
-    /// Creates a new `Level` from XSB format string.
-    ///
-    /// Reads level map and metadata from XSB formatted strings.
-    pub fn from_str(str: &str) -> Result<Self, ParseLevelError> {
-        let mut map_offset = 0;
-        let mut map_len = 0;
-        let mut metadata = HashMap::new();
-        let mut comments = String::new();
-        let mut in_block_comment = false;
-        for line in str.split_inclusive(['\n', '|']) {
-            if map_len == 0 {
-                map_offset += line.len();
-            }
-
-            let trimmed_line = line.trim();
-            if trimmed_line.is_empty() {
-                continue;
-            }
-
-            // Parse comments
-            if in_block_comment {
-                if trimmed_line.to_lowercase().starts_with("comment-end") {
-                    // Exit block comment
-                    in_block_comment = false;
-                    continue;
-                }
-                comments += trimmed_line;
-                comments.push('\n');
-                continue;
-            }
-            if let Some(comment) = trimmed_line.strip_prefix(';') {
-                comments += comment.trim_start();
-                comments.push('\n');
-                continue;
-            }
-
-            // Parse metadata
-            if let Some((key, value)) = trimmed_line.split_once(':') {
-                let key = key.trim().to_lowercase();
-                let value = value.trim();
-
-                if key == "comment" {
-                    if value.is_empty() {
-                        // Enter block comment
-                        in_block_comment = true;
-                    } else {
-                        comments += value;
-                        comments.push('\n');
-                    }
-                    continue;
-                }
-
-                if metadata.insert(key.clone(), value.to_string()).is_some() {
-                    return Err(ParseLevelError::DuplicateMetadata(key));
-                }
-                continue;
-            }
-
-            // Discard line that are not map data (with RLE)
-            if !is_xsb_string(trimmed_line) {
-                if map_len != 0 {
-                    return Err(ParseMapError::InvalidCharacter(
-                        trimmed_line
-                            .chars()
-                            .find(|&c| !is_xsb_symbol_with_rle(c))
-                            .unwrap(),
-                    )
-                    .into());
-                }
-                continue;
-            }
-
-            if map_len == 0 {
-                map_offset -= line.len();
-            }
-            map_len += line.len();
-        }
-        if !comments.is_empty() {
-            debug_assert!(!metadata.contains_key("comments"));
-            metadata.insert("comments".to_string(), comments);
-        }
-        if in_block_comment {
-            return Err(ParseLevelError::UnterminatedBlockComment);
-        }
-        if map_len == 0 {
-            return Err(ParseLevelError::NoMap);
-        }
-
-        Ok(Self {
-            map: Map::from_str(&str[map_offset..map_offset + map_len])?,
-            metadata,
-            actions: Actions::default(),
-            undone_actions: Actions::default(),
-        })
-    }
-
     /// Creates a new `Level` from map.
     pub fn from_map(map: Map) -> Self {
         Self {
@@ -302,6 +207,106 @@ impl fmt::Display for Level {
             writeln!(f, "{}: {}", key, value)?;
         }
         Ok(())
+    }
+}
+
+impl FromStr for Level {
+    type Err = ParseLevelError;
+
+    /// Creates a new `Level` from XSB format string.
+    ///
+    /// Reads level map and metadata from XSB formatted strings.
+    fn from_str(xsb: &str) -> Result<Self, Self::Err> {
+        let mut map_offset = 0;
+        let mut map_len = 0;
+        let mut metadata = HashMap::new();
+        let mut comments = String::new();
+        let mut in_block_comment = false;
+        for line in xsb.split_inclusive(['\n', '|']) {
+            if map_len == 0 {
+                map_offset += line.len();
+            }
+
+            let trimmed_line = line.trim();
+            if trimmed_line.is_empty() {
+                continue;
+            }
+
+            // Parse comments
+            if in_block_comment {
+                if trimmed_line.to_lowercase().starts_with("comment-end") {
+                    // Exit block comment
+                    in_block_comment = false;
+                    continue;
+                }
+                comments += trimmed_line;
+                comments.push('\n');
+                continue;
+            }
+            if let Some(comment) = trimmed_line.strip_prefix(';') {
+                comments += comment.trim_start();
+                comments.push('\n');
+                continue;
+            }
+
+            // Parse metadata
+            if let Some((key, value)) = trimmed_line.split_once(':') {
+                let key = key.trim().to_lowercase();
+                let value = value.trim();
+
+                if key == "comment" {
+                    if value.is_empty() {
+                        // Enter block comment
+                        in_block_comment = true;
+                    } else {
+                        comments += value;
+                        comments.push('\n');
+                    }
+                    continue;
+                }
+
+                if metadata.insert(key.clone(), value.to_string()).is_some() {
+                    return Err(ParseLevelError::DuplicateMetadata(key));
+                }
+                continue;
+            }
+
+            // Discard line that are not map data (with RLE)
+            if !is_xsb_string(trimmed_line) {
+                if map_len != 0 {
+                    return Err(ParseMapError::InvalidCharacter(
+                        trimmed_line
+                            .chars()
+                            .find(|&c| !is_xsb_symbol_with_rle(c))
+                            .unwrap(),
+                    )
+                    .into());
+                }
+                continue;
+            }
+
+            if map_len == 0 {
+                map_offset -= line.len();
+            }
+            map_len += line.len();
+        }
+        if !comments.is_empty() {
+            debug_assert!(!metadata.contains_key("comments"));
+            metadata.insert("comments".to_string(), comments);
+        }
+        if in_block_comment {
+            return Err(ParseLevelError::UnterminatedBlockComment);
+        }
+        if map_len == 0 {
+            return Err(ParseLevelError::NoMap);
+        }
+
+        Ok(Self {
+            map: Map::from_str(&xsb[map_offset..map_offset + map_len])?,
+            metadata,
+            actions: Actions::default(),
+            undone_actions: Actions::default(),
+        })
     }
 }
 

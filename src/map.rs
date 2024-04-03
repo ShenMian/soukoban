@@ -5,6 +5,7 @@ use std::{
     fmt,
     hash::{DefaultHasher, Hash, Hasher},
     ops::{Index, IndexMut},
+    str::FromStr,
 };
 
 use nalgebra::Vector2;
@@ -31,96 +32,6 @@ pub struct Map {
 }
 
 impl Map {
-    /// Creates a new `Map` from XSB format string.
-    ///
-    /// `Map` assumes that the map has a complete exterior wall and a solution.
-    /// Some invalid maps will return [`Err`] when created.
-    /// Returning [`Ok`] does not mean the map is fully valid, as it is
-    /// difficult or even impossible to verify that the map is fully valid.
-    pub fn from_str(str: &str) -> Result<Self, ParseMapError> {
-        debug_assert!(!str.trim().is_empty(), "string is empty");
-
-        // Calculate map dimensions and indentation
-        let mut indent = i32::MAX;
-        let mut dimensions = Vector2::<i32>::zeros();
-        let mut buffer = String::with_capacity(str.len());
-        for line in str.split(['\n', '|']) {
-            let mut line = line.trim_end().to_string();
-            if line.is_empty() {
-                continue;
-            }
-            // If the `line` contains digits, perform RLE decoding
-            if line.chars().any(char::is_numeric) {
-                line = rle_decode(&line).unwrap();
-            }
-            dimensions.x = dimensions.x.max(line.len() as i32);
-            dimensions.y += 1;
-            indent = indent.min(line.chars().take_while(char::is_ascii_whitespace).count() as i32);
-            buffer += &(line + "\n");
-        }
-        dimensions.x -= indent;
-
-        let mut instance = Map::with_dimensions(dimensions);
-
-        // Parse map data
-        let mut player_position = None;
-        for (y, line) in buffer.lines().enumerate() {
-            // Trim map indentation
-            let line = &line[indent as usize..];
-            for (x, char) in line.chars().enumerate() {
-                let position = Vector2::new(x as i32, y as i32);
-                instance[position] = match char {
-                    ' ' | '-' | '_' => Tiles::empty(),
-                    '#' => Tiles::Wall,
-                    '$' => {
-                        instance.box_positions.insert(position);
-                        Tiles::Box
-                    }
-                    '.' => {
-                        instance.goal_positions.insert(position);
-                        Tiles::Goal
-                    }
-                    '@' => {
-                        if player_position.is_some() {
-                            return Err(ParseMapError::MoreThanOnePlayer);
-                        }
-                        player_position = Some(position);
-                        Tiles::Player
-                    }
-                    '*' => {
-                        instance.box_positions.insert(position);
-                        instance.goal_positions.insert(position);
-                        Tiles::Box | Tiles::Goal
-                    }
-                    '+' => {
-                        if player_position.is_some() {
-                            return Err(ParseMapError::MoreThanOnePlayer);
-                        }
-                        player_position = Some(position);
-                        instance.goal_positions.insert(position);
-                        Tiles::Player | Tiles::Goal
-                    }
-                    _ => return Err(ParseMapError::InvalidCharacter(char)),
-                };
-            }
-        }
-        if instance.box_positions.len() != instance.goal_positions.len() {
-            return Err(ParseMapError::BoxGoalMismatch);
-        }
-        if instance.box_positions.is_empty() {
-            return Err(ParseMapError::NoBoxOrGoal);
-        }
-        if let Some(player_position) = player_position {
-            instance.player_position = player_position;
-        } else {
-            return Err(ParseMapError::NoPlayer);
-        }
-
-        instance.add_floors(instance.player_position);
-
-        Ok(instance)
-    }
-
     /// Creates a new `Map` from actions.
     ///
     /// Try to restore the map with a complete solution. This method can only
@@ -600,6 +511,100 @@ impl Map {
                 deque.push_back(neighbor);
             }
         }
+    }
+}
+
+impl FromStr for Map {
+    type Err = ParseMapError;
+
+    /// Creates a new `Map` from XSB format string.
+    ///
+    /// `Map` assumes that the map has a complete exterior wall and a solution.
+    /// Some invalid maps will return [`Err`] when created.
+    /// Returning [`Ok`] does not mean the map is fully valid, as it is
+    /// difficult or even impossible to verify that the map is fully valid.
+    fn from_str(xsb: &str) -> Result<Self, Self::Err> {
+        debug_assert!(!xsb.trim().is_empty(), "string is empty");
+
+        // Calculate map dimensions and indentation
+        let mut indent = i32::MAX;
+        let mut dimensions = Vector2::<i32>::zeros();
+        let mut buffer = String::with_capacity(xsb.len());
+        for line in xsb.split(['\n', '|']) {
+            let mut line = line.trim_end().to_string();
+            if line.is_empty() {
+                continue;
+            }
+            // If the `line` contains digits, perform RLE decoding
+            if line.chars().any(char::is_numeric) {
+                line = rle_decode(&line).unwrap();
+            }
+            dimensions.x = dimensions.x.max(line.len() as i32);
+            dimensions.y += 1;
+            indent = indent.min(line.chars().take_while(char::is_ascii_whitespace).count() as i32);
+            buffer += &(line + "\n");
+        }
+        dimensions.x -= indent;
+
+        let mut instance = Map::with_dimensions(dimensions);
+
+        // Parse map data
+        let mut player_position = None;
+        for (y, line) in buffer.lines().enumerate() {
+            // Trim map indentation
+            let line = &line[indent as usize..];
+            for (x, char) in line.chars().enumerate() {
+                let position = Vector2::new(x as i32, y as i32);
+                instance[position] = match char {
+                    ' ' | '-' | '_' => Tiles::empty(),
+                    '#' => Tiles::Wall,
+                    '$' => {
+                        instance.box_positions.insert(position);
+                        Tiles::Box
+                    }
+                    '.' => {
+                        instance.goal_positions.insert(position);
+                        Tiles::Goal
+                    }
+                    '@' => {
+                        if player_position.is_some() {
+                            return Err(ParseMapError::MoreThanOnePlayer);
+                        }
+                        player_position = Some(position);
+                        Tiles::Player
+                    }
+                    '*' => {
+                        instance.box_positions.insert(position);
+                        instance.goal_positions.insert(position);
+                        Tiles::Box | Tiles::Goal
+                    }
+                    '+' => {
+                        if player_position.is_some() {
+                            return Err(ParseMapError::MoreThanOnePlayer);
+                        }
+                        player_position = Some(position);
+                        instance.goal_positions.insert(position);
+                        Tiles::Player | Tiles::Goal
+                    }
+                    _ => return Err(ParseMapError::InvalidCharacter(char)),
+                };
+            }
+        }
+        if instance.box_positions.len() != instance.goal_positions.len() {
+            return Err(ParseMapError::BoxGoalMismatch);
+        }
+        if instance.box_positions.is_empty() {
+            return Err(ParseMapError::NoBoxOrGoal);
+        }
+        if let Some(player_position) = player_position {
+            instance.player_position = player_position;
+        } else {
+            return Err(ParseMapError::NoPlayer);
+        }
+
+        instance.add_floors(instance.player_position);
+
+        Ok(instance)
     }
 }
 
