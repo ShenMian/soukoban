@@ -4,8 +4,8 @@ use indoc::indoc;
 use nalgebra::Vector2;
 use soukoban::{tiles::Tiles, Actions, Map, ParseMapError};
 
-mod utilies;
-use utilies::*;
+mod utilities;
+use utilities::*;
 
 #[test]
 fn parse_map_error() {

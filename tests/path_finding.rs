@@ -3,8 +3,8 @@ use std::collections::HashSet;
 use nalgebra::Vector2;
 use soukoban::path_finding::*;
 
-mod utilies;
-use utilies::*;
+mod utilities;
+use utilities::*;
 
 #[test]
 fn test_find_path() {
