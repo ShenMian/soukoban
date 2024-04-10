@@ -103,7 +103,7 @@ pub fn player_move_path(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
 /// Converts a position path into a direction path.
 fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direction> {
     path.windows(2)
-        .map(|pos| Direction::try_from(pos[1] - pos[0]).unwrap())
+        .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
         .collect()
 }
 

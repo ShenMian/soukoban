@@ -242,8 +242,16 @@ impl Map {
         self.dimensions = clamped_map.dimensions;
 
         self.player_position -= offset;
-        self.box_positions = self.box_positions.iter().map(|pos| pos - offset).collect();
-        self.goal_positions = self.goal_positions.iter().map(|pos| pos - offset).collect();
+        self.box_positions = self
+            .box_positions
+            .iter()
+            .map(|position| position - offset)
+            .collect();
+        self.goal_positions = self
+            .goal_positions
+            .iter()
+            .map(|position| position - offset)
+            .collect();
     }
 
     /// Returns tiles at the specified position or `None` if out of bounds.
@@ -394,7 +402,7 @@ impl Map {
         for position in self
             .box_positions
             .iter()
-            .filter(|pos| !self[**pos].intersects(Tiles::Floor))
+            .filter(|position| !self[**position].intersects(Tiles::Floor))
             .cloned()
             .collect::<HashSet<_>>()
         {
@@ -430,7 +438,8 @@ impl Map {
 
     /// Normalizes the position of the player on the map.
     fn normalize_player_position(&mut self) {
-        let player_reachable_area = reachable_area(self.player_position, |pos| self.can_move(pos));
+        let player_reachable_area =
+            reachable_area(self.player_position, |position| self.can_move(position));
         self.set_player_position(normalized_area(&player_reachable_area).unwrap());
     }
 
@@ -454,12 +463,12 @@ impl Map {
         self.box_positions = self
             .box_positions
             .iter()
-            .map(|pos| operation(*pos))
+            .map(|position| operation(*position))
             .collect();
         self.goal_positions = self
             .goal_positions
             .iter()
-            .map(|pos| operation(*pos))
+            .map(|position| operation(*position))
             .collect();
     }
 
