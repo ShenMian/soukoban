@@ -643,31 +643,7 @@ impl fmt::Display for Map {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for y in 0..self.dimensions.y {
             for x in 0..self.dimensions.x {
-                let mut tiles = self[Vector2::new(x, y)];
-                if tiles == Tiles::Floor {
-                    write!(f, "_")?;
-                    continue;
-                }
-                tiles.remove(Tiles::Floor);
-                if tiles == Tiles::Box | Tiles::Goal {
-                    write!(f, "*")?;
-                } else if tiles == Tiles::Player | Tiles::Goal {
-                    write!(f, "+")?;
-                } else if tiles == Tiles::Box {
-                    write!(f, "$")?;
-                } else if tiles == Tiles::Goal {
-                    write!(f, ".")?;
-                } else if tiles == Tiles::Player {
-                    write!(f, "@")?;
-                } else if tiles == Tiles::Floor {
-                    write!(f, "_")?;
-                } else if tiles == Tiles::Wall {
-                    write!(f, "#")?;
-                } else if tiles.is_empty() {
-                    write!(f, "-")?;
-                } else {
-                    write!(f, "?")?;
-                }
+                write!(f, "{}", self[Vector2::new(x, y)])?;
             }
             writeln!(f)?;
         }
