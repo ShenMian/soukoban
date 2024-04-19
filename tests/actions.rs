@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use soukoban::{Actions, ParseActionError};
+use soukoban::{Actions, ParseActionError, SecondaryValues};
 
 #[test]
 fn parse_actions_error() {
@@ -31,7 +31,12 @@ fn scoring_metrics() {
     let empty_actions = Actions::from_str("").unwrap();
     assert_eq!(empty_actions.moves(), 0);
     assert_eq!(empty_actions.pushes(), 0);
-    let (box_lines, box_changes, pushing_sessions, player_lines) = empty_actions.secondary_values();
+    let SecondaryValues {
+        box_lines,
+        box_changes,
+        pushing_sessions,
+        player_lines,
+    } = empty_actions.secondary_values();
     assert_eq!(box_lines, 0);
     assert_eq!(box_changes, 0);
     assert_eq!(pushing_sessions, 0);
@@ -49,7 +54,12 @@ fn scoring_metrics() {
     let actions = Actions::from_str("ruuLLLLrrrrddlUruLLLulDrddllluuRRDrdLuuurDD").unwrap();
     assert_eq!(actions.moves(), 43);
     assert_eq!(actions.pushes(), 15);
-    let (box_lines, box_changes, pushing_sessions, player_lines) = actions.secondary_values();
+    let SecondaryValues {
+        box_lines,
+        box_changes,
+        pushing_sessions,
+        player_lines,
+    } = actions.secondary_values();
     assert_eq!(box_lines, 8);
     assert_eq!(box_changes, 5);
     assert_eq!(pushing_sessions, 7);
@@ -65,7 +75,12 @@ fn scoring_metrics() {
     // box lines     : 6
     // pushing sessions: 6
     let actions = Actions::from_str("ullDullddrRuLurrrdLLrrddlUruL").unwrap();
-    let (box_lines, box_changes, pushing_sessions, player_lines) = actions.secondary_values();
+    let SecondaryValues {
+        box_lines,
+        box_changes,
+        pushing_sessions,
+        player_lines,
+    } = actions.secondary_values();
     assert_eq!(box_lines, 6);
     assert_eq!(box_changes, 4);
     assert_eq!(pushing_sessions, 6);

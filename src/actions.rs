@@ -10,6 +10,18 @@ use nalgebra::Vector2;
 
 use crate::{action::Action, error::ParseActionError, run_length::rle_decode};
 
+/// Secondary statistics for a sequence of actions.
+pub struct SecondaryValues {
+    /// Straight line box pushes.
+    pub box_lines: i32,
+    /// Changing focus from one box to another.
+    pub box_changes: i32,
+    /// Changing from moving the line to pushing the boxes.
+    pub pushing_sessions: i32,
+    /// Straight line player moves.
+    pub player_lines: i32,
+}
+
 /// A sequence of actions.
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Default)]
 pub struct Actions(pub Vec<Action>);
@@ -26,7 +38,7 @@ impl Actions {
     }
 
     /// Returns the secondary values.
-    pub fn secondary_values(&self) -> (i32, i32, i32, i32) {
+    pub fn secondary_values(&self) -> SecondaryValues {
         let mut player_lines = 0;
         let mut box_lines = 0;
         let mut box_changes = 0;
@@ -62,7 +74,12 @@ impl Actions {
         if prev_pushed_box_position.is_some() {
             box_changes += 1;
         }
-        (box_lines, box_changes, pushing_sessions, player_lines)
+        SecondaryValues {
+            box_lines,
+            box_changes,
+            pushing_sessions,
+            player_lines,
+        }
     }
 }
 
