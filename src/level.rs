@@ -125,21 +125,21 @@ impl Level {
         reachable_area(self.player_position(), |position| self.can_move(position))
     }
 
-    /// Loads levels from XSB format string.
-    pub fn load(str: &str) -> impl Iterator<Item = Result<Self, ParseLevelError>> + '_ {
-        Self::to_groups(str).map(Self::from_str)
+    /// Lazily loads levels from an XSB format string.
+    pub fn load_from_string(str: &str) -> impl Iterator<Item = Result<Self, ParseLevelError>> + '_ {
+        Self::split_levels(str).map(Self::from_str)
     }
 
-    /// Loads the nth level from XSB format string.
-    pub fn load_nth(str: &str, id: usize) -> Result<Self, ParseLevelError> {
-        let group = Self::to_groups(str).nth(id - 1).unwrap();
+    /// Loads the nth level from an XSB format string.
+    pub fn load_nth_from_string(str: &str, id: usize) -> Result<Self, ParseLevelError> {
+        let group = Self::split_levels(str).nth(id - 1).unwrap();
         Self::from_str(group)
     }
 
-    /// Splits the string into multiple groups (string slice) by empty line
+    /// Lazily splits the string into multiple groups (string slice) by empty line
     /// (excluding empty line within block comment) and filter out groups
     /// without map data.
-    fn to_groups(str: &str) -> impl Iterator<Item = &str> + '_ {
+    fn split_levels(str: &str) -> impl Iterator<Item = &str> + '_ {
         str.split(['\n', '|']).filter_map({
             let mut offset = 0;
             let mut len = 0;

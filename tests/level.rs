@@ -123,7 +123,7 @@ fn create_multiple_levels_with_xsb() {
             .parse()
             .unwrap();
         assert_eq!(
-            Level::load(&fs::read_to_string(path).unwrap())
+            Level::load_from_string(&fs::read_to_string(path).unwrap())
                 .filter_map(Result::ok)
                 .count(),
             count
