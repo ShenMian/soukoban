@@ -130,7 +130,7 @@ fn solver_benchmark(c: &mut Criterion) {
     c.bench_function("solve level 'PATH'", |b| {
         b.iter(|| {
             let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
-            black_box(solver.a_star_search(&map).unwrap());
+            solver.a_star_search(&map).unwrap();
         })
     });
     let map = load_level_from_file("assets/BoxWorld_100.xsb", 3)
@@ -139,7 +139,7 @@ fn solver_benchmark(c: &mut Criterion) {
     c.bench_function("solve level 'BoxWorld #3'", |b| {
         b.iter(|| {
             let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
-            black_box(solver.a_star_search(&map).unwrap());
+            solver.a_star_search(&map).unwrap();
         })
     });
 }
@@ -164,7 +164,7 @@ fn path_finding_benchmark(c: &mut Criterion) {
 fn map_benchmark(c: &mut Criterion) {
     let map = Map::from_str(WORLDCUP2014).unwrap();
     c.bench_function("normalize map", |b| {
-        b.iter(|| black_box(black_box(map.clone()).normalize()))
+        b.iter(|| black_box(map.clone()).normalize())
     });
 }
 
