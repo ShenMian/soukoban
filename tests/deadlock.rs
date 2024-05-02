@@ -1,7 +1,7 @@
 use soukoban::deadlock::*;
 
-mod utilities;
-use utilities::*;
+mod utils;
+use utils::*;
 
 #[test]
 fn test_calculate_dead_positions() {

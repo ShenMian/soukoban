@@ -3,8 +3,8 @@ use std::{fs, str::FromStr};
 use indoc::indoc;
 use soukoban::{Level, ParseLevelError, ParseMapError};
 
-mod utilities;
-use utilities::*;
+mod utils;
+use utils::*;
 
 #[test]
 fn parse_level_error() {

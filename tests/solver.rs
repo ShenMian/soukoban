@@ -1,8 +1,8 @@
 use nalgebra::Vector2;
 use soukoban::solver::*;
 
-mod utilities;
-use utilities::*;
+mod utils;
+use utils::*;
 
 #[test]
 fn test_solver() {
