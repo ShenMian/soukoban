@@ -22,7 +22,7 @@ harness = false
 bench = false
 
 [dependencies]
-bitflags = "2.4"
+bitflags = "2.5"
 itertools = "0.12"
 nalgebra = "0.32"
 thiserror = "1.0"
