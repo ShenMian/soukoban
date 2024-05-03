@@ -23,7 +23,7 @@ bitflags! {
 
 impl fmt::Display for Tiles {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut tiles = self.clone();
+        let mut tiles = *self;
         if tiles == Tiles::Floor {
             write!(f, "_")?;
             return Ok(());

@@ -182,6 +182,7 @@ pub fn construct_box_path(
 ) -> Vec<Vector2<i32>> {
     let mut path = Vec::new();
     let mut current = to;
+    // FIXME: 遇到回头路会提前退出
     while current != from {
         path.push(current);
         let mut directions = Vec::new();
@@ -219,7 +220,7 @@ pub fn construct_box_path(
 pub fn construct_player_path(
     map: &Map,
     mut player_position: Vector2<i32>,
-    box_path: &Vec<Vector2<i32>>,
+    box_path: &[Vector2<i32>],
 ) -> Vec<Vector2<i32>> {
     let mut path = Vec::new();
     let initial_box_position = *box_path.first().unwrap();

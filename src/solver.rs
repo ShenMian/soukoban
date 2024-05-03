@@ -28,7 +28,6 @@ pub enum Strategy {
 struct Node {
     state: State,
     cost: i32,
-    heuristic: i32,
     priority: i32,
 }
 
@@ -40,7 +39,6 @@ impl Node {
             Strategy::OptimalPush => cost + heuristic,
         };
         Self {
-            heuristic,
             state,
             cost,
             priority,
