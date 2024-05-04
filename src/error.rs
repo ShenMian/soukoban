@@ -15,8 +15,8 @@ pub enum ParseLevelError {
     #[error("no map data")]
     NoMap,
     /// There is an error when parsing the map.
-    #[error("failed to parse map: {0}")]
-    ParseMapError(ParseMapError),
+    #[error(transparent)]
+    ParseMapError(#[from] ParseMapError),
 }
 
 /// An error which can be returned when parsing a map.
@@ -42,12 +42,6 @@ pub enum ParseMapError {
     /// Actions are invalid and cannot be used to build and create levels.
     #[error("invalid actions")]
     InvalidActions,
-}
-
-impl From<ParseMapError> for ParseLevelError {
-    fn from(error: ParseMapError) -> Self {
-        ParseLevelError::ParseMapError(error)
-    }
 }
 
 /// An error which can be returned when parsing a action.
