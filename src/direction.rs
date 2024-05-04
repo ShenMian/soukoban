@@ -36,12 +36,12 @@ impl Direction {
     /// assert_eq!(-Direction::Right.rotate(), Direction::Up);
     /// ```
     pub fn rotate(self) -> Direction {
-        use Direction::*;
+        use Direction as E;
         match self {
-            Up => Right,
-            Right => Down,
-            Down => Left,
-            Left => Up,
+            E::Up => E::Right,
+            E::Right => E::Down,
+            E::Down => E::Left,
+            E::Left => E::Up,
         }
     }
 
@@ -55,11 +55,12 @@ impl Direction {
     /// assert_eq!(Direction::Up.flip(), Direction::Down);
     /// ```
     pub fn flip(self) -> Direction {
+        use Direction as E;
         match self {
-            Direction::Up => Direction::Down,
-            Direction::Down => Direction::Up,
-            Direction::Left => Direction::Right,
-            Direction::Right => Direction::Left,
+            E::Up => E::Down,
+            E::Down => E::Up,
+            E::Left => E::Right,
+            E::Right => E::Left,
         }
     }
 }
@@ -68,24 +69,24 @@ impl Neg for Direction {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        use Direction::*;
+        use Direction as E;
         match self {
-            Up => Down,
-            Down => Up,
-            Left => Right,
-            Right => Left,
+            E::Up => E::Down,
+            E::Down => E::Up,
+            E::Left => E::Right,
+            E::Right => E::Left,
         }
     }
 }
 
 impl From<Direction> for Vector2<i32> {
     fn from(direction: Direction) -> Self {
-        use Direction::*;
+        use Direction as E;
         match direction {
-            Up => -Vector2::y(),
-            Down => Vector2::y(),
-            Left => -Vector2::x(),
-            Right => Vector2::x(),
+            E::Up => -Vector2::y(),
+            E::Down => Vector2::y(),
+            E::Left => -Vector2::x(),
+            E::Right => Vector2::x(),
         }
     }
 }
