@@ -39,6 +39,9 @@ pub enum ParseMapError {
     /// Contains non-XSB format character.
     #[error("invalid character: `{0}`")]
     InvalidCharacter(char),
+    /// RLE decoding error occurred.
+    #[error(transparent)]
+    DecodeRleError(#[from] DecodeRleError),
     /// Actions are invalid and cannot be used to build and create levels.
     #[error("invalid actions")]
     InvalidActions,

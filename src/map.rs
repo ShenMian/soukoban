@@ -546,7 +546,7 @@ impl FromStr for Map {
             }
             // If the `line` contains digits, perform RLE decoding
             if line.chars().any(char::is_numeric) {
-                line = rle_decode(&line).unwrap();
+                line = rle_decode(&line)?;
             }
             dimensions.x = dimensions.x.max(line.len() as i32);
             dimensions.y += 1;
