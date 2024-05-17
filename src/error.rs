@@ -14,7 +14,7 @@ pub enum ParseLevelError {
     /// There is no map data.
     #[error("no map data")]
     NoMap,
-    /// There is an error when parsing the map.
+    /// An error occurred while parsing the map.
     #[error(transparent)]
     ParseMapError(#[from] ParseMapError),
 }
@@ -22,27 +22,25 @@ pub enum ParseLevelError {
 /// An error which can be returned when parsing a map.
 #[derive(Error, Clone, Eq, PartialEq, Debug)]
 pub enum ParseMapError {
-    /// There are no players. There should be only one player.
+    /// There is no player. There should be exactly one player.
     #[error("no player")]
     NoPlayer,
-    /// There are multiple players. There should only be one player.
+    /// There are multiple players. There should be exactly one player.
     #[error("more than one player")]
     MoreThanOnePlayer,
-    /// The number of boxes and targets are inconsistent. They should be
-    /// consistent.
+    /// The number of boxes and goals do not match. They should be equal.
     #[error("mismatch between number of boxes and goals")]
     BoxGoalMismatch,
-    /// There are no boxes or goals. There should be at least one box and one
-    /// goal.
+    /// There are no boxes or goals. There should be at least one box and one goal.
     #[error("no box or goal")]
     NoBoxOrGoal,
     /// Contains non-XSB format character.
     #[error("invalid character: `{0}`")]
     InvalidCharacter(char),
-    /// RLE decoding error occurred.
+    /// An error occurred during RLE decoding.
     #[error(transparent)]
     DecodeRleError(#[from] DecodeRleError),
-    /// Actions are invalid and cannot be used to build and create levels.
+    /// Actions are invalid and cannot be used to create level.
     #[error("invalid actions")]
     InvalidActions,
 }
@@ -58,9 +56,9 @@ pub enum ParseActionError {
 /// An error which can be returned when encoding RLE.
 #[derive(Error, Clone, Eq, PartialEq, Debug)]
 pub enum EncodeRleError {
-    /// Unencodable characters encountered, such as numbers.
-    #[error("invalid character: `{0}`")]
-    InvalidCharacter(char),
+    /// Encountered an unencodable numeric character.
+    #[error("numeric character encountered: `{0}`")]
+    NumericCharacter(char),
 }
 
 /// An error which can be returned when decoding RLE.
@@ -88,10 +86,10 @@ pub enum ActionError {
     /// Push in the specified direction is blocked.
     #[error("push in the specified direction is blocked")]
     PushBlocked,
-    /// No actions.
+    /// No actions available.
     #[error("no actions")]
     NoActions,
-    /// No undone actions.
+    /// No undone actions available.
     #[error("no undone actions")]
     NoUndoneActions,
 }

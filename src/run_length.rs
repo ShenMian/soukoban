@@ -23,7 +23,7 @@ pub fn rle_encode(str: &str) -> Result<String, EncodeRleError> {
     let mut count = 0;
     while let Some(char) = chars.next() {
         if char.is_numeric() {
-            return Err(EncodeRleError::InvalidCharacter(char));
+            return Err(EncodeRleError::NumericCharacter(char));
         }
         count += 1;
         if chars.peek() != Some(&char) {

@@ -14,7 +14,7 @@ fn test_rle_encode_single_char() {
 fn test_rle_encode_invalid_char() {
     assert_eq!(
         rle_encode("aa2bb").unwrap_err(),
-        EncodeRleError::InvalidCharacter('2')
+        EncodeRleError::NumericCharacter('2')
     );
 }
 
