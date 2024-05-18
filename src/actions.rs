@@ -27,6 +27,11 @@ pub struct SecondaryValues {
 pub struct Actions(pub Vec<Action>);
 
 impl Actions {
+    /// Creates a new empty sequence of actions.
+    pub fn new() -> Self {
+        Default::default()
+    }
+
     /// Returns the total number of moves.
     pub fn moves(&self) -> usize {
         self.len()
