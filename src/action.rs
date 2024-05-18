@@ -1,14 +1,30 @@
+//! An action.
+
 use std::fmt;
 
 use crate::{direction::Direction, error::ParseActionError};
 
+/// Represents an action.
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub enum Action {
+    /// Move action in a specified direction.
     Move(Direction),
+    /// Push action in a specified direction.
     Push(Direction),
 }
 
 impl Action {
+    /// Returns the direction associated with the action.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::direction::Direction;
+    /// use soukoban::Action;
+    ///
+    /// let action = Action::Move(Direction::Up);
+    /// assert_eq!(action.direction(), Direction::Up);
+    /// ```
     pub fn direction(&self) -> Direction {
         match *self {
             Action::Move(direction) => direction,
@@ -16,10 +32,32 @@ impl Action {
         }
     }
 
+    /// Checks if the action is a move action.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::direction::Direction;
+    /// use soukoban::Action;
+    ///
+    /// let action = Action::Move(Direction::Up);
+    /// assert!(action.is_move());
+    /// ```
     pub fn is_move(&self) -> bool {
         matches!(&self, Action::Move(_))
     }
 
+    /// Checks if the action is a push action.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::direction::Direction;
+    /// use soukoban::Action;
+    ///
+    /// let action = Action::Push(Direction::Up);
+    /// assert!(action.is_push());
+    /// ```
     pub fn is_push(&self) -> bool {
         matches!(&self, Action::Push(_))
     }
