@@ -39,7 +39,7 @@ impl Actions {
 
     /// Returns the total number of pushes.
     pub fn pushes(&self) -> usize {
-        self.iter().filter(|x| x.is_push()).count()
+        self.iter().filter(|action| action.is_push()).count()
     }
 
     /// Returns the secondary values.

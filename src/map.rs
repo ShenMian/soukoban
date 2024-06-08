@@ -160,6 +160,11 @@ impl Map {
         self.add_box_position(to);
     }
 
+    /// Returns `true` if the map is solved.
+    pub fn is_solved(&self) -> bool {
+        self.box_positions == self.goal_positions
+    }
+
     /// Normalizes the map.
     ///
     /// Remove elements from the map that are not relevant to the solution.
