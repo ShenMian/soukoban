@@ -6,6 +6,19 @@
 
 A library provides the implementation of some algorithms and data structures related to [Sokoban].
 
+## Features
+
+- **Level**
+  - **Lazy Loading**: Loads the first n levels, or the nth level, in a long XSB string.
+  - **Map Reconstruction**: Reverse build the level map from the solution.
+  - **Normalization**: Remove elements from the map that are not relevant to the solution.
+  - **RLE Support**: Enables loading of levels encoded in Run-Length Encoding (RLE) format.
+- **Solution**
+  - **Reversal Move Handling**: Automatically interprets reversal moves as undo actions.
+  - **Metrics Calculation**: Computes metrics such as `box_lines`, `box_changes`, `pushing_sessions`, and `player_lines`.
+- **Pathfinding**: Finds the optimal player path to push a box to a position.
+- **Deadlock Detection**: Detects dead positions and freeze deadlocks.
+
 ## License
 
 Licensed under either of
