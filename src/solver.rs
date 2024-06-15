@@ -161,13 +161,20 @@ impl Solver {
 
     /// Returns a reference to the set of lower bounds.
     pub fn lower_bounds(&self) -> &HashMap<Vector2<i32>, i32> {
-        self.lower_bounds
-            .get_or_init(|| self.calculate_minimum_push())
+        self.lower_bounds.get_or_init(|| {
+            let mut lower_bounds = self.calculate_minimum_push();
+            lower_bounds.shrink_to_fit();
+            lower_bounds
+        })
     }
 
     /// Returns a reference to the set of tunnels.
     pub fn tunnels(&self) -> &HashSet<(Vector2<i32>, Direction)> {
-        self.tunnels.get_or_init(|| self.calculate_tunnels())
+        self.tunnels.get_or_init(|| {
+            let mut tunnels = self.calculate_tunnels();
+            tunnels.shrink_to_fit();
+            tunnels
+        })
     }
 
     /// Calculates and returns the minimum push to goals.
@@ -194,7 +201,6 @@ impl Solver {
                 break;
             }
         }
-        lower_bounds.shrink_to_fit();
         lower_bounds
     }
 
@@ -301,7 +307,6 @@ impl Solver {
                 }
             }
         }
-        tunnels.shrink_to_fit();
         tunnels
     }
 }
