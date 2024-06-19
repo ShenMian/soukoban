@@ -45,6 +45,11 @@ impl Level {
         &self.map
     }
 
+    /// Returns the map of the level.
+    pub fn into_map(self) -> Map {
+        self.map
+    }
+
     /// Returns a reference to the metadata of the level.
     pub fn metadata(&self) -> &HashMap<String, String> {
         &self.metadata

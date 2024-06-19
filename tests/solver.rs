@@ -6,23 +6,17 @@ use utils::*;
 
 #[test]
 fn test_solver() {
-    let map = load_level_from_file("assets/BoxWorld_100.xsb", 1)
-        .map()
-        .clone();
+    let map = load_level_from_file("assets/BoxWorld_100.xsb", 1).into_map();
     let solver = Solver::new(map, Strategy::Fast);
     assert!(solver.a_star_search().is_ok());
     assert!(solver.ida_star_search().is_ok());
 
-    let map = load_level_from_file("assets/BoxWorld_100.xsb", 2)
-        .map()
-        .clone();
+    let map = load_level_from_file("assets/BoxWorld_100.xsb", 2).into_map();
     let solver = Solver::new(map, Strategy::Fast);
     assert!(solver.a_star_search().is_ok());
     assert!(solver.ida_star_search().is_ok());
 
-    let map = load_level_from_file("assets/BoxWorld_100.xsb", 3)
-        .map()
-        .clone();
+    let map = load_level_from_file("assets/BoxWorld_100.xsb", 3).into_map();
     let solver = Solver::new(map, Strategy::Fast);
     assert!(solver.a_star_search().is_ok());
     assert!(solver.ida_star_search().is_ok());
