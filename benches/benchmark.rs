@@ -130,7 +130,7 @@ fn solver_benchmark(c: &mut Criterion) {
     c.bench_function("solve level 'PATH'", |b| {
         b.iter(|| {
             let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
-            solver.a_star_search(&map).unwrap();
+            solver.a_star_search().unwrap();
         })
     });
     let map = load_level_from_file("assets/BoxWorld_100.xsb", 3)
@@ -139,7 +139,7 @@ fn solver_benchmark(c: &mut Criterion) {
     c.bench_function("solve level 'BoxWorld #3'", |b| {
         b.iter(|| {
             let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
-            solver.a_star_search(&map).unwrap();
+            solver.a_star_search().unwrap();
         })
     });
 }
