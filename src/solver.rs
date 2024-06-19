@@ -85,12 +85,12 @@ impl Solver {
     }
 
     /// Searches for solution using the A* algorithm.
-    pub fn a_star_search(&self, map: &Map) -> Result<(), SearchError> {
+    pub fn a_star_search(&self) -> Result<(), SearchError> {
         let mut heap = BinaryHeap::new();
         let mut came_from = HashMap::new();
         let mut visited = HashSet::new();
 
-        let state: State = map.clone().into();
+        let state: State = self.map.clone().into();
         heap.push(Node::new(state, 0, self));
 
         while let Some(Node { state, cost, .. }) = heap.pop() {
@@ -98,7 +98,7 @@ impl Solver {
                 return Ok(());
             }
             for successor in state.successors(self) {
-                if !visited.insert(successor.normalized_hash(map)) {
+                if !visited.insert(successor.normalized_hash(&self.map)) {
                     continue;
                 }
                 came_from.insert(successor.clone(), state.clone());
@@ -109,8 +109,8 @@ impl Solver {
     }
 
     /// Searches for solution using the IDA* algorithm.
-    pub fn ida_star_search(&self, map: &Map) -> Result<(), SearchError> {
-        let state: State = map.clone().into();
+    pub fn ida_star_search(&self) -> Result<(), SearchError> {
+        let state: State = self.map.clone().into();
         let mut threshold = state.heuristic(self);
         loop {
             match self.ida_star_search_inner(&state, 0, threshold, &mut HashSet::new()) {
