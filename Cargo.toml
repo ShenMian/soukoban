@@ -23,7 +23,7 @@ bench = false
 
 [dependencies]
 bitflags = "2.5"
-itertools = "0.12"
+itertools = "0.13"
 nalgebra = "0.33"
 thiserror = "1.0"
 
