@@ -24,7 +24,7 @@ bench = false
 [dependencies]
 bitflags = "2.5"
 itertools = "0.12"
-nalgebra = "0.32"
+nalgebra = "0.33"
 thiserror = "1.0"
 
 [dev-dependencies]
