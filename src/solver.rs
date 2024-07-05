@@ -269,12 +269,13 @@ impl Solver {
                 .into_iter()
                 .tuple_windows()
                 {
+                    let player_position = box_position + &down.into();
+
                     //  .
                     // #$#
                     // #@#
-                    if self.map[box_position + &down.into() + &left.into()].intersects(Tiles::Wall)
-                        && self.map[box_position + &down.into() + &right.into()]
-                            .intersects(Tiles::Wall)
+                    if self.map[player_position + &left.into()].intersects(Tiles::Wall)
+                        && self.map[player_position + &right.into()].intersects(Tiles::Wall)
                         && self.map[box_position + &left.into()].intersects(Tiles::Wall)
                         && self.map[box_position + &right.into()].intersects(Tiles::Wall)
                         && self.map[box_position].intersects(Tiles::Floor)
@@ -283,15 +284,14 @@ impl Solver {
                             .contains_key(&(box_position + &up.into()))
                         && !self.map[box_position].intersects(Tiles::Goal)
                     {
-                        tunnels.insert((box_position, up));
+                        tunnels.insert((player_position, up));
                     }
 
-                    //  .   .
-                    // #$_ _$#
-                    // #@# #@#
-                    if self.map[box_position + &down.into() + &left.into()].intersects(Tiles::Wall)
-                        && self.map[box_position + &down.into() + &right.into()]
-                            .intersects(Tiles::Wall)
+                    //  .      .
+                    // #$_ or _$#
+                    // #@#    #@#
+                    if self.map[player_position + &left.into()].intersects(Tiles::Wall)
+                        && self.map[player_position + &right.into()].intersects(Tiles::Wall)
                         && (self.map[box_position + &right.into()].intersects(Tiles::Wall)
                             && self.map[box_position + &left.into()].intersects(Tiles::Floor)
                             || self.map[box_position + &right.into()].intersects(Tiles::Floor)
@@ -302,7 +302,7 @@ impl Solver {
                             .contains_key(&(box_position + &up.into()))
                         && !self.map[box_position].intersects(Tiles::Goal)
                     {
-                        tunnels.insert((box_position, up));
+                        tunnels.insert((player_position, up));
                     }
                 }
             }
