@@ -22,25 +22,31 @@ pub enum Strategy {
 
     /// Find the push optimal solution
     OptimalPush,
+
+    /// Find the move optimal solution
+    OptimalMove,
 }
 
 #[derive(Clone, Eq, Debug)]
 struct Node {
     state: State,
-    cost: i32,
+    pushes: i32,
+    moves: i32,
     priority: i32,
 }
 
 impl Node {
-    pub fn new(state: State, cost: i32, solver: &Solver) -> Self {
+    pub fn new(state: State, pushes: i32, moves: i32, solver: &Solver) -> Self {
         let heuristic = state.heuristic(solver);
         let priority = match solver.strategy() {
             Strategy::Fast => heuristic,
-            Strategy::OptimalPush => cost + heuristic,
+            Strategy::OptimalPush => pushes + heuristic,
+            Strategy::OptimalMove => moves + heuristic,
         };
         Self {
             state,
-            cost,
+            pushes,
+            moves,
             priority,
         }
     }
@@ -91,9 +97,15 @@ impl Solver {
         let mut visited = HashSet::new();
 
         let state: State = self.map.clone().into();
-        heap.push(Node::new(state, 0, self));
+        heap.push(Node::new(state, 0, 0, self));
 
-        while let Some(Node { state, cost, .. }) = heap.pop() {
+        while let Some(Node {
+            state,
+            pushes,
+            moves,
+            ..
+        }) = heap.pop()
+        {
             if state.is_solved(self) {
                 return Ok(());
             }
@@ -102,7 +114,7 @@ impl Solver {
                     continue;
                 }
                 came_from.insert(successor.clone(), state.clone());
-                heap.push(Node::new(successor, cost + 1, self));
+                heap.push(Node::new(successor, pushes + 1, moves + 1, self)); // FIXME: calculate new moves
             }
         }
         Err(SearchError::NoSolution)
