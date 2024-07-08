@@ -36,12 +36,11 @@ impl Direction {
     /// assert_eq!(-Direction::Right.rotate(), Direction::Up);
     /// ```
     pub fn rotate(self) -> Direction {
-        use Direction as E;
         match self {
-            E::Up => E::Right,
-            E::Right => E::Down,
-            E::Down => E::Left,
-            E::Left => E::Up,
+            Self::Up => Self::Right,
+            Self::Right => Self::Down,
+            Self::Down => Self::Left,
+            Self::Left => Self::Up,
         }
     }
 
@@ -55,12 +54,11 @@ impl Direction {
     /// assert_eq!(Direction::Up.flip(), Direction::Down);
     /// ```
     pub fn flip(self) -> Direction {
-        use Direction as E;
         match self {
-            E::Up => E::Down,
-            E::Down => E::Up,
-            E::Left => E::Right,
-            E::Right => E::Left,
+            Self::Up => Self::Down,
+            Self::Down => Self::Up,
+            Self::Left => Self::Right,
+            Self::Right => Self::Left,
         }
     }
 }
@@ -69,13 +67,7 @@ impl Neg for Direction {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        use Direction as E;
-        match self {
-            E::Up => E::Down,
-            E::Down => E::Up,
-            E::Left => E::Right,
-            E::Right => E::Left,
-        }
+        self.flip()
     }
 }
 
@@ -96,16 +88,12 @@ impl TryFrom<Vector2<i32>> for Direction {
 
     fn try_from(vector: Vector2<i32>) -> Result<Self, Self::Error> {
         use Direction::*;
-        if vector == -Vector2::<i32>::y() {
-            Ok(Up)
-        } else if vector == Vector2::<i32>::y() {
-            Ok(Down)
-        } else if vector == -Vector2::<i32>::x() {
-            Ok(Left)
-        } else if vector == Vector2::<i32>::x() {
-            Ok(Right)
-        } else {
-            Err(())
+        match vector {
+            v if v == -Vector2::<i32>::y() => Ok(Up),
+            v if v == Vector2::<i32>::y() => Ok(Down),
+            v if v == -Vector2::<i32>::x() => Ok(Left),
+            v if v == Vector2::<i32>::x() => Ok(Right),
+            _ => Err(()),
         }
     }
 }
