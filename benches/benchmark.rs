@@ -127,19 +127,32 @@ fn tunnel_benchmark(c: &mut Criterion) {
 
 fn solver_benchmark(c: &mut Criterion) {
     let map = Map::from_str(PATH).unwrap();
-    c.bench_function("solve level 'PATH'", |b| {
+    c.bench_function("solve level 'PATH' (A*)", |b| {
         b.iter(|| {
             let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
             solver.a_star_search().unwrap();
         })
     });
+    c.bench_function("solve level 'PATH' (IDA*)", |b| {
+        b.iter(|| {
+            let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
+            solver.ida_star_search().unwrap();
+        })
+    });
+
     let map = load_level_from_file("assets/BoxWorld_100.xsb", 3)
         .map()
         .clone();
-    c.bench_function("solve level 'BoxWorld #3'", |b| {
+    c.bench_function("solve level 'BoxWorld #3' (A*)", |b| {
         b.iter(|| {
             let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
             solver.a_star_search().unwrap();
+        })
+    });
+    c.bench_function("solve level 'BoxWorld #3' (IDA*)", |b| {
+        b.iter(|| {
+            let solver = black_box(Solver::new(map.clone(), Strategy::Fast));
+            solver.ida_star_search().unwrap();
         })
     });
 }
