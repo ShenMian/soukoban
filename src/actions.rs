@@ -22,7 +22,7 @@ pub struct SecondaryValues {
     pub player_lines: i32,
 }
 
-/// A sequence of actions.
+/// A owned, mutable actions (akin to [`Vec<Action>`]).
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Default)]
 pub struct Actions(pub Vec<Action>);
 
