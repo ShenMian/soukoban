@@ -163,7 +163,7 @@ fn deadlock_benchmark(c: &mut Criterion) {
         b.iter(|| black_box(calculate_unused_floors(black_box(map.clone()))))
     });
     c.bench_function("calculate dead positions", |b| {
-        b.iter(|| black_box(calculate_dead_positions(black_box(&map))))
+        b.iter(|| black_box(calculate_static_deadlocks(black_box(&map))))
     });
 }
 

@@ -6,6 +6,49 @@ use nalgebra::Vector2;
 
 use crate::{direction::Direction, map::Map, tiles::Tiles};
 
+/// Checks if the given box position is a static deadlock.
+///
+/// Consider using [`calculate_static_deadlocks`] if you need to efficiently compute multiple static deadlock positions.
+pub fn is_static_deadlock(
+    map: &Map,
+    box_position: Vector2<i32>,
+    box_positions: &HashSet<Vector2<i32>>,
+    visited: &mut HashSet<Vector2<i32>>,
+) -> bool {
+    debug_assert!(box_positions.contains(&box_position));
+
+    if !visited.insert(box_position) {
+        return true;
+    }
+
+    for direction in [
+        Direction::Up,
+        Direction::Right,
+        Direction::Down,
+        Direction::Left,
+    ]
+    .windows(3)
+    {
+        let neighbors = [
+            box_position + &direction[0].into(),
+            box_position + &direction[1].into(),
+            box_position + &direction[2].into(),
+        ];
+        for neighbor in &neighbors {
+            if map[*neighbor].intersects(Tiles::Wall) {
+                continue;
+            }
+            if box_positions.contains(neighbor)
+                && is_static_deadlock(map, *neighbor, box_positions, visited)
+            {
+                continue;
+            }
+            return false;
+        }
+    }
+    true
+}
+
 /// Checks if the given box position is a freeze deadlock.
 pub fn is_freeze_deadlock(
     map: &Map,
@@ -96,12 +139,12 @@ pub fn calculate_unused_floors(mut map: Map) -> HashSet<Vector2<i32>> {
     unused_floors
 }
 
-/// Calculates dead square positions independent of the player's position.
+/// Calculates static deadlock positions independent of the player's position.
 ///
 /// This function returns an **incomplete** set of dead positions independent
 /// of the player's position. Any box pushed to a point in the set will cause a
 /// deadlock, regardless of the player's position.
-pub fn calculate_dead_positions(map: &Map) -> HashSet<Vector2<i32>> {
+pub fn calculate_static_deadlocks(map: &Map) -> HashSet<Vector2<i32>> {
     let mut dead_positions = HashSet::new();
     for x in 1..map.dimensions().x - 1 {
         for y in 1..map.dimensions().y - 1 {
