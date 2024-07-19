@@ -2,7 +2,6 @@
 
 use std::{
     cell::OnceCell,
-    cmp::Ordering,
     collections::{BinaryHeap, HashMap, HashSet},
 };
 
@@ -10,7 +9,8 @@ use itertools::Itertools;
 use nalgebra::Vector2;
 
 use crate::{
-    direction::Direction, path_finding::reachable_area, state::State, Map, SearchError, Tiles,
+    direction::Direction, node::Node, path_finding::reachable_area, state::State, Map, SearchError,
+    Tiles,
 };
 
 /// The strategy to use when searching for a solution.
@@ -25,49 +25,6 @@ pub enum Strategy {
 
     /// Find the move optimal solution
     OptimalMove,
-}
-
-#[derive(Clone, Eq, Debug)]
-struct Node {
-    state: State,
-    pushes: i32,
-    moves: i32,
-    priority: i32,
-}
-
-impl Node {
-    pub fn new(state: State, pushes: i32, moves: i32, solver: &Solver) -> Self {
-        let heuristic = state.heuristic(solver);
-        let priority = match solver.strategy() {
-            Strategy::Fast => heuristic,
-            Strategy::OptimalPush => pushes + heuristic,
-            Strategy::OptimalMove => moves + heuristic,
-        };
-        Self {
-            state,
-            pushes,
-            moves,
-            priority,
-        }
-    }
-}
-
-impl PartialEq for Node {
-    fn eq(&self, other: &Self) -> bool {
-        self.state == other.state
-    }
-}
-
-impl Ord for Node {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.priority.cmp(&other.priority).reverse()
-    }
-}
-
-impl PartialOrd for Node {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 /// A solver for the Sokoban problem.
@@ -99,22 +56,16 @@ impl Solver {
         let state: State = self.map.clone().into();
         heap.push(Node::new(state, 0, 0, self));
 
-        while let Some(Node {
-            state,
-            pushes,
-            moves,
-            ..
-        }) = heap.pop()
-        {
-            if state.is_solved(self) {
+        while let Some(node) = heap.pop() {
+            if node.state.is_solved(self) {
                 return Ok(());
             }
-            for successor in state.successors(self) {
-                if !visited.insert(successor.normalized_hash(&self.map)) {
+            for successor in node.successors(self) {
+                if !visited.insert(successor.state.normalized_hash(&self.map)) {
                     continue;
                 }
-                came_from.insert(successor.clone(), state.clone());
-                heap.push(Node::new(successor, pushes + 1, moves + 1, self)); // FIXME: calculate new moves
+                came_from.insert(successor.state.clone(), node.state.clone());
+                heap.push(successor);
             }
         }
         Err(SearchError::NoSolution)
@@ -124,8 +75,9 @@ impl Solver {
     pub fn ida_star_search(&self) -> Result<(), SearchError> {
         let state: State = self.map.clone().into();
         let mut threshold = state.heuristic(self);
+        let node = Node::new(state, 0, 0, self);
         loop {
-            match self.ida_star_search_inner(&state, 0, threshold, &mut HashSet::new()) {
+            match self.ida_star_search_inner(&node, threshold, &mut HashSet::new()) {
                 Ok(()) => return Ok(()),
                 Err(t) => threshold = t,
             }
@@ -137,23 +89,22 @@ impl Solver {
 
     fn ida_star_search_inner(
         &self,
-        state: &State,
-        cost: i32,
-        threshold: i32,
+        node: &Node,
+        push_threshold: i32,
         visited: &mut HashSet<u64>,
     ) -> Result<(), i32> {
-        if !visited.insert(state.normalized_hash(&self.map)) {
+        if !visited.insert(node.state.normalized_hash(&self.map)) {
             return Err(i32::MAX);
         }
-        if state.is_solved(self) {
+        if node.state.is_solved(self) {
             return Ok(());
         }
-        if cost > threshold {
-            return Err(cost);
+        if node.pushes > push_threshold {
+            return Err(node.pushes);
         }
         let mut min_threshold = i32::MAX;
-        for successor in state.successors(self) {
-            match self.ida_star_search_inner(&successor, cost + 1, threshold, visited) {
+        for successor in node.successors(self) {
+            match self.ida_star_search_inner(&successor, push_threshold, visited) {
                 Ok(()) => return Ok(()),
                 Err(t) => min_threshold = min_threshold.min(t),
             }
@@ -173,6 +124,7 @@ impl Solver {
 
     /// Returns a reference to the set of lower bounds.
     pub fn lower_bounds(&self) -> &HashMap<Vector2<i32>, i32> {
+        // TODO: Calculate lower bounds based on strategy
         self.lower_bounds.get_or_init(|| {
             let mut lower_bounds = self.calculate_minimum_push();
             lower_bounds.shrink_to_fit();
@@ -189,7 +141,8 @@ impl Solver {
         })
     }
 
-    /// Calculates and returns the minimum push to goals.
+    /// Calculates and returns the minimum number of pushes to push the box to
+    /// the nearest goal.
     fn calculate_minimum_push(&self) -> HashMap<Vector2<i32>, i32> {
         let mut lower_bounds = HashMap::new();
         for goal_position in self.map.goal_positions() {

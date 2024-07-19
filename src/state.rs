@@ -6,8 +6,6 @@ use std::{
 use nalgebra::Vector2;
 
 use crate::{
-    deadlock::is_freeze_deadlock,
-    direction::Direction,
     path_finding::{normalized_area, reachable_area},
     solver::Solver,
     Map, Tiles,
@@ -20,58 +18,6 @@ pub struct State {
 }
 
 impl State {
-    /// Returns the successors of the state.
-    pub fn successors(&self, solver: &Solver) -> Vec<State> {
-        let mut successors = Vec::new();
-        let player_reachable_area = reachable_area(self.player_position, |position| {
-            !solver.map()[position].intersects(Tiles::Wall)
-                && !self.box_positions.contains(&position)
-        });
-        // Creates successor states by pushing boxes
-        for box_position in &self.box_positions {
-            for direction in Direction::iter() {
-                let mut new_box_position = box_position + &direction.into();
-                if solver.map()[new_box_position].intersects(Tiles::Wall)
-                    || self.box_positions.contains(&new_box_position)
-                    || !solver.lower_bounds().contains_key(&new_box_position)
-                {
-                    continue;
-                }
-                let new_player_position = box_position - &direction.into();
-                if !player_reachable_area.contains(&new_player_position) {
-                    continue;
-                }
-
-                // Skip no influence pushes
-                while solver.tunnels().contains(&(new_box_position, direction)) {
-                    new_box_position += &direction.into();
-                }
-
-                let mut new_box_positions = self.box_positions.clone();
-                new_box_positions.remove(box_position);
-                new_box_positions.insert(new_box_position);
-
-                // Skip freeze deadlocks
-                if !solver.map()[new_box_position].intersects(Tiles::Goal)
-                    && is_freeze_deadlock(
-                        solver.map(),
-                        new_box_position,
-                        &new_box_positions,
-                        &mut HashSet::new(),
-                    )
-                {
-                    continue;
-                }
-
-                successors.push(State {
-                    player_position: new_player_position,
-                    box_positions: new_box_positions,
-                });
-            }
-        }
-        successors
-    }
-
     /// Returns true if the state is solved.
     pub fn is_solved(&self, solver: &Solver) -> bool {
         self.box_positions == *solver.map().goal_positions()
