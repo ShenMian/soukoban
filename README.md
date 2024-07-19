@@ -17,7 +17,7 @@ A library provides the implementation of some algorithms and data structures rel
   - **Reversal Move Handling**: Automatically interprets reversal moves as undo actions.
   - **Metrics Calculation**: Computes metrics such as `box_lines`, `box_changes`, `pushing_sessions`, and `player_lines`.
 - **Pathfinding**: Finds the optimal player path to push a box to a position.
-- **Deadlock Detection**: Detects dead positions and freeze deadlocks.
+- **Deadlock Detection**: Detects static deadlocks and freeze deadlocks.
 
 ## License
 
