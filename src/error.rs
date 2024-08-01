@@ -31,7 +31,8 @@ pub enum ParseMapError {
     /// The number of boxes and goals do not match. They should be equal.
     #[error("mismatch between number of boxes and goals")]
     BoxGoalMismatch,
-    /// There are no boxes or goals. There should be at least one box and one goal.
+    /// There are no boxes or goals. There should be at least one box and one
+    /// goal.
     #[error("no box or goal")]
     NoBoxOrGoal,
     /// Contains non-XSB format character.

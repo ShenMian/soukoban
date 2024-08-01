@@ -11,8 +11,6 @@ repository = "https://github.com/shenmian/soukoban"
 keywords = ["sokoban", "solver"]
 categories = ["algorithms"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [[bench]]
 name = "benchmark"
 harness = false

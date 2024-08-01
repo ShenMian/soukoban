@@ -18,9 +18,9 @@ use crate::{
 /// A grid-based map.
 ///
 /// Map is used to store the map data of the Sokoban level, which is saved in a
-/// one-bit array and can be accessed through two-dimensional coordinates. Some
-/// data (such as the locations of all boxes) will be additionally stored in
-/// other data structures to speed up certain operations.
+/// bit array and can be accessed through two-dimensional coordinates. The
+/// positions of the player and the boxes are stored in other data structures to
+/// speed up query operations.
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Map {
     data: Vec<Tiles>,
@@ -34,7 +34,7 @@ pub struct Map {
 impl Map {
     /// Creates a new `Map` from actions.
     ///
-    /// Try to restore the map with a complete solution. This method can only
+    /// Tries to restore the map with a complete solution. This method can only
     /// restore the parts of the map that are used by the solution.
     pub fn from_actions(actions: &Actions) -> Result<Self, ParseMapError> {
         let mut min_position = Vector2::<i32>::zeros();
@@ -81,8 +81,8 @@ impl Map {
         }
         instance[current_player_position] = Tiles::Floor;
 
-        // The initial position of boxes are the box positions, and the current (final)
-        // position of boxes are the goal positions
+        // The current positions of the boxes are their final positions, which are the
+        // target positions
         let box_positions = initial_box_positions;
         let goal_positions = current_box_positions;
         if box_positions.is_empty() {
@@ -103,7 +103,7 @@ impl Map {
         instance.box_positions = box_positions;
         instance.goal_positions = goal_positions;
 
-        // Verify solution
+        // Verify the solution
         let mut level = Level::from_map(instance.clone());
         for action in &**actions {
             level
@@ -116,7 +116,8 @@ impl Map {
 
     /// Creates a new, empty `Map` with the specified dimensions.
     ///
-    /// Warning: This will create an invalid map.
+    /// Warning: This will create an invalid map. Some associated functions will
+    /// not work properly until the map becomes valid.
     pub fn with_dimensions(dimensions: Vector2<i32>) -> Self {
         Self {
             data: vec![Tiles::empty(); (dimensions.x * dimensions.y) as usize],
@@ -504,7 +505,7 @@ impl Map {
         }
     }
 
-    /// Add floors to map with only walls.
+    /// Adds floors to the map that contains only closed walls.
     fn add_floors(&mut self, player_position: Vector2<i32>) {
         self.flood_fill(player_position, Tiles::Floor, Tiles::Wall);
     }

@@ -8,7 +8,8 @@ use crate::{direction::Direction, map::Map, tiles::Tiles};
 
 /// Checks if the given box position is a static deadlock.
 ///
-/// Consider using [`calculate_static_deadlocks`] if you need to efficiently compute multiple static deadlock positions.
+/// Consider using [`calculate_static_deadlocks`] if you need to efficiently
+/// compute multiple static deadlock positions.
 pub fn is_static_deadlock(
     map: &Map,
     box_position: Vector2<i32>,

@@ -141,9 +141,9 @@ impl Level {
         Self::from_str(group)
     }
 
-    /// Lazily splits the string into multiple groups (string slice) by empty line
-    /// (excluding empty line within block comment) and filter out groups
-    /// without map data.
+    /// Lazily splits the string into multiple groups (string slice) by empty
+    /// line (excluding empty line within block comment) and filter out
+    /// groups without map data.
     fn split_levels(str: &str) -> impl Iterator<Item = &str> + '_ {
         str.split(['\n', '|']).filter_map({
             let mut offset = 0;
