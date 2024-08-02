@@ -44,6 +44,11 @@ impl Level {
         &self.map
     }
 
+    /// Returns a mutable reference to the map of the level.
+    pub fn map_mut(&mut self) -> &mut Map {
+        &mut self.map
+    }
+
     /// Returns the map of the level.
     pub fn into_map(self) -> Map {
         self.map
