@@ -84,7 +84,7 @@ fn parse_map_error() {
 
 #[test]
 fn get() {
-    let mut map = load_level_from_file("assets/Holland_81.xsb", 9);
+    let mut map = load_level_from_file("assets/Holland_81.xsb", 9).into_map();
     for x in 0..map.dimensions().x {
         for y in 0..map.dimensions().y {
             let position = Vector2::new(x, y);

@@ -3,7 +3,6 @@
 use std::{
     collections::{HashMap, HashSet},
     fmt,
-    ops::{Deref, DerefMut},
     str::FromStr,
 };
 
@@ -77,21 +76,22 @@ impl Level {
             self.undo_action().unwrap();
         }
 
-        let new_player_position = self.player_position() + &direction.into();
-        if self[new_player_position].intersects(Tiles::Wall) {
+        let new_player_position = self.map.player_position() + &direction.into();
+        if self.map[new_player_position].intersects(Tiles::Wall) {
             return Err(ActionError::MoveBlocked);
         }
-        if self[new_player_position].intersects(Tiles::Box) {
+        if self.map[new_player_position].intersects(Tiles::Box) {
             let new_box_position = new_player_position + &direction.into();
-            if self[new_box_position].intersects(Tiles::Wall | Tiles::Box) {
+            if self.map[new_box_position].intersects(Tiles::Wall | Tiles::Box) {
                 return Err(ActionError::PushBlocked);
             }
-            self.set_box_position(new_player_position, new_box_position);
+            self.map
+                .set_box_position(new_player_position, new_box_position);
             self.actions.push(Action::Push(direction));
         } else {
             self.actions.push(Action::Move(direction));
         }
-        self.set_player_position(new_player_position);
+        self.map.set_player_position(new_player_position);
         self.undone_actions.clear();
         Ok(())
     }
@@ -100,12 +100,12 @@ impl Level {
     pub fn undo_action(&mut self) -> Result<(), ActionError> {
         if let Some(last_action) = self.actions.pop() {
             if last_action.is_push() {
-                let box_position = self.player_position() + &last_action.direction().into();
-                let prev_box_position = self.player_position();
-                self.set_box_position(box_position, prev_box_position);
+                let box_position = self.map.player_position() + &last_action.direction().into();
+                let prev_box_position = self.map.player_position();
+                self.map.set_box_position(box_position, prev_box_position);
             }
-            let prev_player_position = self.player_position() - &last_action.direction().into();
-            self.set_player_position(prev_player_position);
+            let prev_player_position = self.map.player_position() - &last_action.direction().into();
+            self.map.set_player_position(prev_player_position);
             self.undone_actions.push(last_action);
             Ok(())
         } else {
@@ -127,7 +127,9 @@ impl Level {
 
     /// Returns the reachable area for the player.
     pub fn player_reachable_area(&self) -> HashSet<Vector2<i32>> {
-        reachable_area(self.player_position(), |position| self.can_move(position))
+        reachable_area(self.map.player_position(), |position| {
+            self.map.can_move(position)
+        })
     }
 
     /// Lazily loads levels from an XSB format string.
@@ -312,20 +314,6 @@ impl FromStr for Level {
             actions: Actions::default(),
             undone_actions: Actions::default(),
         })
-    }
-}
-
-impl Deref for Level {
-    type Target = Map;
-
-    fn deref(&self) -> &Self::Target {
-        &self.map
-    }
-}
-
-impl DerefMut for Level {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.map
     }
 }
 
