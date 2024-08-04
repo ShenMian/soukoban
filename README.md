@@ -9,15 +9,15 @@ A library provides the implementation of some algorithms and data structures rel
 ## Features
 
 - **Level**
-  - **Lazy Loading**: Loads the first n levels, or the nth level, in a long XSB string.
-  - **Map Reconstruction**: Reverse build the level map from the solution.
-  - **Normalization**: Remove elements from the map that are not relevant to the solution.
-  - **RLE Support**: Enables loading of levels encoded in Run-Length Encoding (RLE) format.
+  - **Lazy parsing**: Parses the first n levels or the nth level from an XSB string containing multiple levels.
+  - **Map reconstruction**: Reconstructs the map from the solution.
+  - **Normalization**: Removes elements from the map that are not relevant to the solution.
+  - **RLE support**: Enables loading of levels encoded in Run-Length Encoding (RLE) format.
 - **Solution**
-  - **Reversal Move Handling**: Automatically interprets reversal moves as undo actions.
-  - **Metrics Calculation**: Computes metrics such as `box_lines`, `box_changes`, `pushing_sessions`, and `player_lines`.
+  - **Reversal move handling**: Automatically interprets reversal moves as undo actions.
+  - **Metrics calculation**: Computes metrics such as `box_lines`, `box_changes`, `pushing_sessions`, and `player_lines`.
 - **Pathfinding**: Finds the optimal player path to push a box to a position.
-- **Deadlock Detection**: Detects static deadlocks and freeze deadlocks.
+- **Deadlock detection**: Detects static deadlocks and freeze deadlocks.
 
 ## License
 
