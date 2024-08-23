@@ -49,11 +49,6 @@ impl Level {
         &mut self.map
     }
 
-    /// Returns the map of the level.
-    pub fn into_map(self) -> Map {
-        self.map
-    }
-
     /// Returns a reference to the metadata of the level.
     pub fn metadata(&self) -> &HashMap<String, String> {
         &self.metadata
@@ -319,6 +314,12 @@ impl FromStr for Level {
             actions: Actions::default(),
             undone_actions: Actions::default(),
         })
+    }
+}
+
+impl From<Level> for Map {
+    fn from(level: Level) -> Self {
+        level.map
     }
 }
 
