@@ -213,6 +213,11 @@ impl Solver {
         }
     }
 
+    /// Calculate and return the set of tunnels.
+    ///
+    /// Tunnel is a common type of ineffective push.
+    /// Since tunnels are only determined by the map terrain, they can be
+    /// pre-calculated.
     fn calculate_tunnels(&self) -> HashSet<(Vector2<i32>, Direction)> {
         let mut tunnels = HashSet::new();
         for x in 1..self.map.dimensions().x - 1 {
