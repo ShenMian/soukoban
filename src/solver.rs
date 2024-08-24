@@ -232,12 +232,9 @@ impl Solver {
                     Direction::Right,
                     Direction::Down,
                     Direction::Left,
-                    Direction::Up,
-                    Direction::Right,
-                    Direction::Down,
                 ]
                 .into_iter()
-                .tuple_windows()
+                .circular_tuple_windows()
                 {
                     let player_position = box_position + &down.into();
 
