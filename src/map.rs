@@ -114,20 +114,6 @@ impl Map {
         Ok(instance)
     }
 
-    /// Creates a new, empty `Map` with the specified dimensions.
-    ///
-    /// Warning: This will create an invalid map. Some associated functions will
-    /// not work properly until the map becomes valid.
-    pub fn with_dimensions(dimensions: Vector2<i32>) -> Self {
-        Self {
-            data: vec![Tiles::empty(); (dimensions.x * dimensions.y) as usize],
-            dimensions,
-            player_position: Vector2::zeros(),
-            box_positions: HashSet::new(),
-            goal_positions: HashSet::new(),
-        }
-    }
-
     /// Returns the dimensions of the map.
     pub fn dimensions(&self) -> Vector2<i32> {
         self.dimensions
@@ -333,6 +319,20 @@ impl Map {
         let flip_position =
             |position: Vector2<i32>| Vector2::new(dimensions.x - 1 - position.x, position.y);
         self.transform(flip_position, self.dimensions);
+    }
+
+    /// Creates a new, empty `Map` with the specified dimensions.
+    ///
+    /// Warning: This will create an invalid map. Some associated functions will
+    /// not work properly until the map becomes valid.
+    fn with_dimensions(dimensions: Vector2<i32>) -> Self {
+        Self {
+            data: vec![Tiles::empty(); (dimensions.x * dimensions.y) as usize],
+            dimensions,
+            player_position: Vector2::zeros(),
+            box_positions: HashSet::new(),
+            goal_positions: HashSet::new(),
+        }
     }
 
     /// Adds a box at the given position.
