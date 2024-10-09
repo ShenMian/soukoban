@@ -244,10 +244,10 @@ impl FromStr for Level {
                 if trimmed_line.to_lowercase().starts_with("comment-end") {
                     // Exit block comment
                     in_block_comment = false;
-                    continue;
+                } else {
+                    comments += trimmed_line;
+                    comments.push('\n');
                 }
-                comments += trimmed_line;
-                comments.push('\n');
                 continue;
             }
             if let Some(comment) = trimmed_line.strip_prefix(';') {
