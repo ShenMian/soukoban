@@ -46,6 +46,16 @@ impl Map {
             player_position += &action.direction().into();
             min_position = min_position.zip_map(&player_position, |a, b| a.min(b));
             max_position = max_position.zip_map(&player_position, |a, b| a.max(b));
+            if action.is_push() {
+                min_position = min_position
+                    .zip_map(&(player_position + &action.direction().into()), |a, b| {
+                        a.min(b)
+                    });
+                max_position = max_position
+                    .zip_map(&(player_position + &action.direction().into()), |a, b| {
+                        a.max(b)
+                    });
+            }
         }
 
         // Reserve space for walls
@@ -69,6 +79,7 @@ impl Map {
             instance[current_player_position] = Tiles::Floor;
             current_player_position += &action.direction().into();
             if action.is_push() {
+                instance[current_player_position + &action.direction().into()] = Tiles::Floor;
                 // The player pushed the box when moving, which means there is a box at the
                 // player's current position
                 if !current_box_positions.contains(&current_player_position) {
@@ -96,6 +107,9 @@ impl Map {
         for goal_position in &goal_positions {
             instance[*goal_position].insert(Tiles::Goal);
         }
+        if box_positions.contains(&player_position) {
+            return Err(ParseMapError::InvalidActions);
+        }
 
         instance.add_walls_around_floors();
 
@@ -109,6 +123,9 @@ impl Map {
             level
                 .do_action(action.direction())
                 .map_err(|_| ParseMapError::InvalidActions)?;
+        }
+        if !level.map().is_solved() {
+            return Err(ParseMapError::InvalidActions);
         }
 
         Ok(instance)

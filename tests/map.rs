@@ -8,7 +8,7 @@ mod utils;
 use utils::*;
 
 #[test]
-fn parse_map_error() {
+fn map_from_str() {
     let no_player_map = r#"
         #####
         # $.#
@@ -63,6 +63,12 @@ fn parse_map_error() {
         Map::from_str(invalid_character_map).unwrap_err(),
         ParseMapError::InvalidCharacter('!')
     );
+}
+
+#[test]
+fn map_from_actions() {
+    assert!(Map::from_actions(&Actions::from_str("R").unwrap()).is_ok());
+    assert!(Map::from_actions(&Actions::from_str("DuLLrUUdrR").unwrap()).is_ok());
 
     assert_eq!(
         Map::from_actions(&Actions::from_str("RddrU").unwrap()).unwrap_err(),
