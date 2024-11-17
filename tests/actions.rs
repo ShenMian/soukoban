@@ -3,7 +3,7 @@ use std::str::FromStr;
 use soukoban::{Actions, ParseActionError, SecondaryValues};
 
 #[test]
-fn parse_actions_error() {
+fn actions_from_str() {
     assert_eq!(
         Actions::from_str("lUrDL!uRd").unwrap_err(),
         ParseActionError::InvalidCharacter('!')
