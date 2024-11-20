@@ -36,7 +36,7 @@ impl Map {
     ///
     /// Tries to restore the map with a complete solution. This method can only
     /// restore the parts of the map that are used by the solution.
-    pub fn from_actions(actions: &Actions) -> Result<Self, ParseMapError> {
+    pub fn from_actions(actions: Actions) -> Result<Self, ParseMapError> {
         let mut min_position = Vector2::<i32>::zeros();
         let mut max_position = Vector2::<i32>::zeros();
 
