@@ -37,17 +37,17 @@ pub fn find_path(
     to: Vector2<i32>,
     can_move: impl Fn(Vector2<i32>) -> bool,
 ) -> Option<Vec<Vector2<i32>>> {
-    let mut heap = BinaryHeap::new();
+    let mut open_set = BinaryHeap::new();
     let mut came_from = HashMap::new();
     let mut cost = HashMap::new();
 
-    heap.push(Node {
+    open_set.push(Node {
         position: from,
         heuristic: manhattan_distance(from, to),
     });
     cost.insert(from, 0);
 
-    while let Some(node) = heap.pop() {
+    while let Some(node) = open_set.pop() {
         if node.position == to {
             return Some(construct_path(from, to, came_from));
         }
@@ -62,7 +62,7 @@ pub fn find_path(
             if !cost.contains_key(&new_position) || new_cost < cost[&new_position] {
                 cost.insert(new_position, new_cost);
                 let priority = new_cost + manhattan_distance(new_position, to);
-                heap.push(Node {
+                open_set.push(Node {
                     position: new_position,
                     heuristic: priority,
                 });
