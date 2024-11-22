@@ -99,6 +99,9 @@ impl Map {
         if box_positions.is_empty() {
             return Err(ParseMapError::NoBoxOrGoal);
         }
+        if box_positions.contains(&player_position) {
+            return Err(ParseMapError::InvalidActions);
+        }
 
         instance[player_position].insert(Tiles::Player);
         for box_position in &box_positions {
@@ -106,9 +109,6 @@ impl Map {
         }
         for goal_position in &goal_positions {
             instance[*goal_position].insert(Tiles::Goal);
-        }
-        if box_positions.contains(&player_position) {
-            return Err(ParseMapError::InvalidActions);
         }
 
         instance.add_walls_around_floors();
