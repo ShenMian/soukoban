@@ -5,7 +5,7 @@ use std::fmt;
 use crate::{direction::Direction, error::ParseActionError};
 
 /// Represents an action.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub enum Action {
     /// Move action in a specified direction.
     Move(Direction),

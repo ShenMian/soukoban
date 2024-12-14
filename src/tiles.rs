@@ -6,7 +6,7 @@ use bitflags::bitflags;
 
 bitflags! {
     /// Flags which can represent elements contained in map cells.
-    #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+    #[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
     pub struct Tiles: u8 {
         /// Floor.
         const Floor = 1 << 0;

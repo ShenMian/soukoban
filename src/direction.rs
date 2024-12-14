@@ -5,7 +5,7 @@ use std::ops::Neg;
 use nalgebra::Vector2;
 
 /// A direction.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub enum Direction {
     /// Up.
     Up,

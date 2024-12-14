@@ -9,7 +9,7 @@ use nalgebra::Vector2;
 
 use crate::{direction::Direction, map::Map, Tiles};
 
-#[derive(Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash)]
 struct Node {
     position: Vector2<i32>,
     heuristic: i32,
