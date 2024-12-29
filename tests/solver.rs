@@ -22,7 +22,7 @@ fn test_solver() {
     assert!(solver.ida_star_search().is_ok());
 }
 
-#[allow(dead_code)]
+#[expect(dead_code)]
 fn print_lower_bounds(solver: &Solver) {
     for y in 0..solver.map().dimensions().y {
         for x in 0..solver.map().dimensions().x {

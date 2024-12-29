@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::{fs, path::Path};
 
 use soukoban::Level;
