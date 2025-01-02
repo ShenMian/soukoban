@@ -52,6 +52,9 @@ pub enum ParseActionError {
     /// Contains non-LURD format character.
     #[error("invalid character: `{0}`")]
     InvalidCharacter(char),
+    /// An error occurred during RLE decoding.
+    #[error(transparent)]
+    DecodeRleError(#[from] DecodeRleError),
 }
 
 /// An error which can be returned when encoding RLE.
