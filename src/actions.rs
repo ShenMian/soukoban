@@ -44,10 +44,11 @@ impl Actions {
 
     /// Returns the secondary values.
     pub fn secondary_values(&self) -> SecondaryValues {
-        let mut player_lines = 0;
         let mut box_lines = 0;
         let mut box_changes = 0;
         let mut pushing_sessions = 0;
+        let mut player_lines = 0;
+
         let mut player_position = Vector2::zeros();
         let mut prev_pushed_box_position = None;
         let mut prev_action: Option<Action> = None;
