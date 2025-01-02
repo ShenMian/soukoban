@@ -4,7 +4,7 @@ mod utils;
 use utils::*;
 
 #[test]
-fn test_calculate_dead_positions() {
+fn calculate_dead_positions() {
     let map = load_level_from_file("assets/Microban_155.xsb", 3).into();
     assert_eq!(calculate_static_deadlocks(&map).len(), 9);
 

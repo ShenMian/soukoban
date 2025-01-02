@@ -1,7 +1,7 @@
 use soukoban::direction::*;
 
 #[test]
-fn test_rotate() {
+fn rotate() {
     use Direction::*;
     assert_eq!(Up.rotate(), Right);
     assert_eq!(Right.rotate(), Down);
@@ -10,7 +10,7 @@ fn test_rotate() {
 }
 
 #[test]
-fn test_flip() {
+fn flip() {
     use Direction::*;
     assert_eq!(Up.flip(), Down);
     assert_eq!(Down.flip(), Up);

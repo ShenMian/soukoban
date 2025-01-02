@@ -7,7 +7,7 @@ mod utils;
 use utils::*;
 
 #[test]
-fn test_find_path() {
+fn find_path() {
     let map = load_level_from_file("assets/Microban II_135.xsb", 132).into();
     let path = player_move_path(&map, Vector2::new(25, 21)).unwrap();
     assert_eq!(path.len(), 41);

@@ -1,17 +1,17 @@
 use soukoban::{error::*, run_length::*};
 
 #[test]
-fn test_rle_encode_empty() {
+fn rle_encode_empty() {
     assert_eq!(rle_encode("").unwrap(), "");
 }
 
 #[test]
-fn test_rle_encode_single_char() {
+fn rle_encode_single_char() {
     assert_eq!(rle_encode("a").unwrap(), "a");
 }
 
 #[test]
-fn test_rle_encode_invalid_char() {
+fn rle_encode_invalid_char() {
     assert_eq!(
         rle_encode("aa2bb").unwrap_err(),
         EncodeRleError::NumericCharacter('2')
@@ -19,22 +19,22 @@ fn test_rle_encode_invalid_char() {
 }
 
 #[test]
-fn test_rle_encode_large_repeats() {
+fn rle_encode_large_repeats() {
     assert_eq!(rle_encode("aaaaaabbbbbbbcc").unwrap(), "6a7b2c");
 }
 
 #[test]
-fn test_rle_encode_special_chars() {
+fn rle_encode_special_chars() {
     assert_eq!(rle_encode("!@#$%^&*()").unwrap(), "!@#$%^&*()");
 }
 
 #[test]
-fn test_rle_decode_empty() {
+fn rle_decode_empty() {
     assert_eq!(rle_decode("").unwrap(), "");
 }
 
 #[test]
-fn test_rle_decode_end_with_digits() {
+fn rle_decode_end_with_digits() {
     assert_eq!(
         rle_decode("32#22*11").unwrap_err(),
         DecodeRleError::EndWithDigits(11)
@@ -42,16 +42,16 @@ fn test_rle_decode_end_with_digits() {
 }
 
 #[test]
-fn test_rle_decode_special_chars() {
+fn rle_decode_special_chars() {
     assert_eq!(rle_decode("-#$.*+@").unwrap(), "-#$.*+@");
 }
 
 #[test]
-fn test_rle_decode_single_char() {
+fn rle_decode_single_char() {
     assert_eq!(rle_decode("a").unwrap(), "a");
 }
 
 #[test]
-fn test_rle_decode_with_nested_parentheses() {
+fn rle_decode_with_nested_parentheses() {
     assert_eq!(rle_decode("3(2(a)b)").unwrap(), "aabaabaab");
 }
