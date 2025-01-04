@@ -8,7 +8,7 @@ use std::{
 
 use nalgebra::Vector2;
 
-use crate::{action::Action, error::ParseActionError, run_length::rle_decode};
+use crate::{action::Action, error::ParseActionsError, run_length::rle_decode};
 
 /// Secondary statistics for a sequence of actions.
 pub struct SecondaryValues {
@@ -90,7 +90,7 @@ impl Actions {
 }
 
 impl FromStr for Actions {
-    type Err = ParseActionError;
+    type Err = ParseActionsError;
 
     /// Creates a new `Actions` with LURD format string.
     fn from_str(lurd: &str) -> Result<Self, Self::Err> {

@@ -46,15 +46,23 @@ pub enum ParseMapError {
     InvalidActions,
 }
 
+/// An error which can be returned when parsing actions.
+#[derive(Error, Clone, Eq, PartialEq, Debug)]
+pub enum ParseActionsError {
+    /// An error which can be returned when parsing a action.
+    #[error(transparent)]
+    ParseActionError(#[from] ParseActionError),
+    /// An error occurred during RLE decoding.
+    #[error(transparent)]
+    DecodeRleError(#[from] DecodeRleError),
+}
+
 /// An error which can be returned when parsing a action.
 #[derive(Error, Clone, Eq, PartialEq, Debug)]
 pub enum ParseActionError {
     /// Contains non-LURD format character.
     #[error("invalid character: `{0}`")]
     InvalidCharacter(char),
-    /// An error occurred during RLE decoding.
-    #[error(transparent)]
-    DecodeRleError(#[from] DecodeRleError),
 }
 
 /// An error which can be returned when encoding RLE.
