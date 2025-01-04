@@ -1,12 +1,12 @@
 use std::str::FromStr;
 
-use soukoban::{Actions, ParseActionError, SecondaryValues};
+use soukoban::{Actions, ParseActionError, ParseActionsError, SecondaryValues};
 
 #[test]
 fn actions_from_str() {
     assert_eq!(
         Actions::from_str("lUrDL!uRd").unwrap_err(),
-        ParseActionError::InvalidCharacter('!')
+        ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
     );
 }
 
