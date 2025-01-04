@@ -395,7 +395,7 @@ impl Map {
         for position in self
             .box_positions
             .intersection(&self.goal_positions)
-            .cloned()
+            .copied()
             .collect::<HashSet<_>>()
         {
             // If the current box is deadlocked
@@ -426,7 +426,7 @@ impl Map {
             .box_positions
             .iter()
             .filter(|position| !self[**position].intersects(Tiles::Floor))
-            .cloned()
+            .copied()
             .collect::<HashSet<_>>()
         {
             debug_assert!(
