@@ -73,7 +73,7 @@ impl Level {
     /// Moves the player in the specified direction.
     pub fn do_action(&mut self, direction: Direction) -> Result<(), ActionError> {
         if self.actions.last() == Some(&Action::Move(-direction)) {
-            self.undo_action().expect("Failed to undo last action");
+            self.undo_action().unwrap();
         }
 
         let new_player_position = self.map.player_position() + &direction.into();
@@ -117,8 +117,7 @@ impl Level {
     pub fn redo_action(&mut self) -> Result<(), ActionError> {
         if let Some(last_undone_action) = self.undone_actions.pop() {
             let undone_actions = std::mem::take(&mut self.undone_actions);
-            self.do_action(last_undone_action.direction())
-                .expect("Failed to redo last action");
+            self.do_action(last_undone_action.direction()).unwrap();
             self.undone_actions = undone_actions;
             Ok(())
         } else {
