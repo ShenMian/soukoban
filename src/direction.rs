@@ -7,13 +7,13 @@ use nalgebra::Vector2;
 /// A direction.
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub enum Direction {
-    /// Up.
+    /// Upward direction (negative Y-axis).
     Up,
-    /// Down.
+    /// Downward direction (positive Y-axis).
     Down,
-    /// Left.
+    /// Leftward direction (negative X-axis).
     Left,
-    /// Right.
+    /// Rightward direction (positive X-axis).
     Right,
 }
 
