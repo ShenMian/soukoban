@@ -109,10 +109,10 @@ fn metadata() {
 }
 
 #[test]
-fn create_multiple_levels_with_xsb() {
+fn create_levels_from_str() {
     for entry in fs::read_dir("assets/").unwrap() {
         let path = entry.unwrap().path();
-        if path.extension() != Some(std::ffi::OsStr::new(".xsb")) {
+        if path.extension() != Some(std::ffi::OsStr::new("xsb")) {
             continue;
         }
         let count = path
@@ -123,7 +123,32 @@ fn create_multiple_levels_with_xsb() {
             .parse()
             .unwrap();
         assert_eq!(
-            Level::load_from_string(&fs::read_to_string(path).unwrap())
+            Level::load_from_str(&fs::read_to_string(path).unwrap())
+                .filter_map(Result::ok)
+                .count(),
+            count
+        );
+    }
+}
+
+#[test]
+fn create_levels_from_reader() {
+    for entry in fs::read_dir("assets/").unwrap() {
+        let path = entry.unwrap().path();
+        if path.extension() != Some(std::ffi::OsStr::new("xsb")) {
+            continue;
+        }
+        dbg!(&path);
+        let count = path
+            .to_string_lossy()
+            .rsplit_terminator(['_', '.'])
+            .nth(1)
+            .unwrap()
+            .parse()
+            .unwrap();
+        let reader = std::io::BufReader::new(fs::File::open(&path).unwrap());
+        assert_eq!(
+            Level::load_from_reader(reader)
                 .filter_map(Result::ok)
                 .count(),
             count

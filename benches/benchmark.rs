@@ -11,7 +11,7 @@ use soukoban::{
 
 pub fn load_level_from_file<P: AsRef<Path>>(path: P, id: usize) -> Level {
     debug_assert!(id >= 1);
-    Level::load_nth_from_string(&fs::read_to_string(path).unwrap(), id).unwrap()
+    Level::load_nth_from_str(&fs::read_to_string(path).unwrap(), id).unwrap()
 }
 
 // Title: World Cup 2014 (MF8 61st Sokoban Competition, Extra)
@@ -186,12 +186,10 @@ fn level_benchmark(c: &mut Criterion) {
     }
 
     c.bench_function("load levels", |b| {
-        b.iter(|| black_box(Level::load_from_string(black_box(&string)).collect::<Vec<_>>()))
+        b.iter(|| black_box(Level::load_from_str(black_box(&string)).collect::<Vec<_>>()))
     });
     c.bench_function("load the nth level", |b| {
-        b.iter(|| {
-            black_box(Level::load_nth_from_string(black_box(&string), black_box(3371)).unwrap())
-        })
+        b.iter(|| black_box(Level::load_nth_from_str(black_box(&string), black_box(3371)).unwrap()))
     });
 }
 

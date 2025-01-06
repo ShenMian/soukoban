@@ -49,10 +49,10 @@ fn test_box_move_waypoints() {
     // FIXME:
     // let map = load_level_from_file("assets/Microban II_135.xsb", 135).into();
     // let waypoints = box_move_waypoints(&map, Vector2::new(21, 36));
-    // let box_path = construct_box_path(Vector2::new(21, 36), Vector2::new(21, 37), &waypoints);
-    // assert_eq!(box_path.len() - 1, 591);
-    // let player_path = construct_player_path(&map, Vector2::new(21, 38), &box_path);
-    // assert_eq!(player_path.len() - 1, 1108);
+    // let box_path = construct_box_path(Vector2::new(21, 36), Vector2::new(21,
+    // 37), &waypoints); assert_eq!(box_path.len() - 1, 591);
+    // let player_path = construct_player_path(&map, Vector2::new(21, 38),
+    // &box_path); assert_eq!(player_path.len() - 1, 1108);
 }
 
 #[test]

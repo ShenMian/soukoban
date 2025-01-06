@@ -3,6 +3,7 @@
 use std::{
     collections::{HashMap, HashSet},
     fmt,
+    io::BufRead,
     str::FromStr,
 };
 
@@ -133,22 +134,44 @@ impl Level {
     }
 
     /// Lazily loads levels from an XSB format string.
-    pub fn load_from_string(str: &str) -> impl Iterator<Item = Result<Self, ParseLevelError>> + '_ {
-        Self::split_levels(str).map(Self::from_str)
+    pub fn load_from_str(str: &str) -> impl Iterator<Item = Result<Self, ParseLevelError>> + '_ {
+        Self::split_by_group_from_str(str).map(Self::from_str)
+    }
+
+    /// Lazily loads levels from a reader.
+    pub fn load_from_reader<R: BufRead>(
+        reader: R,
+    ) -> impl Iterator<Item = Result<Self, ParseLevelError>> {
+        Self::split_by_group_from_reader(reader).map(|group| Self::from_str(&group))
     }
 
     /// Loads the nth level from an XSB format string.
-    pub fn load_nth_from_string(str: &str, id: usize) -> Result<Self, ParseLevelError> {
-        let group = Self::split_levels(str)
+    pub fn load_nth_from_str(str: &str, id: usize) -> Result<Self, ParseLevelError> {
+        let group = Self::split_by_group_from_str(str)
             .nth(id - 1)
             .expect("level index out of bounds");
         Self::from_str(group)
     }
 
-    /// Lazily splits the string into multiple groups (string slice) by empty
-    /// line (excluding empty line within block comment) and filter out
+    /// Loads the nth level from a reader.
+    pub fn load_nth_from_reader<R: BufRead>(reader: R, id: usize) -> Result<Self, ParseLevelError> {
+        let group = Self::split_by_group_from_reader(reader)
+            .nth(id - 1)
+            .expect("level index out of bounds");
+        Self::from_str(&group)
+    }
+
+    /// Lazily splits text from a reader into groups separated by empty lines
+    /// (excluding empty lines within block comment), and filter out groups
+    /// without map data.
+    pub fn split_by_group_from_reader<R: BufRead>(reader: R) -> impl Iterator<Item = String> {
+        reader.group().map(|group| group.unwrap())
+    }
+
+    /// Lazily and zero-copy splits a string into groups (string slices) by
+    /// empty lines (excluding empty lines within block comment), and filter out
     /// groups without map data.
-    fn split_levels(str: &str) -> impl Iterator<Item = &str> + '_ {
+    fn split_by_group_from_str(str: &str) -> impl Iterator<Item = &str> + '_ {
         str.split(['\n', '|']).filter_map({
             let mut offset = 0;
             let mut len = 0;
@@ -175,18 +198,19 @@ impl Level {
                         }
                         return None;
                     }
-                    if let Some(value) = trimmed_line.to_lowercase().strip_prefix("comment:") {
-                        if value.trim_start().is_empty() {
+                    if let Some(comment) = trimmed_line.to_lowercase().strip_prefix("comment:") {
+                        if comment.trim_start().is_empty() {
                             // Enter block comment
                             in_block_comment = true;
                         }
                         return None;
                     }
-                    if has_map_data || !is_xsb_string(trimmed_line) {
+                    if has_map_data {
                         return None;
                     }
-
-                    has_map_data = true;
+                    if is_xsb_string(trimmed_line) {
+                        has_map_data = true;
+                    }
 
                     None
                 }
@@ -324,6 +348,76 @@ impl From<Level> for Map {
         level.map
     }
 }
+
+#[derive(Debug)]
+struct Group<B> {
+    buf: B,
+}
+
+impl<B: BufRead> Iterator for Group<B> {
+    type Item = std::io::Result<String>;
+
+    fn next(&mut self) -> Option<std::io::Result<String>> {
+        let mut buf = String::new();
+        let mut in_block_comment = false;
+        let mut has_map_data = false;
+        loop {
+            let mut line = String::new();
+            match self.buf.read_line(&mut line) {
+                Ok(0) => {
+                    if buf.is_empty() {
+                        return None;
+                    } else {
+                        return Some(Ok(buf));
+                    }
+                }
+                Ok(_n) => {
+                    let trimmed_line = line.trim();
+                    buf += &line;
+                    if !in_block_comment {
+                        if trimmed_line.is_empty() {
+                            if has_map_data {
+                                return Some(Ok(buf));
+                            } else {
+                                buf.clear();
+                                continue;
+                            }
+                        }
+                        if let Some(comment) = trimmed_line.to_lowercase().strip_prefix("comment:")
+                        {
+                            if comment.trim_start().is_empty() {
+                                // Enter block comment
+                                in_block_comment = true;
+                            }
+                            continue;
+                        }
+                        if has_map_data {
+                            continue;
+                        }
+                        if is_xsb_string(trimmed_line) {
+                            has_map_data = true;
+                        }
+                    } else if trimmed_line.to_lowercase().starts_with("comment-end") {
+                        // Exit block comment
+                        in_block_comment = false;
+                    }
+                }
+                Err(e) => return Some(Err(e)),
+            }
+        }
+    }
+}
+
+trait GroupExt: BufRead {
+    fn group(self) -> Group<Self>
+    where
+        Self: Sized,
+    {
+        Group { buf: self }
+    }
+}
+
+impl<T: BufRead> GroupExt for T {}
 
 fn is_xsb_string(str: &str) -> bool {
     str.chars().all(is_xsb_symbol)
