@@ -9,7 +9,8 @@ A library provides the implementation of some algorithms and data structures rel
 ## Features
 
 - **Level**
-  - **Lazy parsing**: Parses the first n levels or the nth level from an XSB string containing multiple levels.
+  - **Zero-copy lazy parsing**: Parses levels lazily from an in-memory string without memory allocations except for level creation.
+  - **Lazy stream parsing**: Parses levels lazily from a stream.
   - **Map reconstruction**: Reconstructs the map from the solution.
   - **Normalization**: Removes elements from the map that are not relevant to the solution.
   - **RLE support**: Enables loading of levels encoded in Run-Length Encoding (RLE) format.
