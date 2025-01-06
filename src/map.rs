@@ -469,33 +469,23 @@ impl Map {
     /// Transforms the map based on the provided operation and new dimensions.
     fn transform(
         &mut self,
-        operation: impl Fn(Vector2<i32>) -> Vector2<i32>,
+        operation: impl Fn(Vector2<i32>) -> Vector2<i32> + Copy,
         new_dimensions: Vector2<i32>,
     ) {
         let mut transformed_map = Map::with_dimensions(new_dimensions);
         for x in 0..self.dimensions.x {
             for y in 0..self.dimensions.y {
                 let position = Vector2::new(x, y);
-                let transformed_position = operation(position);
-                transformed_map[transformed_position] = self[position];
+                transformed_map[operation(position)] = self[position];
             }
         }
         self.data = transformed_map.data;
         self.dimensions = transformed_map.dimensions;
         self.player_position = operation(self.player_position);
-        self.box_positions = self
-            .box_positions
-            .iter()
-            .map(|position| operation(*position))
-            .collect();
-        self.goal_positions = self
-            .goal_positions
-            .iter()
-            .map(|position| operation(*position))
-            .collect();
+        self.box_positions = self.box_positions.iter().copied().map(operation).collect();
+        self.goal_positions = self.goal_positions.iter().copied().map(operation).collect();
     }
 
-    /// Add walls around floors.
     fn add_walls_around_floors(&mut self) {
         for x in 1..self.dimensions.x - 1 {
             for y in 1..self.dimensions.y - 1 {
@@ -520,11 +510,6 @@ impl Map {
                 }
             }
         }
-    }
-
-    /// Adds floors to the map that contains only closed walls.
-    fn add_floors(&mut self, player_position: Vector2<i32>) {
-        self.flood_fill(player_position, Tiles::Floor, Tiles::Wall);
     }
 
     /// Performs a flood fill algorithm starting from the specified position,
@@ -634,7 +619,7 @@ impl FromStr for Map {
             return Err(ParseMapError::NoPlayer);
         }
 
-        instance.add_floors(instance.player_position);
+        instance.flood_fill(instance.player_position, Tiles::Floor, Tiles::Wall);
 
         Ok(instance)
     }
@@ -644,14 +629,16 @@ impl Index<Vector2<i32>> for Map {
     type Output = Tiles;
 
     fn index(&self, position: Vector2<i32>) -> &Tiles {
-        assert!(0 <= position.x && position.x < self.dimensions.x && 0 <= position.y);
+        assert!(0 <= position.x && position.x < self.dimensions.x);
+        assert!(0 <= position.y && position.y < self.dimensions.y);
         &self.data[(position.y * self.dimensions.x + position.x) as usize]
     }
 }
 
 impl IndexMut<Vector2<i32>> for Map {
     fn index_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
-        assert!(0 <= position.x && position.x < self.dimensions.x && 0 <= position.y);
+        assert!(0 <= position.x && position.x < self.dimensions.x);
+        assert!(0 <= position.y && position.y < self.dimensions.y);
         &mut self.data[(position.y * self.dimensions.x + position.x) as usize]
     }
 }
