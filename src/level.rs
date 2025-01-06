@@ -179,24 +179,17 @@ impl Level {
             let mut has_map_data = false;
             move |line| {
                 len += line.len() + 1;
-
                 let trimmed_line = line.trim();
-                if !in_block_comment && (trimmed_line.is_empty() || offset + len == str.len() + 1) {
-                    let group = &str[offset..offset + len - 1];
-                    offset += len;
-                    len = 0;
-                    if group.is_empty() || !has_map_data {
-                        return None;
-                    }
-                    has_map_data = false;
-                    Some(group)
-                } else {
-                    if in_block_comment {
-                        if trimmed_line.to_lowercase().starts_with("comment-end") {
-                            // Exit block comment
-                            in_block_comment = false;
+                if !in_block_comment {
+                    if trimmed_line.is_empty() || offset + len == str.len() + 1 {
+                        let group = &str[offset..offset + len - 1];
+                        offset += len;
+                        len = 0;
+                        if group.is_empty() || !has_map_data {
+                            return None;
                         }
-                        return None;
+                        has_map_data = false;
+                        return Some(group);
                     }
                     if let Some(comment) = trimmed_line.to_lowercase().strip_prefix("comment:") {
                         if comment.trim_start().is_empty() {
@@ -211,9 +204,11 @@ impl Level {
                     if is_xsb_string(trimmed_line) {
                         has_map_data = true;
                     }
-
-                    None
+                } else if trimmed_line.to_lowercase().starts_with("comment-end") {
+                    // Exit block comment
+                    in_block_comment = false;
                 }
+                None
             }
         })
     }
