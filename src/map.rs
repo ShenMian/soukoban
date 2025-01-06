@@ -546,7 +546,7 @@ impl FromStr for Map {
         // Calculate map dimensions and indentation
         let mut indent = i32::MAX;
         let mut dimensions = Vector2::<i32>::zeros();
-        let mut buffer = String::with_capacity(xsb.len());
+        let mut buf = String::with_capacity(xsb.len());
         for line in xsb.split(['\n', '|']) {
             let mut line = line.trim_end().to_string();
             if line.is_empty() {
@@ -559,7 +559,7 @@ impl FromStr for Map {
             dimensions.x = dimensions.x.max(line.len() as i32);
             dimensions.y += 1;
             indent = indent.min(line.chars().take_while(char::is_ascii_whitespace).count() as i32);
-            buffer += &(line + "\n");
+            buf += &(line + "\n");
         }
         dimensions.x -= indent;
 
@@ -567,7 +567,7 @@ impl FromStr for Map {
 
         // Parse map data
         let mut player_position = None;
-        for (y, line) in buffer.lines().enumerate() {
+        for (y, line) in buf.lines().enumerate() {
             // Trim map indentation
             let line = &line[indent as usize..];
             for (x, char) in line.chars().enumerate() {
