@@ -124,8 +124,9 @@ impl Solver {
 
     /// Returns a reference to the set of lower bounds.
     pub fn lower_bounds(&self) -> &HashMap<Vector2<i32>, i32> {
-        // TODO: Calculate lower bounds based on strategy
+        // FIXME: Calculate lower bounds based on strategy
         self.lower_bounds.get_or_init(|| {
+            assert!(self.strategy == Strategy::OptimalPush || self.strategy == Strategy::Fast);
             let mut lower_bounds = self.calculate_minimum_push();
             lower_bounds.shrink_to_fit();
             lower_bounds
