@@ -138,7 +138,6 @@ fn create_levels_from_reader() {
         if path.extension() != Some(std::ffi::OsStr::new("xsb")) {
             continue;
         }
-        dbg!(&path);
         let count = path
             .to_string_lossy()
             .rsplit_terminator(['_', '.'])
