@@ -215,7 +215,7 @@ impl Solver {
 
     /// Calculate and return the set of tunnels.
     ///
-    /// Tunnel is a common type of ineffective push.
+    /// Tunnel is a common type of no influence push.
     /// Since tunnels are only determined by the map terrain, they can be
     /// pre-calculated.
     fn calculate_tunnels(&self) -> HashSet<(Vector2<i32>, Direction)> {
@@ -238,29 +238,15 @@ impl Solver {
                 {
                     let player_position = box_position + &down.into();
 
-                    //  .
-                    // #$#
-                    // #@#
+                    //  .      .      .
+                    // #$# or #$_ or _$#
+                    // #@#    #@#    #@#
                     if self.map[player_position + &left.into()].intersects(Tiles::Wall)
                         && self.map[player_position + &right.into()].intersects(Tiles::Wall)
-                        && self.map[box_position + &left.into()].intersects(Tiles::Wall)
-                        && self.map[box_position + &right.into()].intersects(Tiles::Wall)
-                        && self.map[box_position].intersects(Tiles::Floor)
-                        && self
-                            .lower_bounds()
-                            .contains_key(&(box_position + &up.into()))
-                        && !self.map[box_position].intersects(Tiles::Goal)
-                    {
-                        tunnels.insert((player_position, up));
-                    }
-
-                    //  .      .
-                    // #$_ or _$#
-                    // #@#    #@#
-                    if self.map[player_position + &left.into()].intersects(Tiles::Wall)
-                        && self.map[player_position + &right.into()].intersects(Tiles::Wall)
-                        && (self.map[box_position + &right.into()].intersects(Tiles::Wall)
-                            && self.map[box_position + &left.into()].intersects(Tiles::Floor)
+                        && (self.map[box_position + &left.into()].intersects(Tiles::Wall)
+                            && self.map[box_position + &right.into()].intersects(Tiles::Wall)
+                            || self.map[box_position + &right.into()].intersects(Tiles::Wall)
+                                && self.map[box_position + &left.into()].intersects(Tiles::Floor)
                             || self.map[box_position + &right.into()].intersects(Tiles::Floor)
                                 && self.map[box_position + &left.into()].intersects(Tiles::Wall))
                         && self.map[box_position].intersects(Tiles::Floor)
