@@ -57,7 +57,7 @@ impl Node {
                 }
                 let mut new_player_position = *box_position;
 
-                let mut new_pushes = self.pushes;
+                let mut new_pushes = self.pushes + 1;
                 let mut new_moves = self.moves
                     + find_path(
                         self.state.player_position,
@@ -69,7 +69,8 @@ impl Node {
                         },
                     )
                     .unwrap()
-                    .len() as i32;
+                    .len() as i32
+                    - 1;
 
                 // Skip no influence pushes
                 while solver
