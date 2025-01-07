@@ -9,8 +9,11 @@ use itertools::Itertools;
 use nalgebra::Vector2;
 
 use crate::{
-    direction::Direction, node::Node, path_finding::reachable_area, state::State, Map, SearchError,
-    Tiles,
+    direction::Direction,
+    node::Node,
+    path_finding::{find_path, reachable_area},
+    state::State,
+    Action, Actions, Map, SearchError, Tiles,
 };
 
 /// The strategy to use when searching for a solution.
@@ -48,7 +51,7 @@ impl Solver {
     }
 
     /// Searches for solution using the A* algorithm.
-    pub fn a_star_search(&self) -> Result<(), SearchError> {
+    pub fn a_star_search(&self) -> Result<Actions, SearchError> {
         let mut heap = BinaryHeap::new();
         let mut came_from = HashMap::new();
         let mut visited = HashSet::new();
@@ -58,7 +61,7 @@ impl Solver {
 
         while let Some(node) = heap.pop() {
             if node.state.is_solved(self) {
-                return Ok(());
+                return Ok(self.construct_actions(node.state, &came_from));
             }
             for successor in node.successors(self) {
                 if !visited.insert(successor.state.normalized_hash(&self.map)) {
@@ -262,5 +265,53 @@ impl Solver {
             }
         }
         tunnels
+    }
+
+    fn construct_actions(&self, mut state: State, came_from: &HashMap<State, State>) -> Actions {
+        let mut actions = Actions::new();
+        while let Some(previous_state) = came_from.get(&state) {
+            // Find the positions where the box was moved from and to
+            let previous_box_position = *previous_state
+                .box_positions
+                .difference(&state.box_positions)
+                .next()
+                .unwrap();
+            let mut box_position = *state
+                .box_positions
+                .difference(&previous_state.box_positions)
+                .next()
+                .unwrap();
+
+            // Determine the direction of the push
+            let diff = box_position - previous_box_position;
+            let push_direction =
+                Direction::try_from(Vector2::new(diff.x.signum(), diff.y.signum())).unwrap();
+
+            // Find the path for the player to reach the box position before pushing it
+            let mut new_actions: Vec<_> = find_path(
+                previous_state.player_position,
+                previous_box_position - &push_direction.into(),
+                |position| {
+                    !self.map()[position].intersects(Tiles::Wall)
+                        && !previous_state.box_positions.contains(&position)
+                },
+            )
+            .unwrap()
+            .windows(2)
+            .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
+            .map(Action::Move)
+            .collect();
+
+            new_actions.push(Action::Push(push_direction));
+
+            while self.tunnels().contains(&(box_position, push_direction)) {
+                box_position += &push_direction.into();
+                new_actions.push(Action::Push(push_direction));
+            }
+
+            actions.splice(0..0, new_actions.iter().copied());
+            state = previous_state.clone();
+        }
+        actions
     }
 }
