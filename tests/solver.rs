@@ -6,15 +6,10 @@ use utils::*;
 
 fn solve(mut level: Level) {
     let map = level.map().clone();
-    println!("{map}");
     let solver = Solver::new(map, Strategy::Fast);
     let solution = solver.a_star_search().unwrap();
     assert!(solver.ida_star_search().is_ok());
-    println!("Solution: {}", solution);
-    let directions = solution.iter().map(|action| {
-        dbg!(action);
-        action.direction()
-    });
+    let directions = solution.iter().map(|action| action.direction());
     level.do_actions(directions).unwrap();
     assert!(level.is_solved());
 }
