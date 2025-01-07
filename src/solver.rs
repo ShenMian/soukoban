@@ -276,7 +276,7 @@ impl Solver {
                 .difference(&state.box_positions)
                 .next()
                 .unwrap();
-            let mut box_position = *state
+            let box_position = *state
                 .box_positions
                 .difference(&previous_state.box_positions)
                 .next()
@@ -304,8 +304,9 @@ impl Solver {
 
             new_actions.push(Action::Push(push_direction));
 
-            while self.tunnels().contains(&(box_position, push_direction)) {
-                box_position += &push_direction.into();
+            let mut new_box_position = previous_box_position + &push_direction.into();
+            while self.tunnels().contains(&(new_box_position, push_direction)) {
+                new_box_position += &push_direction.into();
                 new_actions.push(Action::Push(push_direction));
             }
 
