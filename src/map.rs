@@ -40,21 +40,17 @@ impl Map {
         let mut min_position = Vector2::<i32>::zeros();
         let mut max_position = Vector2::<i32>::zeros();
 
-        // Calculate the dimensions of the player's movement range
+        // Calculate the dimensions of the player's and pushed box's movement range
         let mut player_position = Vector2::zeros();
         for action in &*actions {
             player_position += &action.direction().into();
-            min_position = min_position.zip_map(&player_position, |a, b| a.min(b));
-            max_position = max_position.zip_map(&player_position, |a, b| a.max(b));
             if action.is_push() {
-                min_position = min_position
-                    .zip_map(&(player_position + &action.direction().into()), |a, b| {
-                        a.min(b)
-                    });
-                max_position = max_position
-                    .zip_map(&(player_position + &action.direction().into()), |a, b| {
-                        a.max(b)
-                    });
+                let box_position = player_position + &action.direction().into();
+                min_position = min_position.zip_map(&box_position, std::cmp::min);
+                max_position = max_position.zip_map(&box_position, std::cmp::max);
+            } else {
+                min_position = min_position.zip_map(&player_position, std::cmp::min);
+                max_position = max_position.zip_map(&player_position, std::cmp::max);
             }
         }
 
