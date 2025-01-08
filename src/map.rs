@@ -37,35 +37,8 @@ impl Map {
     /// Tries to restore the map with a complete solution. This method can only
     /// restore the parts of the map that are used by the solution.
     pub fn from_actions(actions: Actions) -> Result<Self, ParseMapError> {
-        let mut min_position = Vector2::<i32>::zeros();
-        let mut max_position = Vector2::<i32>::zeros();
+        let (dimensions, player_position) = calculate_dimensions_and_player_position(&actions);
 
-        // Calculate the dimensions of the player's and pushed box's movement range
-        let mut player_position = Vector2::zeros();
-        for action in &*actions {
-            player_position += &action.direction().into();
-            if action.is_push() {
-                let box_position = player_position + &action.direction().into();
-                min_position = min_position.zip_map(&box_position, std::cmp::min);
-                max_position = max_position.zip_map(&box_position, std::cmp::max);
-            } else {
-                min_position = min_position.zip_map(&player_position, std::cmp::min);
-                max_position = max_position.zip_map(&player_position, std::cmp::max);
-            }
-        }
-
-        // Reserve space for walls
-        min_position -= Vector2::new(1, 1);
-        max_position += Vector2::new(1, 1);
-
-        if min_position.x < 0 {
-            player_position.x = min_position.x.abs();
-        }
-        if min_position.y < 0 {
-            player_position.y = min_position.y.abs();
-        }
-
-        let dimensions = min_position.abs() + max_position.abs() + Vector2::new(1, 1);
         let mut instance = Map::with_dimensions(dimensions);
 
         let mut initial_box_positions = HashSet::new();
@@ -106,7 +79,6 @@ impl Map {
         for goal_position in &goal_positions {
             instance[*goal_position].insert(Tiles::Goal);
         }
-
         instance.add_walls_around_floors();
 
         instance.player_position = player_position;
@@ -115,11 +87,10 @@ impl Map {
 
         // Verify the solution
         let mut level = Level::from_map(instance.clone());
-        for action in &*actions {
-            level
-                .do_action(action.direction())
-                .map_err(|_| ParseMapError::InvalidActions)?;
-        }
+        let directions = actions.iter().map(|action| action.direction());
+        level
+            .do_actions(directions)
+            .map_err(|_| ParseMapError::InvalidActions)?;
         if !level.map().is_solved() {
             return Err(ParseMapError::InvalidActions);
         }
@@ -655,4 +626,38 @@ impl fmt::Display for Map {
         }
         Ok(())
     }
+}
+
+fn calculate_dimensions_and_player_position(actions: &Actions) -> (Vector2<i32>, Vector2<i32>) {
+    let mut min_position = Vector2::<i32>::zeros();
+    let mut max_position = Vector2::<i32>::zeros();
+
+    // Calculate the dimensions of the player's and pushed box's movement range
+    let mut player_position = Vector2::zeros();
+    for action in &**actions {
+        player_position += &action.direction().into();
+        if action.is_push() {
+            let box_position = player_position + &action.direction().into();
+            min_position = min_position.zip_map(&box_position, std::cmp::min);
+            max_position = max_position.zip_map(&box_position, std::cmp::max);
+        } else {
+            min_position = min_position.zip_map(&player_position, std::cmp::min);
+            max_position = max_position.zip_map(&player_position, std::cmp::max);
+        }
+    }
+
+    // Reserve space for walls
+    min_position -= Vector2::new(1, 1);
+    max_position += Vector2::new(1, 1);
+
+    if min_position.x < 0 {
+        player_position.x = min_position.x.abs();
+    }
+    if min_position.y < 0 {
+        player_position.y = min_position.y.abs();
+    }
+
+    let dimensions = min_position.abs() + max_position.abs() + Vector2::new(1, 1);
+
+    (dimensions, player_position)
 }
