@@ -42,7 +42,7 @@ impl Map {
 
         // Calculate the dimensions of the player's movement range
         let mut player_position = Vector2::zeros();
-        for action in &**actions {
+        for action in &*actions {
             player_position += &action.direction().into();
             min_position = min_position.zip_map(&player_position, |a, b| a.min(b));
             max_position = max_position.zip_map(&player_position, |a, b| a.max(b));
@@ -75,7 +75,7 @@ impl Map {
         let mut initial_box_positions = HashSet::new();
         let mut current_box_positions = HashSet::new();
         let mut current_player_position = player_position;
-        for action in &**actions {
+        for action in &*actions {
             instance[current_player_position] = Tiles::Floor;
             current_player_position += &action.direction().into();
             if action.is_push() {
@@ -119,7 +119,7 @@ impl Map {
 
         // Verify the solution
         let mut level = Level::from_map(instance.clone());
-        for action in &**actions {
+        for action in &*actions {
             level
                 .do_action(action.direction())
                 .map_err(|_| ParseMapError::InvalidActions)?;
