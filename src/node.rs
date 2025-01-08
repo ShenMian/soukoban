@@ -19,6 +19,7 @@ pub struct Node {
 }
 
 impl Node {
+    /// Creates a new `Node`.
     pub fn new(state: State, pushes: i32, moves: i32, solver: &Solver) -> Self {
         let heuristic = state.heuristic(solver);
         let priority = match solver.strategy() {
