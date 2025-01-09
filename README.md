@@ -9,7 +9,7 @@ A library provides the implementation of some algorithms and data structures rel
 ## Features
 
 - **Level**
-  - **Zero-copy lazy parsing**: Parses levels lazily from an in-memory string without memory allocations except for level creation.
+  - **Zero-allocation lazy parsing**: Parses levels lazily from an in-memory string without memory allocations except for level creation.
   - **Lazy stream parsing**: Parses levels lazily from a stream.
   - **Map reconstruction**: Reconstructs the map from the solution.
   - **Normalization**: Removes elements from the map that are not relevant to the solution.
