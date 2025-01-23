@@ -13,9 +13,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/cache@v4
+      - name: Cache Cargo artifacts
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -25,7 +27,8 @@ jobs:
             target/
           key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Bench
         run: cargo bench -- --verbose
