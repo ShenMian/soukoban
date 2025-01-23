@@ -28,6 +28,7 @@ fn a_star_search(c: &mut Criterion) {
     bench_solve(level);
 }
 
+/*
 fn ida_star_search(c: &mut Criterion) {
     let mut bench_solve = |level: Level| {
         c.bench_function(
@@ -47,6 +48,7 @@ fn ida_star_search(c: &mut Criterion) {
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
     bench_solve(level);
 }
+*/
 
 fn tunnels(c: &mut Criterion) {
     let level = Level::from_str(PATH).unwrap();
@@ -60,4 +62,4 @@ fn tunnels(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, a_star_search, ida_star_search, tunnels);
+criterion_group!(benches, a_star_search, tunnels);
