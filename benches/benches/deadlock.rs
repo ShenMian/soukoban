@@ -8,7 +8,7 @@ use super::utils::*;
 fn calculate_unused_floors(c: &mut Criterion) {
     let map = Map::from_str(WORLDCUP2014).unwrap();
     c.bench_function("deadlock::calculate_unused_floors", |b| {
-        b.iter(|| black_box(deadlock::calculate_unused_floors(black_box(map.clone()))))
+        b.iter(|| black_box(deadlock::calculate_useless_floors(black_box(map.clone()))))
     });
 }
 

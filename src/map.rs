@@ -158,8 +158,8 @@ impl Map {
     /// This method can make different maps with the same solution more similar.
     /// Therefore, it can be used for map deduplication.
     pub fn normalize(&mut self) {
-        self.set_immovable_boxes_to_walls();
-        self.set_unused_floors_to_walls();
+        self.set_useless_boxes_to_walls();
+        self.set_useless_floors_to_walls();
         self.remove_unreachable_walls();
         self.remove_unreachable_boxes();
         self.shrink_to_fit();
@@ -350,32 +350,24 @@ impl Map {
     }
 
     /// Sets unused floors to walls.
-    fn set_unused_floors_to_walls(&mut self) {
-        for unused_floor in calculate_unused_floors(self.clone()) {
-            self[unused_floor].remove(Tiles::Floor);
-            self[unused_floor].insert(Tiles::Wall);
+    fn set_useless_floors_to_walls(&mut self) {
+        for useless_floor in calculate_useless_floors(self.clone()) {
+            self[useless_floor].remove(Tiles::Floor);
+            self[useless_floor].insert(Tiles::Wall);
         }
     }
 
-    /// Sets immovable boxes to walls.
-    fn set_immovable_boxes_to_walls(&mut self) {
-        for position in self
-            .box_positions
-            .intersection(&self.goal_positions)
-            .copied()
-            .collect::<HashSet<_>>()
-        {
-            // If the current box is deadlocked
-            if is_freeze_deadlock(self, position, &self.box_positions, &mut HashSet::new()) {
-                debug_assert!(
-                    self[position].contains(Tiles::Box | Tiles::Goal),
-                    "map has no solution"
-                );
-                self.remove_goal_position(position);
-                self.remove_box_position(position);
-                self[position].remove(Tiles::Floor);
-                self[position].insert(Tiles::Wall);
-            }
+    /// Sets useless boxes to walls.
+    fn set_useless_boxes_to_walls(&mut self) {
+        debug_assert!(self
+            .goal_positions
+            .is_superset(&calculate_useless_boxes(self)));
+
+        for position in calculate_useless_boxes(self) {
+            self.remove_goal_position(position);
+            self.remove_box_position(position);
+            self[position].remove(Tiles::Floor);
+            self[position].insert(Tiles::Wall);
         }
     }
 
@@ -394,7 +386,7 @@ impl Map {
             .iter()
             .filter(|position| !self[**position].intersects(Tiles::Floor))
             .copied()
-            .collect::<HashSet<_>>()
+            .collect::<Vec<_>>()
         {
             debug_assert!(
                 self[position].contains(Tiles::Box | Tiles::Goal),
