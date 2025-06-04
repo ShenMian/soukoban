@@ -31,14 +31,18 @@ impl State {
             .sum()
     }
 
+    /// Normalizes the state.
+    pub fn normalize(&mut self, map: &Map) {
+        self.player_position = normalized_area(&reachable_area(self.player_position, |position| {
+            !(map[position].intersects(Tiles::Wall) || self.box_positions.contains(&position))
+        }))
+        .unwrap();
+    }
+
     /// Returns the hash of the normalized state.
     pub fn normalized_hash(&self, map: &Map) -> u64 {
         let mut normalized_state = self.clone();
-        normalized_state.player_position =
-            normalized_area(&reachable_area(self.player_position, |position| {
-                !(map[position].intersects(Tiles::Wall) || self.box_positions.contains(&position))
-            }))
-            .unwrap();
+        normalized_state.normalize(map);
         let mut hasher = DefaultHasher::new();
         normalized_state.hash(&mut hasher);
         hasher.finish()
