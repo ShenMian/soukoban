@@ -53,12 +53,3 @@ impl Hash for State {
         }
     }
 }
-
-impl From<Map> for State {
-    fn from(map: Map) -> Self {
-        Self {
-            player_position: map.player_position(),
-            box_positions: map.box_positions().clone(),
-        }
-    }
-}

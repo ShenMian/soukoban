@@ -12,7 +12,7 @@ use nalgebra::Vector2;
 
 use crate::{
     actions::Actions, deadlock::*, direction::Direction, error::ParseMapError, level::Level,
-    path_finding::*, run_length::rle_decode, tiles::Tiles,
+    path_finding::*, run_length::rle_decode, state::State, tiles::Tiles,
 };
 
 /// A grid-based map.
@@ -617,6 +617,15 @@ impl fmt::Display for Map {
             writeln!(f)?;
         }
         Ok(())
+    }
+}
+
+impl From<Map> for State {
+    fn from(map: Map) -> Self {
+        Self {
+            player_position: map.player_position,
+            box_positions: map.box_positions,
+        }
     }
 }
 
