@@ -217,7 +217,7 @@ impl Solver {
         }
     }
 
-    /// Calculate and return the set of tunnels.
+    /// Calculates and returns the set of tunnels.
     ///
     /// Tunnel is a common type of no influence push.
     /// Since tunnels are only determined by the map terrain, they can be
@@ -231,35 +231,30 @@ impl Solver {
                     continue;
                 }
 
-                for (up, right, down, left) in [
-                    Direction::Up,
-                    Direction::Right,
-                    Direction::Down,
-                    Direction::Left,
-                ]
-                .into_iter()
-                .circular_tuple_windows()
-                {
-                    let player_position = box_position + &down.into();
+                for (up, right, down, left) in Direction::iter().circular_tuple_windows() {
+                    let push_direction = up;
+                    let (up, right, down, left) =
+                        (up.into(), right.into(), down.into(), left.into());
 
+                    let player_position = box_position + &down;
+
+                    // Tunnel patterns:
                     //  .      .      .
                     // #$# or #$_ or _$#
                     // #@#    #@#    #@#
-                    if self.map[player_position + &left.into()].intersects(Tiles::Wall)
-                        && self.map[player_position + &right.into()].intersects(Tiles::Wall)
-                        && (self.map[box_position + &left.into()].intersects(Tiles::Wall)
-                            && self.map[box_position + &right.into()].intersects(Tiles::Wall)
-                            || self.map[box_position + &right.into()].intersects(Tiles::Wall)
-                                && self.map[box_position + &left.into()].intersects(Tiles::Floor)
-                            || self.map[box_position + &right.into()].intersects(Tiles::Floor)
-                                && self.map[box_position + &left.into()].intersects(Tiles::Wall))
+                    if self.map[player_position + &left].intersects(Tiles::Wall)
+                        && self.map[player_position + &right].intersects(Tiles::Wall)
+                        && (self.map[box_position + &left].intersects(Tiles::Wall)
+                            && self.map[box_position + &right].intersects(Tiles::Wall)
+                            || self.map[box_position + &right].intersects(Tiles::Wall)
+                                && self.map[box_position + &left].intersects(Tiles::Floor)
+                            || self.map[box_position + &right].intersects(Tiles::Floor)
+                                && self.map[box_position + &left].intersects(Tiles::Wall))
                         && self.map[box_position].intersects(Tiles::Floor)
-                        && self
-                            .lower_bounds()
-                            .contains_key(&(box_position + &up.into()))
+                        && self.lower_bounds().contains_key(&(box_position + &up))
                         && !self.map[box_position].intersects(Tiles::Goal)
                     {
-                        tunnels.insert((player_position, up));
+                        tunnels.insert((player_position, push_direction));
                     }
                 }
             }
