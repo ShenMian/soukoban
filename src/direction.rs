@@ -19,9 +19,8 @@ pub enum Direction {
 
 impl Direction {
     /// Returns an iterator over all directions.
-    pub fn iter() -> impl Iterator<Item = Direction> {
-        use Direction::*;
-        [Up, Down, Left, Right].iter().copied()
+    pub fn iter() -> std::array::IntoIter<Direction, 4> {
+        [Self::Up, Self::Down, Self::Left, Self::Right].into_iter()
     }
 
     /// Rotate the direction 90° clockwise.
