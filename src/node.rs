@@ -74,15 +74,15 @@ impl Node {
                     - 1;
 
                 // Skip no influence pushes
-                while solver
-                    .tunnels()
-                    .contains(&(new_box_position, push_direction))
-                {
-                    new_player_position = &new_box_position;
-                    new_box_position += push_direction.into();
-                    new_pushes += 1;
-                    new_moves += 1;
-                }
+                // while solver
+                //     .tunnels()
+                //     .contains(&(new_box_position, push_direction))
+                // {
+                //     new_player_position = &new_box_position;
+                //     new_box_position += push_direction.into();
+                //     new_pushes += 1;
+                //     new_moves += 1;
+                // }
 
                 let mut new_box_positions = self.state.box_positions.clone();
                 new_box_positions.remove(&box_position);
