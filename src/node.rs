@@ -56,13 +56,13 @@ impl Node {
                 if !player_reachable_area.contains(&new_player_position) {
                     continue;
                 }
-                let mut new_player_position = *box_position;
+                let mut new_player_position = box_position;
 
                 let mut new_pushes = self.pushes + 1;
                 let mut new_moves = self.moves
                     + find_path(
                         self.state.player_position,
-                        new_player_position,
+                        *new_player_position,
                         |position| {
                             !solver.map()[position].intersects(Tiles::Wall)
                                 && (!self.state.box_positions.contains(&position)
@@ -78,14 +78,14 @@ impl Node {
                     .tunnels()
                     .contains(&(new_box_position, push_direction))
                 {
-                    new_player_position = new_box_position;
-                    new_box_position += &push_direction.into();
+                    new_player_position = &new_box_position;
+                    new_box_position += push_direction.into();
                     new_pushes += 1;
                     new_moves += 1;
                 }
 
                 let mut new_box_positions = self.state.box_positions.clone();
-                new_box_positions.remove(box_position);
+                new_box_positions.remove(&box_position);
                 new_box_positions.insert(new_box_position);
 
                 // Skip freeze deadlocks
@@ -102,7 +102,7 @@ impl Node {
 
                 successors.push(Node::new(
                     State {
-                        player_position: new_player_position,
+                        player_position: *new_player_position,
                         box_positions: new_box_positions,
                     },
                     new_pushes,

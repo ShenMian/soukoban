@@ -8,7 +8,6 @@ use std::{
 };
 
 use itertools::Itertools;
-use nalgebra::Vector2;
 
 use crate::{
     action::Action,
@@ -17,6 +16,7 @@ use crate::{
     error::{ActionError, ParseLevelError, ParseMapError},
     map::Map,
     path_finding::reachable_area,
+    point::Point,
     tiles::Tiles,
 };
 
@@ -75,15 +75,14 @@ impl Level {
     pub fn do_action(&mut self, direction: Direction) -> Result<(), ActionError> {
         if self.actions.last() == Some(&Action::Move(-direction)) {
             self.undo_action().unwrap();
-            return Ok(());
         }
 
-        let new_player_position = self.map.player_position() + &direction.into();
+        let new_player_position = self.map.player_position() + direction.into();
         if self.map[new_player_position].intersects(Tiles::Wall) {
             return Err(ActionError::MoveBlocked);
         }
         if self.map[new_player_position].intersects(Tiles::Box) {
-            let new_box_position = new_player_position + &direction.into();
+            let new_box_position = new_player_position + direction.into();
             if self.map[new_box_position].intersects(Tiles::Wall | Tiles::Box) {
                 return Err(ActionError::PushBlocked);
             }
@@ -102,7 +101,7 @@ impl Level {
     pub fn undo_action(&mut self) -> Result<(), ActionError> {
         if let Some(last_action) = self.actions.pop() {
             if last_action.is_push() {
-                let box_position = self.map.player_position() + &last_action.direction().into();
+                let box_position = self.map.player_position() + last_action.direction().into();
                 let prev_box_position = self.map.player_position();
                 self.map.set_box_position(box_position, prev_box_position);
             }
@@ -133,7 +132,7 @@ impl Level {
     }
 
     /// Returns the reachable area for the player.
-    pub fn player_reachable_area(&self) -> HashSet<Vector2<i32>> {
+    pub fn player_reachable_area(&self) -> HashSet<Point> {
         reachable_area(self.map.player_position(), |position| {
             self.map.can_move(position)
         })

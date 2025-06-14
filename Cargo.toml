@@ -22,7 +22,6 @@ bench = false
 [dependencies]
 bitflags = "2.8"
 itertools = "0.14"
-nalgebra = "0.33"
 thiserror = "2.0"
 
 [dev-dependencies]

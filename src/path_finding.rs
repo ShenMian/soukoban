@@ -5,13 +5,11 @@ use std::{
     collections::{BinaryHeap, HashMap, HashSet, VecDeque},
 };
 
-use nalgebra::Vector2;
-
-use crate::{direction::Direction, map::Map, Tiles};
+use crate::{direction::Direction, map::Map, point::Point, Tiles};
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 struct Node {
-    position: Vector2<i32>,
+    position: Point,
     heuristic: i32,
 }
 
@@ -32,11 +30,7 @@ impl PartialOrd for Node {
 /// This function uses the A* algorithm to find the shortest path from the
 /// starting position to the target position, based on the provided `can_move`
 /// function.
-pub fn find_path(
-    from: Vector2<i32>,
-    to: Vector2<i32>,
-    can_move: impl Fn(Vector2<i32>) -> bool,
-) -> Option<Vec<Vector2<i32>>> {
+pub fn find_path(from: Point, to: Point, can_move: impl Fn(Point) -> bool) -> Option<Vec<Point>> {
     let mut open_set = BinaryHeap::new();
     let mut came_from = HashMap::new();
     let mut cost = HashMap::new();
@@ -53,7 +47,7 @@ pub fn find_path(
         }
 
         for direction in Direction::iter() {
-            let new_position = node.position + &direction.into();
+            let new_position = node.position + direction.into();
             if !can_move(new_position) {
                 continue;
             }
@@ -75,10 +69,10 @@ pub fn find_path(
 }
 
 fn construct_path(
-    from: Vector2<i32>,
-    to: Vector2<i32>,
-    came_from: HashMap<Vector2<i32>, Vector2<i32>>,
-) -> Vec<Vector2<i32>> {
+    from: Point,
+    to: Point,
+    came_from: HashMap<Point, Point>,
+) -> Vec<Point> {
     let mut path = Vec::new();
     let mut current = to;
     while current != from {
@@ -95,13 +89,13 @@ fn construct_path(
 ///
 /// This function finds a path using the A* algorithm from the player's current
 /// position to the target position, based on the provided `can_move` function.
-pub fn player_move_path(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
+pub fn player_move_path(map: &Map, to: Point) -> Option<Vec<Direction>> {
     let path = find_path(map.player_position(), to, |position| map.can_move(position))?;
     Some(convert_path_from_points_to_directions(path))
 }
 
 /// Converts a position path into a direction path.
-fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direction> {
+fn convert_path_from_points_to_directions(path: Vec<Point>) -> Vec<Direction> {
     path.windows(2)
         .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
         .collect()
@@ -122,15 +116,15 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 //   - 使用递归, 增量更新玩家可达范围.
 pub fn box_move_waypoints(
     map: &Map,
-    initial_box_position: Vector2<i32>,
-) -> HashMap<(Vector2<i32>, Direction), u64> {
+    initial_box_position: Point,
+) -> HashMap<(Point, Direction), u64> {
     debug_assert!(
         map.box_positions().contains(&initial_box_position),
         "box position does not exist"
     );
 
     let mut deque = VecDeque::new();
-    let mut path: HashMap<(Vector2<i32>, Direction), u64> = HashMap::new();
+    let mut path: HashMap<(Point, Direction), u64> = HashMap::new();
 
     let player_reachable_area = reachable_area(map.player_position(), |position| {
         position == initial_box_position || map.can_move(position)
@@ -151,7 +145,7 @@ pub fn box_move_waypoints(
 
         let new_cost = cost + 1;
         for push_direction in Direction::iter() {
-            let new_box_position = box_position + &push_direction.into();
+            let new_box_position = box_position + push_direction.into();
             if !(new_box_position == initial_box_position || map.can_move(new_box_position)) {
                 continue;
             }
@@ -176,10 +170,10 @@ pub fn box_move_waypoints(
 /// Creates a path for a box to move from its current position to a target
 /// position.
 pub fn construct_box_path(
-    from: Vector2<i32>,
-    to: Vector2<i32>,
-    waypoints: &HashMap<(Vector2<i32>, Direction), u64>,
-) -> Vec<Vector2<i32>> {
+    from: Point,
+    to: Point,
+    waypoints: &HashMap<(Point, Direction), u64>,
+) -> Vec<Point> {
     let mut path = Vec::new();
     let mut current = to;
     // FIXME: 遇到回头路会提前退出
@@ -191,7 +185,7 @@ pub fn construct_box_path(
                 directions.push(push_direction);
             }
         }
-        let mut min_neighbor = Vector2::zeros();
+        let mut min_neighbor = Point::zeros();
         let mut min_cost = u64::MAX;
         for push_direction in &directions {
             let neighbor = current - &(*push_direction).into();
@@ -219,9 +213,9 @@ pub fn construct_box_path(
 /// Constructs player path based on box path.
 pub fn construct_player_path(
     map: &Map,
-    mut player_position: Vector2<i32>,
-    box_path: &[Vector2<i32>],
-) -> Vec<Vector2<i32>> {
+    mut player_position: Point,
+    box_path: &[Point],
+) -> Vec<Point> {
     let mut path = Vec::new();
     let initial_box_position = *box_path.first().unwrap();
     for box_positions in box_path.windows(2) {
@@ -242,7 +236,7 @@ pub fn construct_player_path(
 }
 
 /// Returns a set of positions of the boxes that can be pushed by the player.
-pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
+pub fn pushable_boxes(map: &Map) -> HashSet<Point> {
     let player_reachable_area =
         reachable_area(map.player_position(), |position| map.can_move(position));
     let mut pushable_boxes = HashSet::new();
@@ -266,11 +260,11 @@ pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
 /// that can be reached from the starting position, based on the provided
 /// `can_move` function.
 pub fn reachable_area(
-    position: Vector2<i32>,
-    can_move: impl Fn(Vector2<i32>) -> bool,
-) -> HashSet<Vector2<i32>> {
+    position: Point,
+    can_move: impl Fn(Point) -> bool,
+) -> HashSet<Point> {
     let mut reachable_area = HashSet::new();
-    let mut deque = VecDeque::<Vector2<i32>>::new();
+    let mut deque = VecDeque::<Point>::new();
     deque.push_back(position);
 
     while let Some(position) = deque.pop_front() {
@@ -278,7 +272,7 @@ pub fn reachable_area(
             continue;
         }
         for direction in Direction::iter() {
-            let neighbor = position + &direction.into();
+            let neighbor = position + direction.into();
             if can_move(neighbor) {
                 deque.push_back(neighbor);
             }
@@ -289,13 +283,13 @@ pub fn reachable_area(
 }
 
 /// Returns the top-left position.
-pub fn normalized_area(area: &HashSet<Vector2<i32>>) -> Option<Vector2<i32>> {
+pub fn normalized_area(area: &HashSet<Point>) -> Option<Point> {
     area.iter()
         .min_by(|a, b| a.y.cmp(&b.y).then_with(|| a.x.cmp(&b.x)))
         .copied()
 }
 
 /// Calculates the Manhattan distance between two 2D vectors.
-fn manhattan_distance(a: Vector2<i32>, b: Vector2<i32>) -> i32 {
+fn manhattan_distance(a: Point, b: Point) -> i32 {
     (a.x - b.x).abs() + (a.y - b.y).abs()
 }

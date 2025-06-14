@@ -8,11 +8,9 @@ use std::{
     str::FromStr,
 };
 
-use nalgebra::Vector2;
-
 use crate::{
     actions::Actions, deadlock::*, direction::Direction, error::ParseMapError, level::Level,
-    path_finding::*, run_length::rle_decode, state::State, tiles::Tiles,
+    path_finding::*, point::Point, run_length::rle_decode, state::State, tiles::Tiles,
 };
 
 /// A grid-based map.
@@ -24,11 +22,11 @@ use crate::{
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Map {
     data: Vec<Tiles>,
-    dimensions: Vector2<i32>,
+    dimensions: Point,
 
-    player_position: Vector2<i32>,
-    box_positions: HashSet<Vector2<i32>>,
-    goal_positions: HashSet<Vector2<i32>>,
+    player_position: Point,
+    box_positions: HashSet<Point>,
+    goal_positions: HashSet<Point>,
 }
 
 impl Map {
@@ -46,9 +44,9 @@ impl Map {
         let mut current_player_position = player_position;
         for action in &*actions {
             instance[current_player_position] = Tiles::Floor;
-            current_player_position += &action.direction().into();
+            current_player_position += action.direction().into();
             if action.is_push() {
-                instance[current_player_position + &action.direction().into()] = Tiles::Floor;
+                instance[current_player_position + action.direction().into()] = Tiles::Floor;
                 // The player pushed the box when moving, which means there is a box at the
                 // player's current position
                 if !current_box_positions.contains(&current_player_position) {
@@ -56,7 +54,7 @@ impl Map {
                     initial_box_positions.insert(current_player_position);
                 }
                 current_box_positions.remove(&current_player_position);
-                current_box_positions.insert(current_player_position + &action.direction().into());
+                current_box_positions.insert(current_player_position + action.direction().into());
             }
         }
         instance[current_player_position] = Tiles::Floor;
@@ -102,45 +100,45 @@ impl Map {
     ///
     /// Warning: This will create an invalid map. Some associated functions will
     /// not work properly until the map becomes valid.
-    pub fn with_dimensions(dimensions: Vector2<i32>) -> Self {
+    pub fn with_dimensions(dimensions: Point) -> Self {
         Self {
             data: vec![Tiles::empty(); (dimensions.x * dimensions.y) as usize],
             dimensions,
-            player_position: Vector2::zeros(),
+            player_position: Point::zeros(),
             box_positions: HashSet::new(),
             goal_positions: HashSet::new(),
         }
     }
 
     /// Returns the dimensions of the map.
-    pub fn dimensions(&self) -> Vector2<i32> {
+    pub fn dimensions(&self) -> Point {
         self.dimensions
     }
 
     /// Returns the position of the player.
-    pub fn player_position(&self) -> Vector2<i32> {
+    pub fn player_position(&self) -> Point {
         self.player_position
     }
 
     /// Sets the position of the player.
-    pub fn set_player_position(&mut self, position: Vector2<i32>) {
+    pub fn set_player_position(&mut self, position: Point) {
         self.index_mut(self.player_position).remove(Tiles::Player);
         self[position].insert(Tiles::Player);
         self.player_position = position;
     }
 
     /// Returns a reference to the positions of the boxes.
-    pub fn box_positions(&self) -> &HashSet<Vector2<i32>> {
+    pub fn box_positions(&self) -> &HashSet<Point> {
         &self.box_positions
     }
 
     /// Returns a reference to the positions of the goals.
-    pub fn goal_positions(&self) -> &HashSet<Vector2<i32>> {
+    pub fn goal_positions(&self) -> &HashSet<Point> {
         &self.goal_positions
     }
 
     /// Sets a box position from one to another.
-    pub fn set_box_position(&mut self, from: Vector2<i32>, to: Vector2<i32>) {
+    pub fn set_box_position(&mut self, from: Point, to: Point) {
         self.remove_box_position(from);
         self.add_box_position(to);
     }
@@ -170,11 +168,11 @@ impl Map {
     /// map.
     pub fn shrink_to_fit(&mut self) {
         let mut new_dimensions = self.dimensions;
-        let mut offset = Vector2::new(0, 0);
+        let mut offset = Point::new(0, 0);
 
         // Trim top empty rows and bottom empty rows
         let is_row_empty = |y| {
-            let mut row = (0..self.dimensions.x).map(|x| self[Vector2::new(x, y)]);
+            let mut row = (0..self.dimensions.x).map(|x| self[Point::new(x, y)]);
             row.all(|tiles| tiles.is_empty())
         };
         for y in 0..self.dimensions.y {
@@ -196,7 +194,7 @@ impl Map {
 
         // Trim left empty columns and right empty columns
         let is_column_empty = |x| {
-            let mut column = (0..self.dimensions.y).map(|y| self[Vector2::new(x, y)]);
+            let mut column = (0..self.dimensions.y).map(|y| self[Point::new(x, y)]);
             column.all(|tiles| tiles.is_empty())
         };
         for x in 0..self.dimensions.x {
@@ -220,11 +218,11 @@ impl Map {
 
     /// Truncates the map to the provided dimensions and copies tiles from the
     /// original map start at the specified offset to the new map.
-    pub fn truncate(&mut self, new_dimensions: Vector2<i32>, offset: Vector2<i32>) {
+    pub fn truncate(&mut self, new_dimensions: Point, offset: Point) {
         let mut clamped_map = Map::with_dimensions(new_dimensions);
         for y in 0..new_dimensions.y {
             for x in 0..new_dimensions.x {
-                let position = Vector2::new(x, y);
+                let position = Point::new(x, y);
                 clamped_map[position] = self[position + offset];
             }
         }
@@ -245,14 +243,14 @@ impl Map {
     }
 
     /// Returns tiles at the specified position or `None` if out of bounds.
-    pub fn get(&self, position: Vector2<i32>) -> Option<&Tiles> {
+    pub fn get(&self, position: Point) -> Option<&Tiles> {
         self.data
             .get((position.y * self.dimensions.x + position.x) as usize)
     }
 
     /// Returns a mutable reference to tiles at the specified position or `None`
     /// if out of bounds.
-    pub fn get_mut(&mut self, position: Vector2<i32>) -> Option<&mut Tiles> {
+    pub fn get_mut(&mut self, position: Point) -> Option<&mut Tiles> {
         self.data
             .get_mut((position.y * self.dimensions.x + position.x) as usize)
     }
@@ -268,7 +266,7 @@ impl Map {
     ///
     /// [`get`]: Map::get
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-    pub unsafe fn get_unchecked(&self, position: Vector2<i32>) -> &Tiles {
+    pub unsafe fn get_unchecked(&self, position: Point) -> &Tiles {
         self.data
             .get_unchecked((position.y * self.dimensions.x + position.x) as usize)
     }
@@ -285,13 +283,13 @@ impl Map {
     ///
     /// [`get_mut`]: Map::get_mut
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
-    pub unsafe fn get_unchecked_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
+    pub unsafe fn get_unchecked_mut(&mut self, position: Point) -> &mut Tiles {
         self.data
             .get_unchecked_mut((position.y * self.dimensions.x + position.x) as usize)
     }
 
     /// Checks if a position is within the bounds of the map.
-    pub fn in_bounds(&self, position: Vector2<i32>) -> bool {
+    pub fn in_bounds(&self, position: Point) -> bool {
         0 <= position.x
             && position.x < self.dimensions.x
             && 0 <= position.y
@@ -299,7 +297,7 @@ impl Map {
     }
 
     /// Checks if a position is traversable.
-    pub fn can_move(&self, position: Vector2<i32>) -> bool {
+    pub fn can_move(&self, position: Point) -> bool {
         self.in_bounds(position) && !self[position].intersects(Tiles::Wall | Tiles::Box)
     }
 
@@ -307,20 +305,22 @@ impl Map {
     pub fn rotate(&mut self) {
         let dimensions = self.dimensions;
         let rotate_position =
-            |position: Vector2<i32>| Vector2::new(position.y, dimensions.x - 1 - position.x);
-        self.transform(rotate_position, self.dimensions.yx());
+            |position: Point| Point::new(position.y, dimensions.x - 1 - position.x);
+        self.transform(
+            rotate_position,
+            Point::new(self.dimensions.y, self.dimensions.x),
+        );
     }
 
     /// Flips the map horizontally.
     pub fn flip(&mut self) {
         let dimensions = self.dimensions;
-        let flip_position =
-            |position: Vector2<i32>| Vector2::new(dimensions.x - 1 - position.x, position.y);
+        let flip_position = |position: Point| Point::new(dimensions.x - 1 - position.x, position.y);
         self.transform(flip_position, self.dimensions);
     }
 
     /// Adds a box at the given position.
-    fn add_box_position(&mut self, position: Vector2<i32>) {
+    fn add_box_position(&mut self, position: Point) {
         debug_assert!(
             !self.box_positions.contains(&position),
             "box position already exists"
@@ -330,7 +330,7 @@ impl Map {
     }
 
     /// Removes a box at the given position.
-    fn remove_box_position(&mut self, position: Vector2<i32>) {
+    fn remove_box_position(&mut self, position: Point) {
         debug_assert!(
             self.box_positions.contains(&position),
             "box position does not exist"
@@ -340,7 +340,7 @@ impl Map {
     }
 
     /// Removes a goal at the given position.
-    fn remove_goal_position(&mut self, position: Vector2<i32>) {
+    fn remove_goal_position(&mut self, position: Point) {
         debug_assert!(
             self.goal_positions.contains(&position),
             "goal position does not exist"
@@ -426,15 +426,11 @@ impl Map {
     }
 
     /// Transforms the map based on the provided operation and new dimensions.
-    fn transform(
-        &mut self,
-        operation: impl Fn(Vector2<i32>) -> Vector2<i32> + Copy,
-        new_dimensions: Vector2<i32>,
-    ) {
+    fn transform(&mut self, operation: impl Fn(Point) -> Point + Copy, new_dimensions: Point) {
         let mut transformed_map = Map::with_dimensions(new_dimensions);
         for x in 0..self.dimensions.x {
             for y in 0..self.dimensions.y {
-                let position = Vector2::new(x, y);
+                let position = Point::new(x, y);
                 transformed_map[operation(position)] = self[position];
             }
         }
@@ -448,17 +444,17 @@ impl Map {
     fn add_walls_around_floors(&mut self) {
         for x in 1..self.dimensions.x - 1 {
             for y in 1..self.dimensions.y - 1 {
-                let position = Vector2::<i32>::new(x, y);
+                let position = Point::new(x, y);
                 if self[position].intersects(Tiles::Floor) {
                     let offsets = [
-                        Vector2::<i32>::y(),
-                        -Vector2::<i32>::y(),
-                        Vector2::<i32>::x(),
-                        -Vector2::<i32>::x(),
-                        Vector2::<i32>::new(1, 1),
-                        Vector2::<i32>::new(-1, -1),
-                        Vector2::<i32>::new(1, -1),
-                        Vector2::<i32>::new(-1, 1),
+                        Point::new(1, 0),
+                        Point::new(-1, 0),
+                        Point::new(0, -1),
+                        Point::new(0, 1),
+                        Point::new(1, 1),
+                        Point::new(-1, -1),
+                        Point::new(1, -1),
+                        Point::new(-1, 1),
                     ];
                     for offset in offsets {
                         let neighbor = position + offset;
@@ -474,7 +470,7 @@ impl Map {
     /// Performs a flood fill algorithm starting from the specified position,
     /// updating the tiles with the value provided within the area surrounded by
     /// the provided border.
-    fn flood_fill(&mut self, position: Vector2<i32>, value: Tiles, border: Tiles) {
+    fn flood_fill(&mut self, position: Point, value: Tiles, border: Tiles) {
         let mut deque = VecDeque::new();
         deque.push_back(position);
         while let Some(position) = deque.pop_front() {
@@ -483,7 +479,7 @@ impl Map {
             }
             self[position].insert(value);
             for direction in Direction::iter() {
-                let neighbor = position + &direction.into();
+                let neighbor = position + direction.into();
                 deque.push_back(neighbor);
             }
         }
@@ -504,7 +500,7 @@ impl FromStr for Map {
 
         // Calculate map dimensions and indentation
         let mut indent = i32::MAX;
-        let mut dimensions = Vector2::<i32>::zeros();
+        let mut dimensions = Point::zeros();
         let mut buf = String::with_capacity(xsb.len());
         for line in xsb.split(['\n', '|']) {
             let mut line = line.trim_end().to_string();
@@ -530,7 +526,7 @@ impl FromStr for Map {
             // Trim map indentation
             let line = &line[indent as usize..];
             for (x, char) in line.chars().enumerate() {
-                let position = Vector2::new(x as i32, y as i32);
+                let position = Point::new(x as i32, y as i32);
                 instance[position] = match char {
                     ' ' | '-' | '_' => Tiles::empty(),
                     '#' => Tiles::Wall,
@@ -584,18 +580,18 @@ impl FromStr for Map {
     }
 }
 
-impl Index<Vector2<i32>> for Map {
+impl Index<Point> for Map {
     type Output = Tiles;
 
-    fn index(&self, position: Vector2<i32>) -> &Tiles {
+    fn index(&self, position: Point) -> &Tiles {
         assert!(0 <= position.x && position.x < self.dimensions.x);
         assert!(0 <= position.y && position.y < self.dimensions.y);
         &self.data[(position.y * self.dimensions.x + position.x) as usize]
     }
 }
 
-impl IndexMut<Vector2<i32>> for Map {
-    fn index_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
+impl IndexMut<Point> for Map {
+    fn index_mut(&mut self, position: Point) -> &mut Tiles {
         assert!(0 <= position.x && position.x < self.dimensions.x);
         assert!(0 <= position.y && position.y < self.dimensions.y);
         &mut self.data[(position.y * self.dimensions.x + position.x) as usize]
@@ -612,7 +608,7 @@ impl fmt::Display for Map {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for y in 0..self.dimensions.y {
             for x in 0..self.dimensions.x {
-                write!(f, "{}", self[Vector2::new(x, y)])?;
+                write!(f, "{}", self[Point::new(x, y)])?;
             }
             writeln!(f)?;
         }
@@ -629,27 +625,27 @@ impl From<Map> for State {
     }
 }
 
-fn calculate_dimensions_and_player_position(actions: &Actions) -> (Vector2<i32>, Vector2<i32>) {
-    let mut min_position = Vector2::<i32>::zeros();
-    let mut max_position = Vector2::<i32>::zeros();
+fn calculate_dimensions_and_player_position(actions: &Actions) -> (Point, Point) {
+    let mut min_position = Point::zeros();
+    let mut max_position = Point::zeros();
 
     // Calculate the dimensions of the player's and pushed box's movement range
-    let mut player_position = Vector2::zeros();
+    let mut player_position = Point::zeros();
     for action in &**actions {
-        player_position += &action.direction().into();
+        player_position += action.direction().into();
         if action.is_push() {
-            let box_position = player_position + &action.direction().into();
-            min_position = min_position.zip_map(&box_position, std::cmp::min);
-            max_position = max_position.zip_map(&box_position, std::cmp::max);
+            let box_position = player_position + action.direction().into();
+            min_position = min_position.zip_map(box_position, std::cmp::min);
+            max_position = max_position.zip_map(box_position, std::cmp::max);
         } else {
-            min_position = min_position.zip_map(&player_position, std::cmp::min);
-            max_position = max_position.zip_map(&player_position, std::cmp::max);
+            min_position = min_position.zip_map(player_position, std::cmp::min);
+            max_position = max_position.zip_map(player_position, std::cmp::max);
         }
     }
 
     // Reserve space for walls
-    min_position -= Vector2::new(1, 1);
-    max_position += Vector2::new(1, 1);
+    min_position -= Point::new(1, 1);
+    max_position += Point::new(1, 1);
 
     if min_position.x < 0 {
         player_position.x = min_position.x.abs();
@@ -658,7 +654,7 @@ fn calculate_dimensions_and_player_position(actions: &Actions) -> (Vector2<i32>,
         player_position.y = min_position.y.abs();
     }
 
-    let dimensions = min_position.abs() + max_position.abs() + Vector2::new(1, 1);
+    let dimensions = min_position.abs() + max_position.abs() + Point::new(1, 1);
 
     (dimensions, player_position)
 }
