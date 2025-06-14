@@ -75,6 +75,7 @@ impl Level {
     pub fn do_action(&mut self, direction: Direction) -> Result<(), ActionError> {
         if self.actions.last() == Some(&Action::Move(-direction)) {
             self.undo_action().unwrap();
+            return Ok(());
         }
 
         let new_player_position = self.map.player_position() + &direction.into();
