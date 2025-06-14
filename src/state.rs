@@ -3,8 +3,7 @@ use std::{
     hash::{DefaultHasher, Hash, Hasher},
 };
 
-use nalgebra::Vector2;
-
+use crate::point::Point;
 use crate::{
     path_finding::{normalized_area, reachable_area},
     solver::Solver,
@@ -13,8 +12,8 @@ use crate::{
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct State {
-    pub player_position: Vector2<i32>,
-    pub box_positions: HashSet<Vector2<i32>>,
+    pub player_position: Point,
+    pub box_positions: HashSet<Point>,
 }
 
 impl State {

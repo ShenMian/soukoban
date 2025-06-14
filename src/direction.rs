@@ -2,7 +2,7 @@
 
 use std::ops::Neg;
 
-use nalgebra::Vector2;
+use crate::point::Point;
 
 /// A direction.
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
@@ -70,28 +70,28 @@ impl Neg for Direction {
     }
 }
 
-impl From<Direction> for Vector2<i32> {
+impl From<Direction> for Point {
     fn from(direction: Direction) -> Self {
         use Direction as E;
         match direction {
-            E::Up => -Vector2::y(),
-            E::Down => Vector2::y(),
-            E::Left => -Vector2::x(),
-            E::Right => Vector2::x(),
+            E::Up => Point::new(0, -1),
+            E::Down => Point::new(0, 1),
+            E::Left => Point::new(-1, 0),
+            E::Right => Point::new(1, 0),
         }
     }
 }
 
-impl TryFrom<Vector2<i32>> for Direction {
+impl TryFrom<Point> for Direction {
     type Error = ();
 
-    fn try_from(vector: Vector2<i32>) -> Result<Self, Self::Error> {
+    fn try_from(vector: Point) -> Result<Self, Self::Error> {
         use Direction::*;
         match vector {
-            v if v == -Vector2::<i32>::y() => Ok(Up),
-            v if v == Vector2::<i32>::y() => Ok(Down),
-            v if v == -Vector2::<i32>::x() => Ok(Left),
-            v if v == Vector2::<i32>::x() => Ok(Right),
+            v if v == Point::new(0, -1) => Ok(Up),
+            v if v == Point::new(0, 1) => Ok(Down),
+            v if v == Point::new(-1, 0) => Ok(Left),
+            v if v == Point::new(1, 0) => Ok(Right),
             _ => Err(()),
         }
     }
