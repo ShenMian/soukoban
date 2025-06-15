@@ -1,6 +1,7 @@
 use std::fs;
+use std::hint::black_box;
 
-use criterion::{black_box, criterion_group, Criterion};
+use criterion::{criterion_group, Criterion};
 use soukoban::Level;
 
 fn load_from_str(c: &mut Criterion) {

@@ -1,6 +1,7 @@
 use std::str::FromStr;
+use std::hint::black_box;
 
-use criterion::{black_box, criterion_group, Criterion};
+use criterion::{criterion_group, Criterion};
 use soukoban::{deadlock, Map};
 
 use super::utils::*;

@@ -1,6 +1,7 @@
+use std::hint::black_box;
 use std::str::FromStr;
 
-use criterion::{black_box, criterion_group, Criterion};
+use criterion::{criterion_group, Criterion};
 use nalgebra::Vector2;
 use soukoban::{path_finding, Level};
 
