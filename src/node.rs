@@ -52,8 +52,8 @@ impl Node {
                 {
                     continue;
                 }
-                let new_player_position = box_position - &push_direction.into();
-                if !player_reachable_area.contains(&new_player_position) {
+                let new_player_position_check = box_position - &push_direction.into();
+                if !player_reachable_area.contains(&new_player_position_check) {
                     continue;
                 }
                 let mut new_player_position = *box_position;
@@ -79,13 +79,13 @@ impl Node {
                     .contains(&(new_box_position, push_direction))
                 {
                     new_player_position = new_box_position;
-                    new_box_position += &push_direction.into();
+                    new_box_position += push_direction.into();
                     new_pushes += 1;
                     new_moves += 1;
                 }
 
                 let mut new_box_positions = self.state.box_positions.clone();
-                new_box_positions.remove(box_position);
+                new_box_positions.remove(&box_position);
                 new_box_positions.insert(new_box_position);
 
                 // Skip freeze deadlocks

@@ -13,6 +13,7 @@ pub mod path_finding;
 pub mod run_length;
 pub mod solver;
 pub mod tiles;
+pub mod point;
 
 mod node;
 mod state;
