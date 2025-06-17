@@ -264,16 +264,16 @@ impl Solver {
 
     fn construct_actions(&self, mut state: State, came_from: &HashMap<State, State>) -> Actions {
         let mut actions = Actions::new();
-        while let Some(previous_state) = came_from.get(&state) {
+        while let Some(prev_state) = came_from.get(&state) {
             // Find the positions where the box was moved from and to
-            let previous_box_position = *previous_state
+            let previous_box_position = *prev_state
                 .box_positions
                 .difference(&state.box_positions)
                 .next()
                 .unwrap();
             let box_position = *state
                 .box_positions
-                .difference(&previous_state.box_positions)
+                .difference(&prev_state.box_positions)
                 .next()
                 .unwrap();
 
@@ -284,11 +284,11 @@ impl Solver {
 
             // Find the path for the player to reach the box position before pushing it
             let mut new_actions: Vec<_> = find_path(
-                previous_state.player_position,
+                prev_state.player_position,
                 previous_box_position - &push_direction.into(),
                 |position| {
                     !self.map()[position].intersects(Tiles::Wall)
-                        && !previous_state.box_positions.contains(&position)
+                        && !prev_state.box_positions.contains(&position)
                 },
             )
             .unwrap()
@@ -306,7 +306,7 @@ impl Solver {
             }
 
             actions.splice(0..0, new_actions.iter().copied());
-            state = previous_state.clone();
+            state = prev_state.clone();
         }
         actions
     }
