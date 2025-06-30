@@ -229,7 +229,7 @@ impl fmt::Display for Level {
             if key == "comments" && value.lines().count() > 1 {
                 writeln!(f, "comment:")?;
                 for line in value.lines() {
-                    writeln!(f, "{}", line)?;
+                    writeln!(f, "{line}")?;
                 }
                 writeln!(f, "comment-end:")?;
                 continue;
@@ -238,7 +238,7 @@ impl fmt::Display for Level {
                 !value.contains('\n'),
                 "metadata value contains multiple line"
             );
-            writeln!(f, "{}: {}", key, value)?;
+            writeln!(f, "{key}: {value}")?;
         }
         Ok(())
     }

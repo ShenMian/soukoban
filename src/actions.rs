@@ -122,7 +122,7 @@ impl DerefMut for Actions {
 impl fmt::Display for Actions {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for action in &self.0 {
-            write!(f, "{}", action)?;
+            write!(f, "{action}")?;
         }
         Ok(())
     }
