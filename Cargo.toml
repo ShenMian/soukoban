@@ -22,9 +22,9 @@ bench = false
 [dependencies]
 bitflags = "2.9"
 itertools = "0.14"
-nalgebra = "0.33"
+nalgebra = "0.34"
 thiserror = "2.0"
 
 [dev-dependencies]
 indoc = "2.0"
-criterion = { version = "0.6", features = ["html_reports"] }
+criterion = { version = "0.7", features = ["html_reports"] }
