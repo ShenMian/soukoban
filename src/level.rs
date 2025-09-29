@@ -60,21 +60,10 @@ impl Level {
         &self.actions
     }
 
-    /// Performs a sequence of actions on the level.
-    pub fn do_actions<I: IntoIterator<Item = Direction>>(
-        &mut self,
-        directions: I,
-    ) -> Result<(), ActionError> {
-        for direction in directions {
-            self.do_action(direction)?;
-        }
-        Ok(())
-    }
-
     /// Moves the player in the specified direction.
-    pub fn do_action(&mut self, direction: Direction) -> Result<(), ActionError> {
+    pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
         if self.actions.last() == Some(&Action::Move(-direction)) {
-            self.undo_action().unwrap();
+            self.undo().unwrap();
             return Ok(());
         }
 
@@ -98,8 +87,19 @@ impl Level {
         Ok(())
     }
 
+    /// Moves the player through a sequence of directions.
+    pub fn execute_batch<I: IntoIterator<Item = Direction>>(
+        &mut self,
+        directions: I,
+    ) -> Result<(), ActionError> {
+        for direction in directions {
+            self.execute(direction)?;
+        }
+        Ok(())
+    }
+
     /// Undoes the last action.
-    pub fn undo_action(&mut self) -> Result<(), ActionError> {
+    pub fn undo(&mut self) -> Result<(), ActionError> {
         if let Some(last_action) = self.actions.pop() {
             if last_action.is_push() {
                 let box_position = self.map.player_position() + &last_action.direction().into();
@@ -116,10 +116,10 @@ impl Level {
     }
 
     /// Redoes the last action.
-    pub fn redo_action(&mut self) -> Result<(), ActionError> {
+    pub fn redo(&mut self) -> Result<(), ActionError> {
         if let Some(last_undone_action) = self.undone_actions.pop() {
             let undone_actions = std::mem::take(&mut self.undone_actions);
-            self.do_action(last_undone_action.direction()).unwrap();
+            self.execute(last_undone_action.direction()).unwrap();
             self.undone_actions = undone_actions;
             Ok(())
         } else {

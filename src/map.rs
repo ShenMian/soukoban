@@ -89,7 +89,7 @@ impl Map {
         let mut level = Level::from_map(instance.clone());
         let directions = actions.iter().map(|action| action.direction());
         level
-            .do_actions(directions)
+            .execute_batch(directions)
             .map_err(|_| ParseMapError::InvalidActions)?;
         if !level.map().is_solved() {
             return Err(ParseMapError::InvalidActions);
@@ -103,6 +103,7 @@ impl Map {
     /// Warning: This will create an invalid map. Some associated functions will
     /// not work properly until the map becomes valid.
     pub fn with_dimensions(dimensions: Vector2<i32>) -> Self {
+        debug_assert!(dimensions.x >= 0 && dimensions.y >= 0);
         Self {
             data: vec![Tiles::empty(); (dimensions.x * dimensions.y) as usize],
             dimensions,

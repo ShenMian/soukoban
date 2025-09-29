@@ -10,7 +10,7 @@ fn solve(mut level: Level) {
     let solution = solver.a_star_search().unwrap();
     assert!(solver.ida_star_search().is_ok());
     let directions = solution.iter().map(|action| action.direction());
-    level.do_actions(directions).unwrap();
+    level.execute_batch(directions).unwrap();
     assert!(level.is_solved());
 }
 
