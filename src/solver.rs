@@ -35,7 +35,9 @@ pub enum Strategy {
 pub struct Solver {
     map: Map,
     strategy: Strategy,
+    /// Lower bounds for heuristic calculation.
     lower_bounds: OnceCell<HashMap<Vector2<i32>, i32>>,
+    /// Set of tunnel positions and directions.
     tunnels: OnceCell<HashSet<(Vector2<i32>, Direction)>>,
 }
 
