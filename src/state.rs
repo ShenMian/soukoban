@@ -52,7 +52,9 @@ impl State {
 impl Hash for State {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.player_position.hash(state);
-        for box_position in &self.box_positions {
+        let mut sorted_boxes: Vec<_> = self.box_positions.iter().collect();
+        sorted_boxes.sort_by_key(|position| (position.x, position.y));
+        for box_position in sorted_boxes {
             box_position.hash(state);
         }
     }
