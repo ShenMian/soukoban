@@ -61,14 +61,16 @@ impl Actions {
                 if action.is_push() {
                     if *action != prev_action {
                         box_lines += 1;
-                        if !prev_action.is_push() {
-                            pushing_sessions += 1;
-                        }
+                    }
+                    if !prev_action.is_push() {
+                        pushing_sessions += 1;
                     }
                     if let Some(prev_pushed_box_position) = prev_pushed_box_position {
                         if player_position != prev_pushed_box_position {
                             box_changes += 1;
                         }
+                    } else {
+                        box_changes += 1;
                     }
                     prev_pushed_box_position = Some(player_position + &action.direction().into());
                 }
@@ -76,9 +78,6 @@ impl Actions {
                 player_lines += 1;
             }
             prev_action = Some(*action);
-        }
-        if prev_pushed_box_position.is_some() {
-            box_changes += 1;
         }
         SecondaryValues {
             box_lines,

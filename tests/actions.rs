@@ -8,26 +8,34 @@ fn actions_from_str() {
         Actions::from_str("lUrDL!uRd").unwrap_err(),
         ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
     );
+    assert_eq!(
+        Actions::from_str("!lUrDLuRd").unwrap_err(),
+        ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
+    );
+    assert_eq!(
+        Actions::from_str("lUrDLuRd!").unwrap_err(),
+        ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
+    );
 }
 
 #[test]
 fn rle_decode() {
     assert_eq!(
-        Actions::from_str("ruu4L4rddlUru3LulDrdd3luuRRDrdL3urDD")
+        Actions::from_str("ruu3LulD4rddlUru3Ldd3luurRDrdL3urDD")
             .unwrap()
             .to_string(),
-        "ruuLLLLrrrrddlUruLLLulDrddllluuRRDrdLuuurDD"
+        "ruuLLLulDrrrrddlUruLLLddllluurRDrdLuuurDD"
     );
     assert_eq!(
-        Actions::from_str("ullDullddrRuLu3rdLLrrddlUruL")
+        Actions::from_str("ullDLdRuurrdLLrrddlUruL")
             .unwrap()
             .to_string(),
-        "ullDullddrRuLurrrdLLrrddlUruL"
+        "ullDLdRuurrdLLrrddlUruL"
     );
 }
 
 #[test]
-fn scoring_metrics() {
+fn secondary_values() {
     let empty_actions = Actions::from_str("").unwrap();
     assert_eq!(empty_actions.moves(), 0);
     assert_eq!(empty_actions.pushes(), 0);
@@ -49,11 +57,9 @@ fn scoring_metrics() {
     // # #  #$ #
     // # . .#@ #
     // #########
-    // box lines     : 8
-    // pushing sessions: 7
-    let actions = Actions::from_str("ruuLLLLrrrrddlUruLLLulDrddllluuRRDrdLuuurDD").unwrap();
-    assert_eq!(actions.moves(), 43);
-    assert_eq!(actions.pushes(), 15);
+    let actions = Actions::from_str("ruuLLLulDrrrrddlUruLLLddllluurRDrdLuuurDD").unwrap();
+    assert_eq!(actions.moves(), 41);
+    assert_eq!(actions.pushes(), 13);
     let SecondaryValues {
         box_lines,
         box_changes,
@@ -61,9 +67,9 @@ fn scoring_metrics() {
         player_lines,
     } = actions.secondary_values();
     assert_eq!(box_lines, 8);
-    assert_eq!(box_changes, 5);
+    assert_eq!(box_changes, 4);
     assert_eq!(pushing_sessions, 7);
-    assert_eq!(player_lines, 25);
+    assert_eq!(player_lines, 24);
 
     // Microban #4
     // ########
@@ -72,9 +78,9 @@ fn scoring_metrics() {
     // #      #
     // #####  #
     //     ####
-    // box lines     : 6
-    // pushing sessions: 6
-    let actions = Actions::from_str("ullDullddrRuLurrrdLLrrddlUruL").unwrap();
+    let actions = Actions::from_str("ullDLdRuurrdLLrrddlUruL").unwrap();
+    assert_eq!(actions.moves(), 23);
+    assert_eq!(actions.pushes(), 7);
     let SecondaryValues {
         box_lines,
         box_changes,
@@ -82,7 +88,7 @@ fn scoring_metrics() {
         player_lines,
     } = actions.secondary_values();
     assert_eq!(box_lines, 6);
-    assert_eq!(box_changes, 4);
-    assert_eq!(pushing_sessions, 6);
-    assert_eq!(player_lines, 20);
+    assert_eq!(box_changes, 5);
+    assert_eq!(pushing_sessions, 5);
+    assert_eq!(player_lines, 17);
 }
