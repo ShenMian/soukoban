@@ -29,9 +29,11 @@ jobs:
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
 
-      - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features -- --deny warnings
       
       - name: Install cargo-audit
         run: cargo install --force cargo-audit
@@ -39,14 +41,14 @@ jobs:
       - name: Audit
         run: cargo audit
 
-      - name: Clippy
-        run: cargo clippy --locked --workspace --all-targets --all-features -- --deny warnings
-
       - name: Test
         run: |
-          cargo test --locked --workspace --all-features --all-targets
+          cargo test --workspace --all-features --all-targets
           # Workaround for https://github.com/rust-lang/cargo/issues/6669
-          cargo test --locked --workspace --all-features --doc
+          cargo test --workspace --all-features --doc
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
 
       - name: Generate code coverage
         run: cargo llvm-cov --all-features --no-cfg-coverage --workspace --lcov --output-path lcov.info
