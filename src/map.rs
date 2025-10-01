@@ -222,6 +222,17 @@ impl Map {
     /// Truncates the map to the provided dimensions and copies tiles from the
     /// original map start at the specified offset to the new map.
     pub fn truncate(&mut self, offset: Vector2<i32>, dimensions: Vector2<i32>) {
+        debug_assert!(offset.x + dimensions.x <= self.dimensions.x);
+        debug_assert!(offset.y + dimensions.y <= self.dimensions.y);
+        debug_assert!(
+            offset.x >= 0 && offset.y >= 0,
+            "offset must be non-negative"
+        );
+        debug_assert!(
+            dimensions.x >= 0 && dimensions.y >= 0,
+            "dimensions must be non-negative"
+        );
+
         let mut clamped_map = Map::with_dimensions(dimensions);
         for y in 0..dimensions.y {
             for x in 0..dimensions.x {
