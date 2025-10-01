@@ -464,17 +464,17 @@ impl Map {
             for y in 1..self.dimensions.y - 1 {
                 let position = Vector2::<i32>::new(x, y);
                 if self[position].intersects(Tiles::Floor) {
-                    let offsets = [
-                        Vector2::<i32>::y(),
-                        -Vector2::<i32>::y(),
-                        Vector2::<i32>::x(),
-                        -Vector2::<i32>::x(),
+                    const OFFSETS: [Vector2<i32>; 8] = [
+                        Vector2::<i32>::new(1, 0),
+                        Vector2::<i32>::new(-1, 0),
+                        Vector2::<i32>::new(0, 1),
+                        Vector2::<i32>::new(0, -1),
                         Vector2::<i32>::new(1, 1),
                         Vector2::<i32>::new(-1, -1),
                         Vector2::<i32>::new(1, -1),
                         Vector2::<i32>::new(-1, 1),
                     ];
-                    for offset in offsets {
+                    for offset in OFFSETS {
                         let neighbor = position + offset;
                         if !self[neighbor].intersects(Tiles::Floor) {
                             self[neighbor].insert(Tiles::Wall);
