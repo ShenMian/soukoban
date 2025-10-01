@@ -216,15 +216,15 @@ impl Map {
             }
         }
 
-        self.truncate(new_dimensions, offset);
+        self.truncate(offset, new_dimensions);
     }
 
     /// Truncates the map to the provided dimensions and copies tiles from the
     /// original map start at the specified offset to the new map.
-    pub fn truncate(&mut self, new_dimensions: Vector2<i32>, offset: Vector2<i32>) {
-        let mut clamped_map = Map::with_dimensions(new_dimensions);
-        for y in 0..new_dimensions.y {
-            for x in 0..new_dimensions.x {
+    pub fn truncate(&mut self, offset: Vector2<i32>, dimensions: Vector2<i32>) {
+        let mut clamped_map = Map::with_dimensions(dimensions);
+        for y in 0..dimensions.y {
+            for x in 0..dimensions.x {
                 let position = Vector2::new(x, y);
                 clamped_map[position] = self[position + offset];
             }
