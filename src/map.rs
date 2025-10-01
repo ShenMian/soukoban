@@ -270,6 +270,7 @@ impl Map {
     /// [`get`]: Map::get
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     pub unsafe fn get_unchecked(&self, position: Vector2<i32>) -> &Tiles {
+        debug_assert!(self.in_bounds(position));
         self.data
             .get_unchecked((position.y * self.dimensions.x + position.x) as usize)
     }
@@ -287,6 +288,7 @@ impl Map {
     /// [`get_mut`]: Map::get_mut
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     pub unsafe fn get_unchecked_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
+        debug_assert!(self.in_bounds(position));
         self.data
             .get_unchecked_mut((position.y * self.dimensions.x + position.x) as usize)
     }
@@ -589,17 +591,13 @@ impl Index<Vector2<i32>> for Map {
     type Output = Tiles;
 
     fn index(&self, position: Vector2<i32>) -> &Tiles {
-        assert!(0 <= position.x && position.x < self.dimensions.x);
-        assert!(0 <= position.y && position.y < self.dimensions.y);
-        &self.data[(position.y * self.dimensions.x + position.x) as usize]
+        unsafe { self.get_unchecked(position) }
     }
 }
 
 impl IndexMut<Vector2<i32>> for Map {
     fn index_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
-        assert!(0 <= position.x && position.x < self.dimensions.x);
-        assert!(0 <= position.y && position.y < self.dimensions.y);
-        &mut self.data[(position.y * self.dimensions.x + position.x) as usize]
+        unsafe { self.get_unchecked_mut(position) }
     }
 }
 
