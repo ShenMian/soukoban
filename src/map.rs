@@ -37,7 +37,7 @@ impl Map {
     /// Tries to restore the map with a complete solution. This method can only
     /// restore the parts of the map that are used by the solution.
     pub fn from_actions(actions: Actions) -> Result<Self, ParseMapError> {
-        let (dimensions, player_position) = calculate_dimensions_and_player_position(&actions);
+        let (dimensions, player_position) = compute_dimensions_and_player_position(&actions);
 
         let mut instance = Map::with_dimensions(dimensions);
 
@@ -365,7 +365,7 @@ impl Map {
 
     /// Sets unused floors to walls.
     fn set_useless_floors_to_walls(&mut self) {
-        for useless_floor in calculate_useless_floors(self.clone()) {
+        for useless_floor in compute_useless_floors(self.clone()) {
             self[useless_floor].remove(Tiles::Floor);
             self[useless_floor].insert(Tiles::Wall);
         }
@@ -375,9 +375,9 @@ impl Map {
     fn set_useless_boxes_to_walls(&mut self) {
         debug_assert!(self
             .goal_positions
-            .is_superset(&calculate_useless_boxes(self)));
+            .is_superset(&compute_useless_boxes(self)));
 
-        for position in calculate_useless_boxes(self) {
+        for position in compute_useless_boxes(self) {
             self.remove_goal_position(position);
             self.remove_box_position(position);
             self[position].remove(Tiles::Floor);
@@ -639,7 +639,7 @@ impl From<Map> for State {
     }
 }
 
-fn calculate_dimensions_and_player_position(actions: &Actions) -> (Vector2<i32>, Vector2<i32>) {
+fn compute_dimensions_and_player_position(actions: &Actions) -> (Vector2<i32>, Vector2<i32>) {
     let mut min_position = Vector2::<i32>::zeros();
     let mut max_position = Vector2::<i32>::zeros();
 

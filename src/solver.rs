@@ -132,7 +132,7 @@ impl Solver {
         // FIXME: Calculate lower bounds based on strategy
         self.lower_bounds.get_or_init(|| {
             assert!(self.strategy == Strategy::OptimalPush || self.strategy == Strategy::Fast);
-            let mut lower_bounds = self.calculate_minimum_push();
+            let mut lower_bounds = self.compute_minimum_push();
             lower_bounds.shrink_to_fit();
             lower_bounds
         })
@@ -141,15 +141,15 @@ impl Solver {
     /// Returns a reference to the set of tunnels.
     pub fn tunnels(&self) -> &HashSet<(Vector2<i32>, Direction)> {
         self.tunnels.get_or_init(|| {
-            let mut tunnels = self.calculate_tunnels();
+            let mut tunnels = self.compute_tunnels();
             tunnels.shrink_to_fit();
             tunnels
         })
     }
 
-    /// Calculates and returns the minimum number of pushes to push the box to
+    /// Computes and returns the minimum number of pushes to push the box to
     /// the nearest goal.
-    fn calculate_minimum_push(&self) -> HashMap<Vector2<i32>, i32> {
+    fn compute_minimum_push(&self) -> HashMap<Vector2<i32>, i32> {
         let mut lower_bounds = HashMap::new();
         for goal_position in self.map.goal_positions() {
             lower_bounds.insert(*goal_position, 0);
@@ -163,7 +163,7 @@ impl Solver {
                 {
                     continue;
                 }
-                self.calculate_minimum_push_to(
+                self.computes_minimum_push_to(
                     *goal_position,
                     new_player_position,
                     &mut lower_bounds,
@@ -175,11 +175,11 @@ impl Solver {
         lower_bounds
     }
 
-    /// Calculates the minimum push of the box to the specified position.
+    /// Computes the minimum push of the box to the specified position.
     ///
-    /// Place the box on the goal, then calculate all the positions the box can
+    /// Place the box on the goal, then computes all the positions the box can
     /// be pulled to and the minimum pulls it can be pulled to that position.
-    fn calculate_minimum_push_to(
+    fn computes_minimum_push_to(
         &self,
         box_position: Vector2<i32>,
         player_position: Vector2<i32>,
@@ -210,7 +210,7 @@ impl Solver {
                 lower_bounds.insert(new_box_position, new_lower_bound);
             }
 
-            self.calculate_minimum_push_to(
+            self.computes_minimum_push_to(
                 new_box_position,
                 new_player_position,
                 lower_bounds,
@@ -219,12 +219,12 @@ impl Solver {
         }
     }
 
-    /// Calculates and returns the set of tunnels.
+    /// Computes and returns the set of tunnels.
     ///
     /// Tunnel is a common type of no influence push.
     /// Since tunnels are only determined by the map terrain, they can be
     /// pre-calculated.
-    fn calculate_tunnels(&self) -> HashSet<(Vector2<i32>, Direction)> {
+    fn compute_tunnels(&self) -> HashSet<(Vector2<i32>, Direction)> {
         let mut tunnels = HashSet::new();
         for x in 1..self.map.dimensions().x - 1 {
             for y in 1..self.map.dimensions().y - 1 {

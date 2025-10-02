@@ -8,7 +8,7 @@ use crate::{direction::Direction, map::Map, tiles::Tiles};
 
 /// Checks if the given box position is a static deadlock.
 ///
-/// Consider using [`calculate_static_deadlocks`] if you need to efficiently
+/// Consider using [`compute_static_deadlocks`] if you need to efficiently
 /// compute multiple static deadlock positions.
 pub fn is_static_deadlock(
     map: &Map,
@@ -100,7 +100,7 @@ pub fn is_freeze_deadlock(
 /// This function returns an **incomplete** set of dead positions independent
 /// of the player's position. Any box pushed to a point in the set will cause a
 /// deadlock, regardless of the player's position.
-pub fn calculate_static_deadlocks(map: &Map) -> HashSet<Vector2<i32>> {
+pub fn compute_static_deadlocks(map: &Map) -> HashSet<Vector2<i32>> {
     let mut dead_positions = HashSet::new();
     for x in 1..map.dimensions().x - 1 {
         for y in 1..map.dimensions().y - 1 {
@@ -151,8 +151,8 @@ pub fn calculate_static_deadlocks(map: &Map) -> HashSet<Vector2<i32>> {
     dead_positions
 }
 
-/// Calculate the positions of the useless floors.
-pub fn calculate_useless_floors(mut map: Map) -> HashSet<Vector2<i32>> {
+/// Computes the positions of the useless floors.
+pub fn compute_useless_floors(mut map: Map) -> HashSet<Vector2<i32>> {
     let mut useless_floors = HashSet::new();
 
     // Add all floors to `unchecked_floors`
@@ -196,8 +196,8 @@ pub fn calculate_useless_floors(mut map: Map) -> HashSet<Vector2<i32>> {
     useless_floors
 }
 
-/// Calculate the positions of the useless boxes.
-pub fn calculate_useless_boxes(map: &Map) -> HashSet<Vector2<i32>> {
+/// Computes the positions of the useless boxes.
+pub fn compute_useless_boxes(map: &Map) -> HashSet<Vector2<i32>> {
     map.box_positions()
         .iter()
         .cloned()

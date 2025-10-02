@@ -1,23 +1,23 @@
-use std::str::FromStr;
 use std::hint::black_box;
+use std::str::FromStr;
 
 use criterion::{criterion_group, Criterion};
 use soukoban::{deadlock, Map};
 
 use super::utils::*;
 
-fn calculate_unused_floors(c: &mut Criterion) {
+fn compute_unused_floors(c: &mut Criterion) {
     let map = Map::from_str(WORLDCUP2014).unwrap();
-    c.bench_function("deadlock::calculate_unused_floors", |b| {
-        b.iter(|| black_box(deadlock::calculate_useless_floors(black_box(map.clone()))))
+    c.bench_function("deadlock::compute_useless_floors", |b| {
+        b.iter(|| black_box(deadlock::compute_useless_floors(black_box(map.clone()))))
     });
 }
 
-fn calculate_static_deadlocks(c: &mut Criterion) {
+fn compute_static_deadlocks(c: &mut Criterion) {
     let map = Map::from_str(WORLDCUP2014).unwrap();
-    c.bench_function("deadlock::calculate_static_deadlocks", |b| {
-        b.iter(|| black_box(deadlock::calculate_static_deadlocks(black_box(&map))))
+    c.bench_function("deadlock::compute_static_deadlocks", |b| {
+        b.iter(|| black_box(deadlock::compute_static_deadlocks(black_box(&map))))
     });
 }
 
-criterion_group!(benches, calculate_unused_floors, calculate_static_deadlocks);
+criterion_group!(benches, compute_unused_floors, compute_static_deadlocks);
