@@ -3,7 +3,7 @@ use std::{cmp::Ordering, collections::HashSet};
 use crate::{
     deadlock::is_freeze_deadlock,
     direction::Direction,
-    path_finding::{find_path, reachable_area},
+    path_finding::{find_path, compute_reachable_area},
     solver::{Solver, Strategy},
     state::State,
     Tiles,
@@ -38,7 +38,7 @@ impl Node {
     /// Returns the successors of the node.
     pub fn successors(&self, solver: &Solver) -> Vec<Node> {
         let mut successors = Vec::new();
-        let player_reachable_area = reachable_area(self.state.player_position, |position| {
+        let player_reachable_area = compute_reachable_area(self.state.player_position, |position| {
             !solver.map()[position].intersects(Tiles::Wall)
                 && !self.state.box_positions.contains(&position)
         });

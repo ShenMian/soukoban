@@ -432,11 +432,11 @@ impl Map {
         *self = transformed_maps.remove(&min_hash).unwrap();
     }
 
-    /// Normalizes the position of the player on the map.
+    /// Normalizes the position of the player.
     fn normalize_player_position(&mut self) {
         let player_reachable_area =
-            reachable_area(self.player_position, |position| self.can_move(position));
-        self.set_player_position(normalized_area(&player_reachable_area).unwrap());
+            compute_reachable_area(self.player_position, |position| self.can_move(position));
+        self.set_player_position(compute_area_anchor(&player_reachable_area).unwrap());
     }
 
     /// Transforms the map based on the provided operation and new dimensions.

@@ -132,7 +132,7 @@ pub fn box_move_waypoints(
     let mut deque = VecDeque::new();
     let mut path: HashMap<(Vector2<i32>, Direction), u64> = HashMap::new();
 
-    let player_reachable_area = reachable_area(map.player_position(), |position| {
+    let player_reachable_area = compute_reachable_area(map.player_position(), |position| {
         position == initial_box_position || map.can_move(position)
     });
     for direction in Direction::iter() {
@@ -145,7 +145,7 @@ pub fn box_move_waypoints(
 
     while let Some((box_position, push_direction, cost)) = deque.pop_front() {
         let player_position = box_position - &push_direction.into();
-        let player_reachable_area = reachable_area(player_position, |position| {
+        let player_reachable_area = compute_reachable_area(player_position, |position| {
             (position == initial_box_position || map.can_move(position)) && position != box_position
         });
 
@@ -244,7 +244,7 @@ pub fn construct_player_path(
 /// Returns a set of positions of the boxes that can be pushed by the player.
 pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
     let player_reachable_area =
-        reachable_area(map.player_position(), |position| map.can_move(position));
+        compute_reachable_area(map.player_position(), |position| map.can_move(position));
     let mut pushable_boxes = HashSet::new();
     for box_position in map.box_positions() {
         // Check if the player can push the box from any direction
@@ -260,12 +260,12 @@ pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
     pushable_boxes
 }
 
-/// Calculates the reachable area starting from a given position.
+/// Computes the reachable area starting from a given position.
 ///
 /// This function performs a breadth-first search to determine all positions
 /// that can be reached from the starting position, based on the provided
 /// `can_move` function.
-pub fn reachable_area(
+pub fn compute_reachable_area(
     position: Vector2<i32>,
     can_move: impl Fn(Vector2<i32>) -> bool,
 ) -> HashSet<Vector2<i32>> {
@@ -288,10 +288,10 @@ pub fn reachable_area(
     reachable_area
 }
 
-/// Returns the top-left position.
-pub fn normalized_area(area: &HashSet<Vector2<i32>>) -> Option<Vector2<i32>> {
+/// Computes the anchor point (top-left) for a given positions.
+pub fn compute_area_anchor(area: &HashSet<Vector2<i32>>) -> Option<Vector2<i32>> {
     area.iter()
-        .min_by(|a, b| a.y.cmp(&b.y).then_with(|| a.x.cmp(&b.x)))
+        .min_by(|a, b| (a.y, a.x).cmp(&(b.y, b.x)))
         .copied()
 }
 

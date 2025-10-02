@@ -11,7 +11,7 @@ use nalgebra::Vector2;
 use crate::{
     direction::Direction,
     node::Node,
-    path_finding::{find_path, reachable_area},
+    path_finding::{compute_reachable_area, find_path},
     state::State,
     Action, Actions, Map, SearchError, Tiles,
 };
@@ -186,7 +186,7 @@ impl Solver {
         lower_bounds: &mut HashMap<Vector2<i32>, i32>,
         visited: &mut HashSet<(Vector2<i32>, Direction)>,
     ) {
-        let player_reachable_area = reachable_area(player_position, |position| {
+        let player_reachable_area = compute_reachable_area(player_position, |position| {
             !(self.map[position].intersects(Tiles::Wall) || position == box_position)
         });
         for pull_direction in Direction::iter() {

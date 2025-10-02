@@ -16,7 +16,7 @@ use crate::{
     direction::Direction,
     error::{ActionError, ParseLevelError, ParseMapError},
     map::Map,
-    path_finding::reachable_area,
+    path_finding::compute_reachable_area,
     tiles::Tiles,
 };
 
@@ -134,7 +134,7 @@ impl Level {
 
     /// Returns the reachable area for the player.
     pub fn player_reachable_area(&self) -> HashSet<Vector2<i32>> {
-        reachable_area(self.map.player_position(), |position| {
+        compute_reachable_area(self.map.player_position(), |position| {
             self.map.can_move(position)
         })
     }
