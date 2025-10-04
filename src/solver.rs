@@ -77,43 +77,66 @@ impl Solver {
     }
 
     /// Searches for solution using the IDA* algorithm.
-    pub fn ida_star_search(&self) -> Result<(), SearchError> {
+    pub fn ida_star_search(&self) -> Result<Actions, SearchError> {
         let state: State = self.map.clone().into();
-        let mut threshold = state.heuristic(self);
-        let node = Node::new(state, 0, 0, self);
+        let node = Node::new(state.clone(), 0, 0, self);
+
+        let mut threshold = node.estimated_total_cost(self);
         loop {
-            match self.ida_star_search_inner(&node, threshold, &mut HashSet::new()) {
-                Ok(()) => return Ok(()),
-                Err(t) => threshold = t,
-            }
-            if threshold == i32::MAX {
-                return Err(SearchError::NoSolution);
+            let mut came_from = HashMap::new();
+            match self.ida_star_depth_search(&node, threshold, &mut came_from, &mut HashSet::new())
+            {
+                Ok(state) => return Ok(self.construct_actions(state, &came_from)),
+                Err(new_threshold) => {
+                    if new_threshold == i32::MAX {
+                        return Err(SearchError::NoSolution);
+                    }
+                    threshold = new_threshold;
+                }
             }
         }
     }
 
-    fn ida_star_search_inner(
+    /// Depth-limited search for IDA*.
+    ///
+    /// Returns `Ok(State)` if solution found, `Err(i32)` with the minimum f-value exceeding threshold.
+    fn ida_star_depth_search(
         &self,
         node: &Node,
-        push_threshold: i32,
+        threshold: i32,
+        came_from: &mut HashMap<State, State>,
         visited: &mut HashSet<u64>,
-    ) -> Result<(), i32> {
-        if !visited.insert(node.state.normalized_hash(&self.map)) {
-            return Err(i32::MAX);
+    ) -> Result<State, i32> {
+        if node.estimated_total_cost(self) > threshold {
+            return Err(node.estimated_total_cost(self));
         }
+
         if node.state.is_solved(self) {
-            return Ok(());
+            return Ok(node.state.clone());
         }
-        if node.pushes > push_threshold {
-            return Err(node.pushes);
-        }
+
         let mut min_threshold = i32::MAX;
+
         for successor in node.successors(self) {
-            match self.ida_star_search_inner(&successor, push_threshold, visited) {
-                Ok(()) => return Ok(()),
-                Err(t) => min_threshold = min_threshold.min(t),
+            let state_hash = successor.state.normalized_hash(&self.map);
+
+            // Skip if this state is already in the current search path
+            if visited.contains(&state_hash) {
+                continue;
             }
+
+            visited.insert(state_hash);
+            came_from.insert(successor.state.clone(), node.state.clone());
+
+            match self.ida_star_depth_search(&successor, threshold, came_from, visited) {
+                Ok(state) => return Ok(state),
+                Err(new_threshold) => min_threshold = min_threshold.min(new_threshold),
+            }
+
+            visited.remove(&state_hash);
+            came_from.remove(&successor.state);
         }
+
         Err(min_threshold)
     }
 

@@ -4,21 +4,37 @@ use soukoban::{solver::*, Level};
 mod utils;
 use utils::*;
 
-fn solve(mut level: Level) {
-    let map = level.map().clone();
-    let solver = Solver::new(map, Strategy::Fast);
-    let solution = solver.a_star_search().unwrap();
-    assert!(solver.ida_star_search().is_ok());
-    let directions = solution.iter().map(|action| action.direction());
-    level.execute_batch(directions).unwrap();
-    assert!(level.is_solved());
+#[test]
+fn a_star_search() {
+    fn search(mut level: Level) {
+        let map = level.map().clone();
+        let solver = Solver::new(map, Strategy::Fast);
+        let solution = solver.a_star_search().unwrap();
+        assert!(solver.a_star_search().is_ok());
+        let directions = solution.iter().map(|action| action.direction());
+        level.execute_batch(directions).unwrap();
+        assert!(level.is_solved());
+    }
+
+    search(load_level_from_file("assets/BoxWorld_100.xsb", 1));
+    search(load_level_from_file("assets/BoxWorld_100.xsb", 2));
+    search(load_level_from_file("assets/BoxWorld_100.xsb", 3));
 }
 
 #[test]
-fn test_solver() {
-    solve(load_level_from_file("assets/BoxWorld_100.xsb", 1));
-    solve(load_level_from_file("assets/BoxWorld_100.xsb", 2));
-    solve(load_level_from_file("assets/BoxWorld_100.xsb", 3));
+fn ida_star_search() {
+    fn search(mut level: Level) {
+        let map = level.map().clone();
+        let solver = Solver::new(map, Strategy::Fast);
+        let solution = solver.ida_star_search().unwrap();
+        let directions = solution.iter().map(|action| action.direction());
+        level.execute_batch(directions).unwrap();
+        assert!(level.is_solved());
+    }
+
+    search(load_level_from_file("assets/BoxWorld_100.xsb", 1));
+    search(load_level_from_file("assets/BoxWorld_100.xsb", 2));
+    search(load_level_from_file("assets/BoxWorld_100.xsb", 3));
 }
 
 #[expect(dead_code)]

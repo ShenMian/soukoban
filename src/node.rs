@@ -15,6 +15,7 @@ pub struct Node {
     pub state: State,
     pub pushes: i32,
     pub moves: i32,
+    actual_cost: i32,
     priority: (i32, i32, i32),
 }
 
@@ -22,17 +23,35 @@ impl Node {
     /// Creates a new `Node`.
     pub fn new(state: State, pushes: i32, moves: i32, solver: &Solver) -> Self {
         let heuristic = state.heuristic(solver);
-        let priority = match solver.strategy() {
-            Strategy::Fast => (heuristic, pushes, moves),
-            Strategy::OptimalPush => (pushes, heuristic, moves),
-            Strategy::OptimalMove => (moves, heuristic, pushes),
+        let (actual_cost, priority) = match solver.strategy() {
+            Strategy::Fast => (0, (heuristic, pushes, moves)),
+            Strategy::OptimalPush => (pushes, (pushes, heuristic, moves)),
+            Strategy::OptimalMove => (moves, (moves, heuristic, pushes)),
         };
         Self {
             state,
             pushes,
             moves,
+            actual_cost,
             priority,
         }
+    }
+
+    /// Returns the actual cost from the start node to this node (g-value).
+    pub fn actual_cost(&self) -> i32 {
+        self.actual_cost
+    }
+
+    /// Returns the heuristic estimated cost from this node to the goal (h-value).
+    pub fn estimated_cost(&self, solver: &Solver) -> i32 {
+        self.state.heuristic(solver)
+    }
+
+    /// Returns the estimated total cost from start to goal through this node (f-value).
+    ///
+    /// This is the sum of the actual cost and the heuristic cost: f(n) = g(n) + h(n).
+    pub fn estimated_total_cost(&self, solver: &Solver) -> i32 {
+        self.actual_cost() + self.estimated_cost(solver)
     }
 
     /// Returns the successors of the node.
@@ -63,7 +82,6 @@ impl Node {
 
                 let mut new_player_position = *box_position;
 
-                let mut new_pushes = self.pushes + 1;
                 let mut new_moves = self.moves
                     + find_path(
                         self.state.player_position,
@@ -77,8 +95,9 @@ impl Node {
                     .unwrap()
                     .len() as i32
                     - 1;
+                let mut new_pushes = self.pushes + 1;
 
-                // Skip no influence pushes
+                // Skip pushes in tunnels
                 while solver
                     .tunnels()
                     .contains(&(new_box_position, push_direction))
