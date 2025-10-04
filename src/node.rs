@@ -3,7 +3,7 @@ use std::{cmp::Ordering, collections::HashSet};
 use crate::{
     deadlock::is_freeze_deadlock,
     direction::Direction,
-    path_finding::{find_path, compute_reachable_area},
+    path_finding::{compute_reachable_area, find_path},
     solver::{Solver, Strategy},
     state::State,
     Tiles,
@@ -15,7 +15,7 @@ pub struct Node {
     pub state: State,
     pub pushes: i32,
     pub moves: i32,
-    priority: i32,
+    priority: (i32, i32, i32),
 }
 
 impl Node {
@@ -23,9 +23,9 @@ impl Node {
     pub fn new(state: State, pushes: i32, moves: i32, solver: &Solver) -> Self {
         let heuristic = state.heuristic(solver);
         let priority = match solver.strategy() {
-            Strategy::Fast => heuristic,
-            Strategy::OptimalPush => pushes + heuristic,
-            Strategy::OptimalMove => moves + heuristic,
+            Strategy::Fast => (heuristic, pushes, moves),
+            Strategy::OptimalPush => (pushes, heuristic, moves),
+            Strategy::OptimalMove => (moves, heuristic, pushes),
         };
         Self {
             state,
@@ -38,10 +38,11 @@ impl Node {
     /// Returns the successors of the node.
     pub fn successors(&self, solver: &Solver) -> Vec<Node> {
         let mut successors = Vec::new();
-        let player_reachable_area = compute_reachable_area(self.state.player_position, |position| {
-            !solver.map()[position].intersects(Tiles::Wall)
-                && !self.state.box_positions.contains(&position)
-        });
+        let player_reachable_area =
+            compute_reachable_area(self.state.player_position, |position| {
+                !solver.map()[position].intersects(Tiles::Wall)
+                    && !self.state.box_positions.contains(&position)
+            });
         // Creates successor states by pushing boxes
         for box_position in &self.state.box_positions {
             for push_direction in Direction::iter() {
