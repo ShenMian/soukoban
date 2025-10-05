@@ -297,5 +297,5 @@ pub fn compute_area_anchor(area: &HashSet<Vector2<i32>>) -> Option<Vector2<i32>>
 
 /// Calculates the Manhattan distance between two 2D vectors.
 fn manhattan_distance(a: Vector2<i32>, b: Vector2<i32>) -> i32 {
-    (a.x - b.x).abs() + (a.y - b.y).abs()
+    (a - b).abs().sum()
 }
