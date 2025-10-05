@@ -168,8 +168,8 @@ impl Solver {
         self.lower_bounds.get_or_init(|| {
             // TODO: Compute lower bounds based on strategy
             //
-            // Since the heuristic is always less than or equal to the actual cost, the
-            // current implementation remains admissible.
+            // Since the pushes is always less than or equal to the moves, the current
+            // implementation remains admissible.
             let mut lower_bounds = self.compute_minimum_push();
             lower_bounds.shrink_to_fit();
             lower_bounds
