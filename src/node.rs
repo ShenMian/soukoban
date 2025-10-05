@@ -147,12 +147,12 @@ impl Node {
     /// Returns the priority tuple.
     ///
     /// Lower values indicate higher priority.
-    fn priority(&self) -> (i32, i32, i32) {
+    fn priority(&self) -> (i32, i32) {
         match self.strategy {
-            Strategy::FastPush => (self.heuristic, self.pushes, self.moves),
-            Strategy::FastMove => (self.heuristic, self.moves, self.pushes),
-            Strategy::OptimalPush => (self.pushes, self.heuristic, self.moves),
-            Strategy::OptimalMove => (self.moves, self.heuristic, self.pushes),
+            Strategy::FastPush => (self.heuristic, self.pushes),
+            Strategy::FastMove => (self.heuristic, self.moves),
+            Strategy::OptimalPush => (self.pushes + self.heuristic, self.moves),
+            Strategy::OptimalMove => (self.moves + self.heuristic, self.pushes),
         }
     }
 }
