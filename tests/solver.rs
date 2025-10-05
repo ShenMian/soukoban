@@ -8,7 +8,7 @@ use utils::*;
 fn a_star_search() {
     fn search(mut level: Level) {
         let map = level.map().clone();
-        let solver = Solver::new(map, Strategy::Fast);
+        let solver = Solver::new(map, Strategy::FastPush);
         let solution = solver.a_star_search().unwrap();
         assert!(solver.a_star_search().is_ok());
         let directions = solution.iter().map(|action| action.direction());
@@ -25,7 +25,7 @@ fn a_star_search() {
 fn ida_star_search() {
     fn search(mut level: Level) {
         let map = level.map().clone();
-        let solver = Solver::new(map, Strategy::Fast);
+        let solver = Solver::new(map, Strategy::FastPush);
         let solution = solver.ida_star_search().unwrap();
         let directions = solution.iter().map(|action| action.direction());
         level.execute_batch(directions).unwrap();

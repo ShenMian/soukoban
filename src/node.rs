@@ -39,20 +39,23 @@ impl Node {
     /// Returns the actual cost from the start node to this node (g-value).
     pub fn cost(&self) -> i32 {
         match self.strategy {
-            Strategy::Fast => 0,
+            Strategy::FastPush | Strategy::FastMove => 0,
             Strategy::OptimalPush => self.pushes,
             Strategy::OptimalMove => self.moves,
         }
     }
 
-    /// Returns the heuristic estimated cost from this node to the goal (h-value).
+    /// Returns the heuristic estimated cost from this node to the goal
+    /// (h-value).
     pub fn estimated_cost(&self) -> i32 {
         self.heuristic
     }
 
-    /// Returns the estimated total cost from start to goal through this node (f-value).
+    /// Returns the estimated total cost from start to goal through this node
+    /// (f-value).
     ///
-    /// This is the sum of the actual cost and the heuristic cost: f(n) = g(n) + h(n).
+    /// This is the sum of the actual cost and the heuristic cost: f(n) = g(n) +
+    /// h(n).
     pub fn estimated_total_cost(&self) -> i32 {
         self.cost() + self.estimated_cost()
     }
@@ -141,9 +144,13 @@ impl Node {
         successors
     }
 
+    /// Returns the priority tuple.
+    ///
+    /// Lower values indicate higher priority.
     fn priority(&self) -> (i32, i32, i32) {
         match self.strategy {
-            Strategy::Fast => (self.heuristic, self.pushes, self.moves),
+            Strategy::FastPush => (self.heuristic, self.pushes, self.moves),
+            Strategy::FastMove => (self.heuristic, self.moves, self.pushes),
             Strategy::OptimalPush => (self.pushes, self.heuristic, self.moves),
             Strategy::OptimalMove => (self.moves, self.heuristic, self.pushes),
         }

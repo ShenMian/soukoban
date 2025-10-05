@@ -19,11 +19,15 @@ use crate::{
 /// The strategy to use when searching for a solution.
 #[derive(Clone, Copy, Eq, PartialEq, Debug, Default)]
 pub enum Strategy {
-    /// Search for any solution as quickly as possible.
+    /// Search for any solution as quickly as possible, preferring fewer pushes.
     ///
-    /// Using this strategy, A* search degrades into Greedy Best‑First Search.
+    /// Using this strategy, A* search degrades into greedy search.
     #[default]
-    Fast,
+    FastPush,
+    /// Search for any solution as quickly as possible, preferring fewer moves.
+    ///
+    /// Using this strategy, A* search degrades into greedy search.
+    FastMove,
     /// Find the push optimal solution.
     OptimalPush,
     /// Find the move optimal solution.
@@ -99,7 +103,8 @@ impl Solver {
 
     /// Depth-limited search for IDA*.
     ///
-    /// Returns `Ok(State)` if solution found, `Err(i32)` with the minimum f-value exceeding threshold.
+    /// Returns `Ok(State)` if solution found, `Err(i32)` with the minimum
+    /// f-value exceeding threshold.
     fn ida_star_depth_search(
         &self,
         node: &Node,
@@ -116,7 +121,6 @@ impl Solver {
         }
 
         let mut min_threshold = i32::MAX;
-
         for successor in node.successors(self) {
             let state_hash = successor.state.normalized_hash(&self.map);
 
@@ -166,7 +170,6 @@ impl Solver {
             //
             // Since the heuristic is always less than or equal to the actual cost, the
             // current implementation remains admissible.
-            assert!(self.strategy == Strategy::OptimalPush || self.strategy == Strategy::Fast);
             let mut lower_bounds = self.compute_minimum_push();
             lower_bounds.shrink_to_fit();
             lower_bounds

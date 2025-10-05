@@ -14,7 +14,7 @@ fn a_star_search(c: &mut Criterion) {
         c.bench_function(
             &format!("Solver::a_star_search '{}'", level.metadata()["title"]),
             |b| {
-                let solver = black_box(Solver::new(level.map().clone(), Strategy::Fast));
+                let solver = black_box(Solver::new(level.map().clone(), Strategy::FastPush));
                 b.iter(|| {
                     solver.a_star_search().unwrap();
                 })
@@ -34,7 +34,7 @@ fn ida_star_search(c: &mut Criterion) {
         c.bench_function(
             &format!("Solver::ida_star_search '{}'", level.metadata()["title"]),
             |b| {
-                let solver = black_box(Solver::new(level.map().clone(), Strategy::Fast));
+                let solver = black_box(Solver::new(level.map().clone(), Strategy::FastPush));
                 b.iter(|| {
                     solver.ida_star_search().unwrap();
                 })
@@ -51,7 +51,7 @@ fn ida_star_search(c: &mut Criterion) {
 
 fn tunnels(c: &mut Criterion) {
     let level = Level::from_str(PATH).unwrap();
-    let solver = Solver::new(level.map().clone(), Strategy::Fast);
+    let solver = Solver::new(level.map().clone(), Strategy::FastPush);
     solver.lower_bounds();
     c.bench_function("Solver::tunnels", |b| {
         let solver = solver.clone();
