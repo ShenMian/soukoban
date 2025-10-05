@@ -7,7 +7,6 @@ use nalgebra::Vector2;
 
 use crate::{
     path_finding::{compute_area_anchor, compute_reachable_area},
-    solver::Solver,
     Map, Tiles,
 };
 
@@ -18,19 +17,6 @@ pub struct State {
 }
 
 impl State {
-    /// Returns true if the state is solved.
-    pub fn is_solved(&self, solver: &Solver) -> bool {
-        self.box_positions == *solver.map().goal_positions()
-    }
-
-    /// Returns the heuristic value of the state.
-    pub fn heuristic(&self, solver: &Solver) -> i32 {
-        self.box_positions
-            .iter()
-            .map(|box_position| solver.lower_bounds()[box_position])
-            .sum()
-    }
-
     /// Returns the hash of the normalized state.
     pub fn normalized_hash(&self, map: &Map) -> u64 {
         let mut normalized_state = self.clone();

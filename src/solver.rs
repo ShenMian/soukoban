@@ -62,7 +62,7 @@ impl Solver {
         heap.push(Node::new(state, 0, 0, self));
 
         while let Some(node) = heap.pop() {
-            if node.state.is_solved(self) {
+            if node.is_solved() {
                 return Ok(self.construct_actions(node.state, &came_from));
             }
             for successor in node.successors(self) {
@@ -81,7 +81,7 @@ impl Solver {
         let state: State = self.map.clone().into();
         let node = Node::new(state.clone(), 0, 0, self);
 
-        let mut threshold = node.estimated_total_cost(self);
+        let mut threshold = node.estimated_total_cost();
         loop {
             let mut came_from = HashMap::new();
             match self.ida_star_depth_search(&node, threshold, &mut came_from, &mut HashSet::new())
@@ -107,11 +107,11 @@ impl Solver {
         came_from: &mut HashMap<State, State>,
         visited: &mut HashSet<u64>,
     ) -> Result<State, i32> {
-        if node.estimated_total_cost(self) > threshold {
-            return Err(node.estimated_total_cost(self));
+        if node.estimated_total_cost() > threshold {
+            return Err(node.estimated_total_cost());
         }
 
-        if node.state.is_solved(self) {
+        if node.is_solved() {
             return Ok(node.state.clone());
         }
 
@@ -148,6 +148,15 @@ impl Solver {
     /// Returns the strategy.
     pub fn strategy(&self) -> Strategy {
         self.strategy
+    }
+
+    /// Returns the heuristic value of the state.
+    pub fn heuristic(&self, state: &State) -> i32 {
+        state
+            .box_positions
+            .iter()
+            .map(|box_position| self.lower_bounds()[box_position])
+            .sum()
     }
 
     /// Returns a reference to the set of lower bounds.

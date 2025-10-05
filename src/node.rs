@@ -15,43 +15,46 @@ pub struct Node {
     pub state: State,
     pub pushes: i32,
     pub moves: i32,
-    actual_cost: i32,
-    priority: (i32, i32, i32),
+    heuristic: i32,
+    strategy: Strategy,
 }
 
 impl Node {
     /// Creates a new `Node`.
     pub fn new(state: State, pushes: i32, moves: i32, solver: &Solver) -> Self {
-        let heuristic = state.heuristic(solver);
-        let (actual_cost, priority) = match solver.strategy() {
-            Strategy::Fast => (0, (heuristic, pushes, moves)),
-            Strategy::OptimalPush => (pushes, (pushes, heuristic, moves)),
-            Strategy::OptimalMove => (moves, (moves, heuristic, pushes)),
-        };
         Self {
+            heuristic: solver.heuristic(&state),
             state,
             pushes,
             moves,
-            actual_cost,
-            priority,
+            strategy: solver.strategy(),
         }
     }
 
+    /// Returns true if the state is solved.
+    pub fn is_solved(&self) -> bool {
+        self.heuristic == 0
+    }
+
     /// Returns the actual cost from the start node to this node (g-value).
-    pub fn actual_cost(&self) -> i32 {
-        self.actual_cost
+    pub fn cost(&self) -> i32 {
+        match self.strategy {
+            Strategy::Fast => 0,
+            Strategy::OptimalPush => self.pushes,
+            Strategy::OptimalMove => self.moves,
+        }
     }
 
     /// Returns the heuristic estimated cost from this node to the goal (h-value).
-    pub fn estimated_cost(&self, solver: &Solver) -> i32 {
-        self.state.heuristic(solver)
+    pub fn estimated_cost(&self) -> i32 {
+        self.heuristic
     }
 
     /// Returns the estimated total cost from start to goal through this node (f-value).
     ///
     /// This is the sum of the actual cost and the heuristic cost: f(n) = g(n) + h(n).
-    pub fn estimated_total_cost(&self, solver: &Solver) -> i32 {
-        self.actual_cost() + self.estimated_cost(solver)
+    pub fn estimated_total_cost(&self) -> i32 {
+        self.cost() + self.estimated_cost()
     }
 
     /// Returns the successors of the node.
@@ -137,6 +140,14 @@ impl Node {
         }
         successors
     }
+
+    fn priority(&self) -> (i32, i32, i32) {
+        match self.strategy {
+            Strategy::Fast => (self.heuristic, self.pushes, self.moves),
+            Strategy::OptimalPush => (self.pushes, self.heuristic, self.moves),
+            Strategy::OptimalMove => (self.moves, self.heuristic, self.pushes),
+        }
+    }
 }
 
 impl PartialEq for Node {
@@ -147,7 +158,7 @@ impl PartialEq for Node {
 
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.priority.cmp(&other.priority).reverse()
+        self.priority().cmp(&other.priority()).reverse()
     }
 }
 
