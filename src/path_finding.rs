@@ -12,12 +12,12 @@ use crate::{direction::Direction, map::Map, Tiles};
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 struct Node {
     position: Vector2<i32>,
-    heuristic: i32,
+    priority: i32,
 }
 
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.heuristic.cmp(&other.heuristic).reverse()
+        self.priority.cmp(&other.priority).reverse()
     }
 }
 
@@ -43,7 +43,7 @@ pub fn find_path(
 
     open_set.push(Node {
         position: from,
-        heuristic: manhattan_distance(from, to),
+        priority: manhattan_distance(from, to),
     });
     cost.insert(from, 0);
 
@@ -61,10 +61,9 @@ pub fn find_path(
             let new_cost = cost[&node.position] + 1;
             if !cost.contains_key(&new_position) || new_cost < cost[&new_position] {
                 cost.insert(new_position, new_cost);
-                let priority = new_cost + manhattan_distance(new_position, to);
                 open_set.push(Node {
                     position: new_position,
-                    heuristic: priority,
+                    priority: new_cost + manhattan_distance(new_position, to),
                 });
                 came_from.insert(new_position, node.position);
             }
