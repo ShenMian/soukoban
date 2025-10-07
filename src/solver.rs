@@ -85,12 +85,13 @@ impl Solver {
         let state: State = self.map.clone().into();
         let node = Node::new(state.clone(), 0, 0, self);
 
+        let mut path = vec![state];
+        let mut visited = HashSet::new();
+        visited.insert(node.state.normalized_hash(&self.map));
         let mut threshold = node.estimated_total_cost();
         loop {
-            let mut came_from = HashMap::new();
-            match self.ida_star_depth_search(&node, threshold, &mut came_from, &mut HashSet::new())
-            {
-                Ok(state) => return Ok(self.construct_actions(state, &came_from)),
+            match self.ida_star_depth_search(&node, &mut path, &mut visited, threshold) {
+                Ok(state) => return Ok(self.construct_actions_from_path(state, &path)),
                 Err(new_threshold) => {
                     if new_threshold == i32::MAX {
                         return Err(SearchError::NoSolution);
@@ -108,9 +109,9 @@ impl Solver {
     fn ida_star_depth_search(
         &self,
         node: &Node,
-        threshold: i32,
-        came_from: &mut HashMap<State, State>,
+        path: &mut Vec<State>,
         visited: &mut HashSet<u64>,
+        threshold: i32,
     ) -> Result<State, i32> {
         if node.estimated_total_cost() > threshold {
             return Err(node.estimated_total_cost());
@@ -129,16 +130,16 @@ impl Solver {
                 continue;
             }
 
+            path.push(successor.state.clone());
             visited.insert(state_hash);
-            came_from.insert(successor.state.clone(), node.state.clone());
 
-            match self.ida_star_depth_search(&successor, threshold, came_from, visited) {
+            match self.ida_star_depth_search(&successor, path, visited, threshold) {
                 Ok(state) => return Ok(state),
                 Err(new_threshold) => min_threshold = min_threshold.min(new_threshold),
             }
 
+            path.pop();
             visited.remove(&state_hash);
-            came_from.remove(&successor.state);
         }
 
         Err(min_threshold)
@@ -305,6 +306,55 @@ impl Solver {
     fn construct_actions(&self, mut state: State, came_from: &HashMap<State, State>) -> Actions {
         let mut actions = Actions::new();
         while let Some(prev_state) = came_from.get(&state) {
+            // Find the positions where the box was moved from and to
+            let previous_box_position = *prev_state
+                .box_positions
+                .difference(&state.box_positions)
+                .next()
+                .unwrap();
+            let box_position = *state
+                .box_positions
+                .difference(&prev_state.box_positions)
+                .next()
+                .unwrap();
+
+            // Determine the direction of the push
+            let diff = box_position - previous_box_position;
+            let push_direction =
+                Direction::try_from(Vector2::new(diff.x.signum(), diff.y.signum())).unwrap();
+
+            // Find the path for the player to reach the box position before pushing it
+            let mut new_actions: Vec<_> = find_path(
+                prev_state.player_position,
+                previous_box_position - &push_direction.into(),
+                |position| {
+                    !self.map()[position].intersects(Tiles::Wall)
+                        && !prev_state.box_positions.contains(&position)
+                },
+            )
+            .unwrap()
+            .windows(2)
+            .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
+            .map(Action::Move)
+            .collect();
+
+            new_actions.push(Action::Push(push_direction));
+
+            let mut new_box_position = previous_box_position + &push_direction.into();
+            while self.tunnels().contains(&(new_box_position, push_direction)) {
+                new_box_position += &push_direction.into();
+                new_actions.push(Action::Push(push_direction));
+            }
+
+            actions.splice(0..0, new_actions.iter().copied());
+            state = prev_state.clone();
+        }
+        actions
+    }
+
+    fn construct_actions_from_path(&self, mut state: State, path: &[State]) -> Actions {
+        let mut actions = Actions::new();
+        for prev_state in path.iter().rev().skip(1) {
             // Find the positions where the box was moved from and to
             let previous_box_position = *prev_state
                 .box_positions
