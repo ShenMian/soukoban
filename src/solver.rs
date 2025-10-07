@@ -67,7 +67,7 @@ impl Solver {
 
         while let Some(node) = open_set.pop() {
             if node.is_solved() {
-                return Ok(self.construct_actions(node.state, &came_from));
+                return Ok(self.construct_actions(&construct_path(node.state, &came_from)));
             }
             for successor in node.successors(self) {
                 if !close_set.insert(successor.state.normalized_hash(&self.map)) {
@@ -91,7 +91,7 @@ impl Solver {
         let mut threshold = node.estimated_total_cost();
         loop {
             match self.ida_star_depth_search(&node, &mut path, &mut visited, threshold) {
-                Ok(state) => return Ok(self.construct_actions_from_path(state, &path)),
+                Ok(_state) => return Ok(self.construct_actions(&path)),
                 Err(new_threshold) => {
                     if new_threshold == i32::MAX {
                         return Err(SearchError::NoSolution);
@@ -303,18 +303,19 @@ impl Solver {
         tunnels
     }
 
-    fn construct_actions(&self, mut state: State, came_from: &HashMap<State, State>) -> Actions {
+    fn construct_actions(&self, path: &[State]) -> Actions {
         let mut actions = Actions::new();
-        while let Some(prev_state) = came_from.get(&state) {
+        for window in path.windows(2) {
+            let (state, next_state) = (&window[0], &window[1]);
             // Find the positions where the box was moved from and to
-            let previous_box_position = *prev_state
+            let previous_box_position = *state
                 .box_positions
-                .difference(&state.box_positions)
+                .difference(&next_state.box_positions)
                 .next()
                 .unwrap();
-            let box_position = *state
+            let box_position = *next_state
                 .box_positions
-                .difference(&prev_state.box_positions)
+                .difference(&state.box_positions)
                 .next()
                 .unwrap();
 
@@ -325,11 +326,11 @@ impl Solver {
 
             // Find the path for the player to reach the box position before pushing it
             let mut new_actions: Vec<_> = find_path(
-                prev_state.player_position,
+                state.player_position,
                 previous_box_position - &push_direction.into(),
                 |position| {
                     !self.map()[position].intersects(Tiles::Wall)
-                        && !prev_state.box_positions.contains(&position)
+                        && !state.box_positions.contains(&position)
                 },
             )
             .unwrap()
@@ -346,58 +347,17 @@ impl Solver {
                 new_actions.push(Action::Push(push_direction));
             }
 
-            actions.splice(0..0, new_actions.iter().copied());
-            state = prev_state.clone();
+            actions.extend(new_actions.iter());
         }
         actions
     }
+}
 
-    fn construct_actions_from_path(&self, mut state: State, path: &[State]) -> Actions {
-        let mut actions = Actions::new();
-        for prev_state in path.iter().rev().skip(1) {
-            // Find the positions where the box was moved from and to
-            let previous_box_position = *prev_state
-                .box_positions
-                .difference(&state.box_positions)
-                .next()
-                .unwrap();
-            let box_position = *state
-                .box_positions
-                .difference(&prev_state.box_positions)
-                .next()
-                .unwrap();
-
-            // Determine the direction of the push
-            let diff = box_position - previous_box_position;
-            let push_direction =
-                Direction::try_from(Vector2::new(diff.x.signum(), diff.y.signum())).unwrap();
-
-            // Find the path for the player to reach the box position before pushing it
-            let mut new_actions: Vec<_> = find_path(
-                prev_state.player_position,
-                previous_box_position - &push_direction.into(),
-                |position| {
-                    !self.map()[position].intersects(Tiles::Wall)
-                        && !prev_state.box_positions.contains(&position)
-                },
-            )
-            .unwrap()
-            .windows(2)
-            .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
-            .map(Action::Move)
-            .collect();
-
-            new_actions.push(Action::Push(push_direction));
-
-            let mut new_box_position = previous_box_position + &push_direction.into();
-            while self.tunnels().contains(&(new_box_position, push_direction)) {
-                new_box_position += &push_direction.into();
-                new_actions.push(Action::Push(push_direction));
-            }
-
-            actions.splice(0..0, new_actions.iter().copied());
-            state = prev_state.clone();
-        }
-        actions
+fn construct_path(state: State, came_from: &HashMap<State, State>) -> Vec<State> {
+    let mut path = vec![state];
+    while let Some(prev_state) = came_from.get(path.last().unwrap()) {
+        path.push(prev_state.clone());
     }
+    path.reverse();
+    path
 }
