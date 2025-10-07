@@ -58,23 +58,23 @@ impl Solver {
 
     /// Searches for solution using the A* algorithm.
     pub fn a_star_search(&self) -> Result<Actions, SearchError> {
-        let mut heap = BinaryHeap::new();
+        let mut open_set = BinaryHeap::new();
+        let mut close_set = HashSet::new();
         let mut came_from = HashMap::new();
-        let mut visited = HashSet::new();
 
         let state: State = self.map.clone().into();
-        heap.push(Node::new(state, 0, 0, self));
+        open_set.push(Node::new(state, 0, 0, self));
 
-        while let Some(node) = heap.pop() {
+        while let Some(node) = open_set.pop() {
             if node.is_solved() {
                 return Ok(self.construct_actions(node.state, &came_from));
             }
             for successor in node.successors(self) {
-                if !visited.insert(successor.state.normalized_hash(&self.map)) {
+                if !close_set.insert(successor.state.normalized_hash(&self.map)) {
                     continue;
                 }
                 came_from.insert(successor.state.clone(), node.state.clone());
-                heap.push(successor);
+                open_set.push(successor);
             }
         }
         Err(SearchError::NoSolution)
