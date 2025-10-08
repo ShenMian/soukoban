@@ -7,7 +7,7 @@ use std::{
 
 use nalgebra::Vector2;
 
-use crate::{direction::Direction, map::Map, Tiles};
+use crate::{Tiles, direction::Direction, map::Map};
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 struct Node {
@@ -199,12 +199,12 @@ pub fn construct_box_path(
                 continue;
             }
             for push_direction in Direction::iter() {
-                if let Some(cost) = waypoints.get(&(neighbor, push_direction)) {
-                    if *cost < min_cost {
-                        min_cost = *cost;
-                        min_neighbor = neighbor;
-                        break;
-                    }
+                if let Some(cost) = waypoints.get(&(neighbor, push_direction))
+                    && *cost < min_cost
+                {
+                    min_cost = *cost;
+                    min_neighbor = neighbor;
+                    break;
                 }
             }
         }

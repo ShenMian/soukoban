@@ -282,8 +282,10 @@ impl Map {
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     pub unsafe fn get_unchecked(&self, position: Vector2<i32>) -> &Tiles {
         debug_assert!(self.in_bounds(position));
-        self.data
-            .get_unchecked((position.y * self.dimensions.x + position.x) as usize)
+        unsafe {
+            self.data
+                .get_unchecked((position.y * self.dimensions.x + position.x) as usize)
+        }
     }
 
     /// Returns a mutable reference to tiles at the specified position, without
@@ -300,8 +302,10 @@ impl Map {
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     pub unsafe fn get_unchecked_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
         debug_assert!(self.in_bounds(position));
-        self.data
-            .get_unchecked_mut((position.y * self.dimensions.x + position.x) as usize)
+        unsafe {
+            self.data
+                .get_unchecked_mut((position.y * self.dimensions.x + position.x) as usize)
+        }
     }
 
     /// Checks if a position is within the bounds of the map.
@@ -373,9 +377,10 @@ impl Map {
 
     /// Sets useless boxes to walls.
     fn set_useless_boxes_to_walls(&mut self) {
-        debug_assert!(self
-            .goal_positions
-            .is_superset(&compute_useless_boxes(self)));
+        debug_assert!(
+            self.goal_positions
+                .is_superset(&compute_useless_boxes(self))
+        );
 
         for position in compute_useless_boxes(self) {
             self.remove_goal_position(position);
