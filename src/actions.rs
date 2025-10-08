@@ -12,13 +12,13 @@ use crate::{action::Action, error::ParseActionsError, run_length::rle_decode};
 
 /// Secondary statistics for a sequence of actions.
 pub struct SecondaryValues {
-    /// Straight line box pushes.
+    /// Number of box lines.
     pub box_lines: i32,
-    /// Changing focus from one box to another.
+    /// Number of times the pushed box changed (first push counts).
     pub box_changes: i32,
-    /// Changing from moving the line to pushing the boxes.
+    /// Number of pushing sessions (transitions from moving to pushing).
     pub pushing_sessions: i32,
-    /// Straight line player moves.
+    /// Number of player lines (direction changes while moving).
     pub player_lines: i32,
 }
 
