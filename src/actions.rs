@@ -50,7 +50,8 @@ impl Actions {
         let mut player_lines = 0;
 
         let mut player_position = Vector2::zeros();
-        let mut prev_pushed_box_position = None;
+        // Previous pushed box position
+        let mut prev_box_position = None;
         let mut prev_action: Option<Action> = None;
         for action in &self.0 {
             player_position += &action.direction().into();
@@ -65,16 +66,20 @@ impl Actions {
                     if !prev_action.is_push() {
                         pushing_sessions += 1;
                     }
-                    if let Some(prev_pushed_box_position) = prev_pushed_box_position {
-                        if player_position != prev_pushed_box_position {
+                    if let Some(prev_box_position) = prev_box_position {
+                        if player_position != prev_box_position {
                             box_changes += 1;
                         }
                     } else {
                         box_changes += 1;
                     }
-                    prev_pushed_box_position = Some(player_position + &action.direction().into());
+                    prev_box_position = Some(player_position + &action.direction().into());
                 }
             } else {
+                if action.is_push() {
+                    box_lines += 1;
+                    pushing_sessions += 1;
+                }
                 player_lines += 1;
             }
             prev_action = Some(*action);
