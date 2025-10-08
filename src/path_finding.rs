@@ -108,9 +108,9 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 
 /// Calculates the waypoints for the box to move from their current position to
 /// reachable positions.
+//
 // TODO:
-// 1. 使代码更加灵活, 以便支持不同指标(如移动数)优先的寻路.
-// 2. 计算玩家可达全部位置没有必要且非常耗时, 有以下优化方式:
+// 1. 计算玩家可达全部位置没有必要且非常耗时, 有以下优化方式:
 //   -  使用图论的割点来快速判断两点之间的连通性.
 //      可以通过预先计算割点来快速判断玩家是否能到达箱子的一侧.
 //      因为该方不支持涉及具体路径的计算, 因此无法以最优移动寻路.
@@ -119,6 +119,7 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 //     将上一次搜索路径的终点作为新的搜索起点. 这样曼哈顿距离更小,
 //     在大部分情况下会更快.
 //   - 使用递归, 增量更新玩家可达范围.
+// 2. 使代码更加灵活, 以便支持不同指标 (如移动数) 优先的寻路.
 pub fn box_move_waypoints(
     map: &Map,
     initial_box_position: Vector2<i32>,
