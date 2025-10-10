@@ -1,40 +1,152 @@
+use std::str::FromStr;
+
 use nalgebra::Vector2;
-use soukoban::{solver::*, Level};
+use soukoban::{Actions, Level, solver::*};
 
 mod utils;
 use utils::*;
 
 #[test]
 fn a_star_search() {
-    fn search(mut level: Level) {
+    fn search(mut level: Level, strategy: Strategy) -> Actions {
         let map = level.map().clone();
-        let solver = Solver::new(map, Strategy::FastPush);
+        let solver = Solver::new(map, strategy);
         let solution = solver.a_star_search().unwrap();
-        assert!(solver.a_star_search().is_ok());
+
         let directions = solution.iter().map(|action| action.direction());
         level.execute_batch(directions).unwrap();
         assert!(level.is_solved());
+
+        solution
     }
 
-    search(load_level_from_file("assets/BoxWorld_100.xsb", 1));
-    search(load_level_from_file("assets/BoxWorld_100.xsb", 2));
-    search(load_level_from_file("assets/BoxWorld_100.xsb", 3));
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 1),
+        Strategy::FastPush,
+    );
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 2),
+        Strategy::FastPush,
+    );
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 3),
+        Strategy::FastPush,
+    );
+
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::OptimalPush,
+        )
+        .pushes(),
+        Actions::from_str("DuLLrUUdrR").unwrap().pushes()
+    );
+    // FIXME:
+    // assert_eq!(
+    //     search(
+    //         load_level_from_file("assets/BoxWorld_100.xsb", 1),
+    //         Strategy::OptimalMove,
+    //     )
+    //     .moves(),
+    //     Actions::from_str("DuLLrUUdrR").unwrap().moves()
+    // );
+
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 2),
+            Strategy::OptimalPush,
+        )
+        .pushes(),
+        Actions::from_str(
+            "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+        )
+        .unwrap()
+        .pushes()
+    );
+    // FIXME:
+    // assert_eq!(
+    //     search(
+    //         load_level_from_file("assets/BoxWorld_100.xsb", 2),
+    //         Strategy::OptimalMove,
+    //     )
+    //     .moves(),
+    //     Actions::from_str(
+    //         "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+    //     )
+    //     .unwrap()
+    //     .moves()
+    // );
 }
 
 #[test]
 fn ida_star_search() {
-    fn search(mut level: Level) {
+    fn search(mut level: Level, strategy: Strategy) -> Actions {
         let map = level.map().clone();
-        let solver = Solver::new(map, Strategy::FastPush);
+        let solver = Solver::new(map, strategy);
         let solution = solver.ida_star_search().unwrap();
+
         let directions = solution.iter().map(|action| action.direction());
         level.execute_batch(directions).unwrap();
         assert!(level.is_solved());
+
+        solution
     }
 
-    search(load_level_from_file("assets/BoxWorld_100.xsb", 1));
-    search(load_level_from_file("assets/BoxWorld_100.xsb", 2));
-    search(load_level_from_file("assets/BoxWorld_100.xsb", 3));
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 1),
+        Strategy::FastPush,
+    );
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 2),
+        Strategy::FastPush,
+    );
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 3),
+        Strategy::FastPush,
+    );
+
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::OptimalPush,
+        )
+        .pushes(),
+        Actions::from_str("DuLLrUUdrR").unwrap().pushes()
+    );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str("DuLLrUUdrR").unwrap().moves()
+    );
+
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 2),
+            Strategy::OptimalPush,
+        )
+        .pushes(),
+        Actions::from_str(
+            "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+        )
+        .unwrap()
+        .pushes()
+    );
+    // FIXME:
+    // assert_eq!(
+    //     search(
+    //         load_level_from_file("assets/BoxWorld_100.xsb", 2),
+    //         Strategy::OptimalMove,
+    //     )
+    //     .moves(),
+    //     Actions::from_str(
+    //         "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+    //     )
+    //     .unwrap()
+    //     .moves()
+    // );
 }
 
 #[expect(dead_code)]
