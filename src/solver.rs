@@ -9,11 +9,11 @@ use itertools::Itertools;
 use nalgebra::Vector2;
 
 use crate::{
+    Action, Actions, Map, SearchError, Tiles,
     direction::Direction,
     node::Node,
     path_finding::{compute_reachable_area, find_path},
     state::State,
-    Action, Actions, Map, SearchError, Tiles,
 };
 
 /// The strategy to use when searching for a solution.
@@ -59,10 +59,11 @@ impl Solver {
     /// Searches for solution using the A* algorithm.
     pub fn a_star_search(&self) -> Result<Actions, SearchError> {
         let mut open_set = BinaryHeap::new();
-        let mut close_set = HashSet::new();
         let mut came_from = HashMap::new();
+        let mut cost = HashMap::new();
 
         let state: State = self.map.clone().into();
+        cost.insert(state.normalized_hash(&self.map), 0);
         open_set.push(Node::new(state, 0, 0, self));
 
         while let Some(node) = open_set.pop() {
@@ -70,11 +71,12 @@ impl Solver {
                 return Ok(self.construct_actions(&construct_path(node.state, &came_from)));
             }
             for successor in node.successors(self) {
-                if !close_set.insert(successor.state.normalized_hash(&self.map)) {
-                    continue;
+                let hash = successor.state.normalized_hash(&self.map);
+                if !cost.contains_key(&hash) || successor.cost() < cost[&hash] {
+                    cost.insert(hash, successor.cost());
+                    came_from.insert(successor.state.clone(), node.state.clone());
+                    open_set.push(successor);
                 }
-                came_from.insert(successor.state.clone(), node.state.clone());
-                open_set.push(successor);
             }
         }
         Err(SearchError::NoSolution)

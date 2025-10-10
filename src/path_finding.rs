@@ -41,11 +41,11 @@ pub fn find_path(
     let mut came_from = HashMap::new();
     let mut cost = HashMap::new();
 
+    cost.insert(from, 0);
     open_set.push(Node {
         position: from,
         priority: manhattan_distance(from, to),
     });
-    cost.insert(from, 0);
 
     while let Some(node) = open_set.pop() {
         if node.position == to {
