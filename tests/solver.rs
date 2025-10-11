@@ -41,15 +41,14 @@ fn a_star_search() {
         .pushes(),
         Actions::from_str("DuLLrUUdrR").unwrap().pushes()
     );
-    // FIXME:
-    // assert_eq!(
-    //     search(
-    //         load_level_from_file("assets/BoxWorld_100.xsb", 1),
-    //         Strategy::OptimalMove,
-    //     )
-    //     .moves(),
-    //     Actions::from_str("DuLLrUUdrR").unwrap().moves()
-    // );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str("DuLLrUUdrR").unwrap().moves()
+    );
 
     assert_eq!(
         search(
@@ -63,19 +62,18 @@ fn a_star_search() {
         .unwrap()
         .pushes()
     );
-    // FIXME:
-    // assert_eq!(
-    //     search(
-    //         load_level_from_file("assets/BoxWorld_100.xsb", 2),
-    //         Strategy::OptimalMove,
-    //     )
-    //     .moves(),
-    //     Actions::from_str(
-    //         "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
-    //     )
-    //     .unwrap()
-    //     .moves()
-    // );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 2),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str(
+            "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+        )
+        .unwrap()
+        .moves()
+    );
 }
 
 #[test]
@@ -134,19 +132,18 @@ fn ida_star_search() {
         .unwrap()
         .pushes()
     );
-    // FIXME:
-    // assert_eq!(
-    //     search(
-    //         load_level_from_file("assets/BoxWorld_100.xsb", 2),
-    //         Strategy::OptimalMove,
-    //     )
-    //     .moves(),
-    //     Actions::from_str(
-    //         "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
-    //     )
-    //     .unwrap()
-    //     .moves()
-    // );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 2),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str(
+            "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+        )
+        .unwrap()
+        .moves()
+    );
 }
 
 #[expect(dead_code)]

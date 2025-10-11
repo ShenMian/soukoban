@@ -88,22 +88,19 @@ impl Node {
 
                 let mut new_player_position = *box_position;
 
-                // The player's current position and new position cannot be the same, so the
-                // length of the `find_path` result must be a positive number. Therefore, it is
-                // safe to subtract 1.
-                let mut new_moves = self.moves
-                    + find_path(
-                        self.state.player_position,
-                        new_player_position,
-                        |position| {
-                            !solver.map()[position].intersects(Tiles::Wall)
-                                && (!self.state.box_positions.contains(&position)
-                                    || position == *box_position)
-                        },
-                    )
-                    .unwrap()
-                    .len() as i32
-                    - 1;
+                let push_from_position = *box_position - &push_direction.into();
+                let path_to_push_position = find_path(
+                    self.state.player_position,
+                    push_from_position,
+                    |position| {
+                        !solver.map()[position].intersects(Tiles::Wall)
+                            && !self.state.box_positions.contains(&position)
+                    },
+                )
+                .unwrap();
+
+                // Number of moves to get to the position to push, plus 1 for the push itself.
+                let mut new_moves = self.moves + (path_to_push_position.len() - 1) as i32 + 1;
                 let mut new_pushes = self.pushes + 1;
 
                 // Skip pushes in tunnels

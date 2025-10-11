@@ -63,8 +63,9 @@ impl Solver {
         let mut cost = HashMap::new();
 
         let state: State = self.map.clone().into();
-        cost.insert(state.normalized_hash(&self.map), 0);
-        open_set.push(Node::new(state, 0, 0, self));
+        let initial_node = Node::new(state, 0, 0, self);
+        cost.insert(initial_node.state.normalized_hash(&self.map), (initial_node.moves, initial_node.pushes));
+        open_set.push(initial_node);
 
         while let Some(node) = open_set.pop() {
             if node.is_solved() {
@@ -72,8 +73,9 @@ impl Solver {
             }
             for successor in node.successors(self) {
                 let hash = successor.state.normalized_hash(&self.map);
-                if !cost.contains_key(&hash) || successor.cost() < cost[&hash] {
-                    cost.insert(hash, successor.cost());
+                let successor_cost = (successor.moves, successor.pushes);
+                if !cost.contains_key(&hash) || successor_cost <= cost[&hash] {
+                    cost.insert(hash, successor_cost);
                     came_from.insert(successor.state.clone(), node.state.clone());
                     open_set.push(successor);
                 }
