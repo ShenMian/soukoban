@@ -1,12 +1,12 @@
 use std::{cmp::Ordering, collections::HashSet};
 
 use crate::{
+    Tiles,
     deadlock::is_freeze_deadlock,
     direction::Direction,
     path_finding::{compute_reachable_area, find_path},
     solver::{Solver, Strategy},
     state::State,
-    Tiles,
 };
 
 /// A node in the search tree.
@@ -88,6 +88,9 @@ impl Node {
 
                 let mut new_player_position = *box_position;
 
+                // The player's current position and new position cannot be the same, so the
+                // length of the `find_path` result must be a positive number. Therefore, it is
+                // safe to subtract 1.
                 let mut new_moves = self.moves
                     + find_path(
                         self.state.player_position,

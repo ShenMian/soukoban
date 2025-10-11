@@ -108,7 +108,6 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 
 /// Calculates the waypoints for the box to move from their current position to
 /// reachable positions.
-//
 // TODO:
 // 1. 计算玩家可达全部位置没有必要且非常耗时, 有以下优化方式:
 //   -  使用图论的割点来快速判断两点之间的连通性.

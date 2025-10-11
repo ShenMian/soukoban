@@ -1,9 +1,9 @@
 use std::hint::black_box;
 use std::str::FromStr;
 
-use criterion::{criterion_group, Criterion};
+use criterion::{Criterion, criterion_group};
 use nalgebra::Vector2;
-use soukoban::{path_finding, Level};
+use soukoban::{Level, path_finding};
 
 use super::utils::*;
 

@@ -19,8 +19,8 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::direction::Direction;
     /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
     ///
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.direction(), Direction::Up);
@@ -37,8 +37,8 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::direction::Direction;
     /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
     ///
     /// let action = Action::Move(Direction::Up);
     /// assert!(action.is_move());
@@ -52,8 +52,8 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::direction::Direction;
     /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
     ///
     /// let action = Action::Push(Direction::Up);
     /// assert!(action.is_push());

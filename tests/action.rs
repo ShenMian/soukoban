@@ -1,4 +1,4 @@
-use soukoban::{direction::Direction, Action};
+use soukoban::{Action, direction::Direction};
 
 #[test]
 fn action_from_char() {

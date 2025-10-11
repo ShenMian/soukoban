@@ -1,7 +1,7 @@
 use std::hint::black_box;
 use std::str::FromStr;
 
-use criterion::{criterion_group, Criterion};
+use criterion::{Criterion, criterion_group};
 use soukoban::Map;
 
 use super::utils::*;

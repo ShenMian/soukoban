@@ -6,8 +6,8 @@ use std::{
 use nalgebra::Vector2;
 
 use crate::{
-    path_finding::{compute_area_anchor, compute_reachable_area},
     Map, Tiles,
+    path_finding::{compute_area_anchor, compute_reachable_area},
 };
 
 #[derive(Clone, Eq, PartialEq, Debug)]
