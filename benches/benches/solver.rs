@@ -10,11 +10,15 @@ use soukoban::{
 use super::utils::*;
 
 fn a_star_search(c: &mut Criterion) {
-    let mut bench_solve = |level: Level| {
+    let mut bench_search = |level: Level, strategy: Strategy| {
         c.bench_function(
-            &format!("Solver::a_star_search '{}'", level.metadata()["title"]),
+            &format!(
+                "Solver::a_star_search '{}' using '{:?}'",
+                level.metadata()["title"],
+                strategy
+            ),
             |b| {
-                let solver = black_box(Solver::new(level.map().clone(), Strategy::FastPush));
+                let solver = black_box(Solver::new(level.map().clone(), strategy));
                 b.iter(|| {
                     solver.a_star_search().unwrap();
                 })
@@ -23,18 +27,22 @@ fn a_star_search(c: &mut Criterion) {
     };
 
     let level = Level::from_str(PATH).unwrap();
-    bench_solve(level);
+    bench_search(level, Strategy::FastPush);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
-    bench_solve(level);
+    bench_search(level, Strategy::FastPush);
 }
 
 fn ida_star_search(c: &mut Criterion) {
-    let mut bench_solve = |level: Level| {
+    let mut bench_search = |level: Level, strategy: Strategy| {
         c.bench_function(
-            &format!("Solver::ida_star_search '{}'", level.metadata()["title"]),
+            &format!(
+                "Solver::ida_star_search '{}' using '{:?}'",
+                level.metadata()["title"],
+                strategy
+            ),
             |b| {
-                let solver = black_box(Solver::new(level.map().clone(), Strategy::FastPush));
+                let solver = black_box(Solver::new(level.map().clone(), strategy));
                 b.iter(|| {
                     solver.ida_star_search().unwrap();
                 })
@@ -43,10 +51,10 @@ fn ida_star_search(c: &mut Criterion) {
     };
 
     let level = Level::from_str(PATH).unwrap();
-    bench_solve(level);
+    bench_search(level, Strategy::FastPush);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
-    bench_solve(level);
+    bench_search(level, Strategy::FastPush);
 }
 
 fn tunnels(c: &mut Criterion) {
