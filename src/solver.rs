@@ -19,15 +19,11 @@ use crate::{
 /// The strategy to use when searching for a solution.
 #[derive(Clone, Copy, Eq, PartialEq, Debug, Default)]
 pub enum Strategy {
-    /// Search for any solution as quickly as possible, preferring fewer pushes.
+    /// Search for any solution as quickly as possible.
     ///
     /// Using this strategy, A* search degrades into greedy search.
     #[default]
-    FastPush,
-    /// Search for any solution as quickly as possible, preferring fewer moves.
-    ///
-    /// Using this strategy, A* search degrades into greedy search.
-    FastMove,
+    Fast,
     /// Find the push optimal solution.
     OptimalPush,
     /// Find the move optimal solution.

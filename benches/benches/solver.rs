@@ -27,10 +27,10 @@ fn a_star_search(c: &mut Criterion) {
     };
 
     let level = Level::from_str(PATH).unwrap();
-    bench_search(level, Strategy::FastPush);
+    bench_search(level, Strategy::Fast);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
-    bench_search(level, Strategy::FastPush);
+    bench_search(level, Strategy::Fast);
 }
 
 fn ida_star_search(c: &mut Criterion) {
@@ -51,15 +51,15 @@ fn ida_star_search(c: &mut Criterion) {
     };
 
     let level = Level::from_str(PATH).unwrap();
-    bench_search(level, Strategy::FastPush);
+    bench_search(level, Strategy::Fast);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
-    bench_search(level, Strategy::FastPush);
+    bench_search(level, Strategy::Fast);
 }
 
 fn tunnels(c: &mut Criterion) {
     let level = Level::from_str(PATH).unwrap();
-    let solver = Solver::new(level.map().clone(), Strategy::FastPush);
+    let solver = Solver::new(level.map().clone(), Strategy::Fast);
     solver.lower_bounds();
     c.bench_function("Solver::tunnels", |b| {
         let solver = solver.clone();
