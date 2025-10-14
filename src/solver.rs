@@ -59,7 +59,7 @@ impl Solver {
         let mut cost = HashMap::new();
 
         let state: State = self.map.clone().into();
-        cost.insert(state.normalized_hash(&self.map), 0);
+        cost.insert(state.compute_hash(self.strategy, &self.map), 0);
         open_set.push(Node::new(state, 0, 0, self));
 
         while let Some(node) = open_set.pop() {
@@ -67,7 +67,7 @@ impl Solver {
                 return Ok(self.construct_actions(&construct_path(node.state, &came_from)));
             }
             for successor in node.successors(self) {
-                let hash = successor.state.normalized_hash(&self.map);
+                let hash = successor.state.compute_hash(self.strategy, &self.map);
                 if !cost.contains_key(&hash) || successor.cost() < cost[&hash] {
                     cost.insert(hash, successor.cost());
                     came_from.insert(successor.state.clone(), node.state.clone());
@@ -85,7 +85,7 @@ impl Solver {
 
         let mut path = vec![state];
         let mut visited = HashSet::new();
-        visited.insert(node.state.normalized_hash(&self.map));
+        visited.insert(node.state.compute_hash(self.strategy, &self.map));
         let mut threshold = node.estimated_total_cost();
         loop {
             match self.ida_star_depth_search(&node, &mut path, &mut visited, threshold) {
@@ -121,15 +121,15 @@ impl Solver {
 
         let mut min_threshold = i32::MAX;
         for successor in node.successors(self) {
-            let state_hash = successor.state.normalized_hash(&self.map);
+            let hash = successor.state.compute_hash(self.strategy, &self.map);
 
             // Skip if this state is already in the current search path
-            if visited.contains(&state_hash) {
+            if visited.contains(&hash) {
                 continue;
             }
 
             path.push(successor.state.clone());
-            visited.insert(state_hash);
+            visited.insert(hash);
 
             match self.ida_star_depth_search(&successor, path, visited, threshold) {
                 Ok(state) => return Ok(state),
@@ -137,7 +137,7 @@ impl Solver {
             }
 
             path.pop();
-            visited.remove(&state_hash);
+            visited.remove(&hash);
         }
 
         Err(min_threshold)

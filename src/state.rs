@@ -8,6 +8,7 @@ use nalgebra::Vector2;
 use crate::{
     Map, Tiles,
     path_finding::{compute_area_anchor, compute_reachable_area},
+    solver::Strategy,
 };
 
 #[derive(Clone, Eq, PartialEq, Debug)]
@@ -17,13 +18,21 @@ pub struct State {
 }
 
 impl State {
-    /// Returns the hash of the normalized state.
-    pub fn normalized_hash(&self, map: &Map) -> u64 {
-        let mut normalized_state = self.clone();
-        normalized_state.normalize_player_position(map);
+    /// Computes the hash of the state according to the given strategy.
+    pub fn compute_hash(&self, strategy: Strategy, map: &Map) -> u64 {
         let mut hasher = DefaultHasher::new();
-        normalized_state.hash(&mut hasher);
-        hasher.finish()
+        match strategy {
+            Strategy::Fast | Strategy::OptimalPush => {
+                let mut normalized_state = self.clone();
+                normalized_state.normalize_player_position(map);
+                normalized_state.hash(&mut hasher);
+                hasher.finish()
+            }
+            Strategy::OptimalMove => {
+                self.hash(&mut hasher);
+                hasher.finish()
+            }
+        }
     }
 
     /// Normalizes the position of the player.

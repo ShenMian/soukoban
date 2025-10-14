@@ -41,15 +41,14 @@ fn a_star_search() {
         .pushes(),
         Actions::from_str("DuLLrUUdrR").unwrap().pushes()
     );
-    // FIXME:
-    // assert_eq!(
-    //     search(
-    //         load_level_from_file("assets/BoxWorld_100.xsb", 1),
-    //         Strategy::OptimalMove,
-    //     )
-    //     .moves(),
-    //     Actions::from_str("DuLLrUUdrR").unwrap().moves()
-    // );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str("DuLLrUUdrR").unwrap().moves()
+    );
 
     assert_eq!(
         search(
@@ -113,15 +112,14 @@ fn ida_star_search() {
         .pushes(),
         Actions::from_str("DuLLrUUdrR").unwrap().pushes()
     );
-    // FIXME:
-    // assert_eq!(
-    //     search(
-    //         load_level_from_file("assets/BoxWorld_100.xsb", 1),
-    //         Strategy::OptimalMove,
-    //     )
-    //     .moves(),
-    //     Actions::from_str("DuLLrUUdrR").unwrap().moves()
-    // );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str("DuLLrUUdrR").unwrap().moves()
+    );
 
     assert_eq!(
         search(
