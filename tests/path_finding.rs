@@ -18,12 +18,18 @@ fn test_box_move_waypoints() {
     let map = load_level_from_file("assets/Microban_155.xsb", 3).into();
     assert_eq!(box_move_waypoints(&map, Vector2::new(6, 3)).len(), 0);
     let waypoints = box_move_waypoints(&map, Vector2::new(6, 2));
-    let positions: HashSet<_> = waypoints.iter().map(|((pos, _), _)| pos).collect();
+    let positions: HashSet<_> = waypoints
+        .iter()
+        .map(|((position, _), _)| position)
+        .collect();
     assert_eq!(positions.len(), 15);
 
     let map = load_level_from_file("assets/Microban II_135.xsb", 132).into();
     let waypoints = box_move_waypoints(&map, Vector2::new(8, 7));
-    let positions: HashSet<_> = waypoints.iter().map(|((pos, _), _)| pos).collect();
+    let positions: HashSet<_> = waypoints
+        .iter()
+        .map(|((position, _), _)| position)
+        .collect();
     let box_path = construct_box_path(Vector2::new(8, 7), Vector2::new(9, 8), &waypoints);
     let player_path = construct_player_path(&map, Vector2::new(7, 6), &box_path);
     assert_eq!(positions.len(), 4 * 35);
@@ -32,7 +38,10 @@ fn test_box_move_waypoints() {
 
     let map = load_level_from_file("assets/Microban II_135.xsb", 133).into();
     let waypoints = box_move_waypoints(&map, Vector2::new(18, 18));
-    let positions: HashSet<_> = waypoints.iter().map(|((pos, _), _)| pos).collect();
+    let positions: HashSet<_> = waypoints
+        .iter()
+        .map(|((position, _), _)| position)
+        .collect();
     let box_path = construct_box_path(Vector2::new(18, 18), Vector2::new(17, 18), &waypoints);
     let player_path = construct_player_path(&map, Vector2::new(16, 18), &box_path);
     assert_eq!(positions.len(), 4 * 6);
