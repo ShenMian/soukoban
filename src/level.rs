@@ -1,13 +1,12 @@
 //! A level.
 
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
     fmt,
     io::BufRead,
     str::FromStr,
 };
 
-use itertools::Itertools;
 use nalgebra::Vector2;
 
 use crate::{
@@ -24,7 +23,7 @@ use crate::{
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Level {
     map: Map,
-    metadata: HashMap<String, String>,
+    metadata: BTreeMap<String, String>,
     actions: Actions,
     undone_actions: Actions,
 }
@@ -34,7 +33,7 @@ impl Level {
     pub fn from_map(map: Map) -> Self {
         Self {
             map,
-            metadata: HashMap::new(),
+            metadata: BTreeMap::new(),
             actions: Actions::default(),
             undone_actions: Actions::default(),
         }
@@ -51,7 +50,7 @@ impl Level {
     }
 
     /// Returns a reference to the metadata of the level.
-    pub fn metadata(&self) -> &HashMap<String, String> {
+    pub fn metadata(&self) -> &BTreeMap<String, String> {
         &self.metadata
     }
 
@@ -223,8 +222,7 @@ impl Level {
 impl fmt::Display for Level {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.map)?;
-        self.metadata.iter();
-        for key in self.metadata.keys().sorted() {
+        for key in self.metadata.keys() {
             let value = &self.metadata[key];
             if key == "comments" && value.lines().count() > 1 {
                 writeln!(f, "comment:")?;
@@ -253,7 +251,7 @@ impl FromStr for Level {
     fn from_str(xsb: &str) -> Result<Self, Self::Err> {
         let mut map_offset = 0;
         let mut map_len = 0;
-        let mut metadata = HashMap::new();
+        let mut metadata = BTreeMap::new();
         let mut comments = String::new();
         let mut in_block_comment = false;
         for line in xsb.split_inclusive(['\n', '|']) {
