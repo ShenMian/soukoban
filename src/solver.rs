@@ -344,6 +344,7 @@ impl Solver {
                 new_box_position += &push_direction.into();
                 new_actions.push(Action::Push(push_direction));
             }
+            debug_assert_eq!(new_box_position, box_position);
 
             actions.extend(new_actions.iter());
         }
