@@ -9,7 +9,7 @@ A library provides the implementation of algorithms and data structures related 
 ## Features
 
 - **Solver**
-  - **Search algorithms**: Supports A\*, IDA\* and greedy search.
+  - **Search algorithms**: Supports A\*, IDA\* and GBFS search.
   - **Strategies**: Supports optimal and suboptimal strategies.
 - **Level**
   - **Zero-allocation lazy parsing**: Parses levels lazily from an in-memory string without memory allocations except for level creation.
