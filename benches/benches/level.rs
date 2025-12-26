@@ -1,30 +1,27 @@
 use std::fs;
-use std::hint::black_box;
 
 use criterion::{Criterion, criterion_group};
 use soukoban::Level;
 
 fn load_from_str(c: &mut Criterion) {
-    let mut buf = String::new();
-    for entry in fs::read_dir("assets/").unwrap() {
-        let path = entry.unwrap().path();
-        buf += &(fs::read_to_string(path).unwrap() + "\n\n");
-    }
-
     c.bench_function("Level::load_from_str", |b| {
-        b.iter(|| black_box(Level::load_from_str(black_box(&buf)).count()))
+        let mut buf = String::new();
+        for entry in fs::read_dir("assets/").unwrap() {
+            let path = entry.unwrap().path();
+            buf += &(fs::read_to_string(path).unwrap() + "\n\n");
+        }
+        b.iter(|| Level::load_from_str(&buf).count())
     });
 }
 
 fn load_nth_from_str(c: &mut Criterion) {
-    let mut buf = String::new();
-    for entry in fs::read_dir("assets/").unwrap() {
-        let path = entry.unwrap().path();
-        buf += &(fs::read_to_string(path).unwrap() + "\n\n");
-    }
-
     c.bench_function("Level::load_nth_from_str", |b| {
-        b.iter(|| black_box(Level::load_nth_from_str(black_box(&buf), black_box(3371)).unwrap()))
+        let mut buf = String::new();
+        for entry in fs::read_dir("assets/").unwrap() {
+            let path = entry.unwrap().path();
+            buf += &(fs::read_to_string(path).unwrap() + "\n\n");
+        }
+        b.iter(|| Level::load_nth_from_str(&buf, 3371).unwrap())
     });
 }
 

@@ -1,22 +1,25 @@
-use std::hint::black_box;
 use std::str::FromStr;
 
-use criterion::{Criterion, criterion_group};
+use criterion::{BatchSize, Criterion, criterion_group};
 use soukoban::{Map, deadlock};
 
 use super::utils::*;
 
 fn compute_unused_floors(c: &mut Criterion) {
-    let map = Map::from_str(WORLDCUP2014).unwrap();
     c.bench_function("deadlock::compute_useless_floors", |b| {
-        b.iter(|| black_box(deadlock::compute_useless_floors(black_box(map.clone()))))
+        let map = Map::from_str(WORLDCUP2014).unwrap();
+        b.iter_batched(
+            || map.clone(),
+            deadlock::compute_useless_floors,
+            BatchSize::SmallInput,
+        )
     });
 }
 
 fn compute_static_deadlocks(c: &mut Criterion) {
-    let map = Map::from_str(WORLDCUP2014).unwrap();
     c.bench_function("deadlock::compute_static_deadlocks", |b| {
-        b.iter(|| black_box(deadlock::compute_static_deadlocks(black_box(&map))))
+        let map = Map::from_str(WORLDCUP2014).unwrap();
+        b.iter(|| deadlock::compute_static_deadlocks(&map))
     });
 }
 

@@ -1,7 +1,6 @@
-use std::hint::black_box;
 use std::str::FromStr;
 
-use criterion::{Criterion, criterion_group};
+use criterion::{BatchSize, Criterion, criterion_group};
 use soukoban::{
     Level,
     solver::{Solver, Strategy},
@@ -18,10 +17,11 @@ fn a_star_search(c: &mut Criterion) {
                 strategy
             ),
             |b| {
-                let solver = black_box(Solver::new(level.map().clone(), strategy));
-                b.iter(|| {
-                    solver.a_star_search().unwrap();
-                })
+                b.iter_batched_ref(
+                    || Solver::new(level.map().clone(), strategy),
+                    |solver| solver.a_star_search().unwrap(),
+                    BatchSize::SmallInput,
+                )
             },
         );
     };
@@ -42,10 +42,11 @@ fn ida_star_search(c: &mut Criterion) {
                 strategy
             ),
             |b| {
-                let solver = black_box(Solver::new(level.map().clone(), strategy));
-                b.iter(|| {
-                    solver.ida_star_search().unwrap();
-                })
+                b.iter_batched_ref(
+                    || Solver::new(level.map().clone(), strategy),
+                    |solver| solver.ida_star_search().unwrap(),
+                    BatchSize::SmallInput,
+                )
             },
         );
     };
@@ -62,10 +63,13 @@ fn tunnels(c: &mut Criterion) {
     let solver = Solver::new(level.map().clone(), Strategy::Fast);
     solver.lower_bounds();
     c.bench_function("Solver::tunnels", |b| {
-        let solver = solver.clone();
-        b.iter(|| {
-            black_box(solver.tunnels());
-        })
+        b.iter_batched_ref(
+            || solver.clone(),
+            |solver| {
+                solver.tunnels();
+            },
+            BatchSize::SmallInput,
+        )
     });
 }
 

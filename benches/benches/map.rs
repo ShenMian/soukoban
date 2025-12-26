@@ -1,15 +1,14 @@
-use std::hint::black_box;
 use std::str::FromStr;
 
-use criterion::{Criterion, criterion_group};
+use criterion::{BatchSize, Criterion, criterion_group};
 use soukoban::Map;
 
 use super::utils::*;
 
 fn normalize(c: &mut Criterion) {
-    let map = Map::from_str(WORLDCUP2014).unwrap();
     c.bench_function("Map::normalize", |b| {
-        b.iter(|| black_box(map.clone()).normalize())
+        let map = Map::from_str(WORLDCUP2014).unwrap();
+        b.iter_batched_ref(|| map.clone(), |map| map.normalize(), BatchSize::SmallInput)
     });
 }
 
