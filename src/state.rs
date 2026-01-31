@@ -18,8 +18,8 @@ pub struct State {
 }
 
 impl State {
-    /// Computes the hash of the state according to the given strategy.
-    pub fn compute_hash(&self, strategy: Strategy, map: &Map) -> u64 {
+    /// Computes the hash of the normalized state.
+    pub fn normalized_hash(&self, strategy: Strategy, map: &Map) -> u64 {
         let mut hasher = DefaultHasher::new();
         match strategy {
             Strategy::Fast | Strategy::OptimalPush => {
