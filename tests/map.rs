@@ -167,7 +167,7 @@ fn from_actions() {
 }
 
 #[test]
-fn normalize() {
+fn canonicalize() {
     // Steaming Hot
     let mut actual = Map::from_str(
         r#"
@@ -206,7 +206,7 @@ fn normalize() {
     "#,
     )
     .unwrap();
-    actual.normalize();
+    actual.canonicalize();
     assert_eq!(actual, expected);
 
     // Sasquatch #41
@@ -229,7 +229,7 @@ fn normalize() {
     "#,
     )
     .unwrap();
-    actual.normalize();
+    actual.canonicalize();
     assert_eq!(actual, expected);
 
     // Title: World Cup 2014 (MF8 61st Sokoban Competition, Extra)
@@ -257,7 +257,7 @@ fn normalize() {
     "#,
     )
     .unwrap();
-    actual.normalize();
+    actual.canonicalize();
     assert_eq!(actual, expected);
 }
 

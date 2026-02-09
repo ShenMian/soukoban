@@ -18,14 +18,14 @@ pub struct State {
 }
 
 impl State {
-    /// Computes the hash of the normalized state.
-    pub fn normalized_hash(&self, strategy: Strategy, map: &Map) -> u64 {
+    /// Computes the hash of the canonicalized state.
+    pub fn canonicalized_hash(&self, strategy: Strategy, map: &Map) -> u64 {
         let mut hasher = DefaultHasher::new();
         match strategy {
             Strategy::Fast | Strategy::OptimalPush => {
-                let mut normalized_state = self.clone();
-                normalized_state.normalize_player_position(map);
-                normalized_state.hash(&mut hasher);
+                let mut canonicalized_state = self.clone();
+                canonicalized_state.canonicalize_player(map);
+                canonicalized_state.hash(&mut hasher);
                 hasher.finish()
             }
             Strategy::OptimalMove => {
@@ -35,8 +35,8 @@ impl State {
         }
     }
 
-    /// Normalizes the position of the player.
-    fn normalize_player_position(&mut self, map: &Map) {
+    /// Canonicalizes the position of the player.
+    fn canonicalize_player(&mut self, map: &Map) {
         let player_reachable_area = compute_reachable_area(self.player_position, |position| {
             !(map[position].intersects(Tiles::Wall) || self.box_positions.contains(&position))
         });

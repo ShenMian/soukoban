@@ -151,20 +151,20 @@ impl Map {
         self.box_positions == self.goal_positions
     }
 
-    /// Normalizes the map.
+    /// Canonicalizes the map.
     ///
     /// Remove elements from the map that are not relevant to the solution.
     /// The map's solution will not change.
     ///
     /// This method can make different maps with the same solution more similar.
     /// Therefore, it can be used for map deduplication.
-    pub fn normalize(&mut self) {
+    pub fn canonicalize(&mut self) {
         self.set_useless_boxes_to_walls();
         self.set_useless_floors_to_walls();
         self.remove_unreachable_walls();
         self.remove_unreachable_boxes();
         self.shrink_to_fit();
-        self.normalize_transformation();
+        self.canonicalize_transform();
     }
 
     /// Shrinks the dimensions of the map by trims the empty area around the
@@ -416,8 +416,8 @@ impl Map {
         }
     }
 
-    /// Normalizes the transformation of the map.
-    fn normalize_transformation(&mut self) {
+    /// Canonicalizes the transformation of the map.
+    fn canonicalize_transform(&mut self) {
         let mut transformed_maps = HashMap::with_capacity(8);
         let mut min_hash = u64::MAX;
         for i in 0..8 {
@@ -425,7 +425,7 @@ impl Map {
                 self.flip();
             }
             self.rotate();
-            self.normalize_player_position();
+            self.canonicalize_player();
 
             let mut hasher = DefaultHasher::new();
             self.hash(&mut hasher);
@@ -437,8 +437,8 @@ impl Map {
         *self = transformed_maps.remove(&min_hash).unwrap();
     }
 
-    /// Normalizes the position of the player.
-    fn normalize_player_position(&mut self) {
+    /// Canonicalizes the position of the player.
+    fn canonicalize_player(&mut self) {
         let player_reachable_area =
             compute_reachable_area(self.player_position, |position| self.can_move(position));
         self.set_player_position(compute_area_anchor(&player_reachable_area).unwrap());
