@@ -81,32 +81,29 @@ impl Node {
                     continue;
                 }
 
+                let push_position = box_position - &push_direction.into();
+
                 // Checks if the player can push the box
-                if !player_reachable_area.contains(&(box_position - &push_direction.into())) {
+                if !player_reachable_area.contains(&push_position) {
                     continue;
                 }
 
-                let mut new_player_position = *box_position;
-
-                // The player's current position and new position cannot be the same, so the
-                // length of the `find_path` result must be a positive number. Therefore, it is
-                // safe to subtract 1.
                 let mut new_moves = self.moves
                     + find_path(
                         self.state.player_position,
-                        new_player_position,
+                        push_position,
                         |position| {
                             !solver.map()[position].intersects(Tiles::Wall)
-                                && (!self.state.box_positions.contains(&position)
-                                    || position == *box_position)
+                                && !self.state.box_positions.contains(&position)
                         },
                     )
                     .unwrap()
-                    .len() as i32
-                    - 1;
+                    .len() as i32;
                 let mut new_pushes = self.pushes + 1;
 
-                // Skip pushes in tunnels
+                let mut new_player_position = *box_position;
+
+                // Skips pushes in tunnels
                 while solver
                     .tunnels()
                     .contains(&(new_box_position, push_direction))
@@ -121,7 +118,7 @@ impl Node {
                 new_box_positions.remove(box_position);
                 new_box_positions.insert(new_box_position);
 
-                // Skip freeze deadlocks
+                // Skips freeze deadlocks
                 if !solver.map()[new_box_position].intersects(Tiles::Goal)
                     && is_freeze_deadlock(
                         solver.map(),

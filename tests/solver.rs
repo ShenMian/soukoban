@@ -61,19 +61,18 @@ fn a_star_search() {
         .unwrap()
         .pushes()
     );
-    // FIXME:
-    // assert_eq!(
-    //     search(
-    //         load_level_from_file("assets/BoxWorld_100.xsb", 2),
-    //         Strategy::OptimalMove,
-    //     )
-    //     .moves(),
-    //     Actions::from_str(
-    //         "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
-    //     )
-    //     .unwrap()
-    //     .moves()
-    // );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 2),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str(
+            "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+        )
+        .unwrap()
+        .moves()
+    );
 
     assert_eq!(
         search(
@@ -156,19 +155,18 @@ fn ida_star_search() {
         .unwrap()
         .pushes()
     );
-    // FIXME:
-    // assert_eq!(
-    //     search(
-    //         load_level_from_file("assets/BoxWorld_100.xsb", 2),
-    //         Strategy::OptimalMove,
-    //     )
-    //     .moves(),
-    //     Actions::from_str(
-    //         "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
-    //     )
-    //     .unwrap()
-    //     .moves()
-    // );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 2),
+            Strategy::OptimalMove,
+        )
+        .moves(),
+        Actions::from_str(
+            "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+        )
+        .unwrap()
+        .moves()
+    );
 
     // FIXME: Potential infinite loop occurs.
     // assert_eq!(
