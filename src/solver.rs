@@ -123,7 +123,7 @@ impl Solver {
         for successor in node.successors(self) {
             let hash = successor.state.canonicalized_hash(self.strategy, &self.map);
 
-            // Skip if this state is already in the current search path
+            // Skips if this state is already in the current search path
             if visited.contains(&hash) {
                 continue;
             }
@@ -194,12 +194,15 @@ impl Solver {
             for pull_direction in Direction::iter() {
                 let new_box_position = goal_position + &pull_direction.into();
                 let new_player_position = new_box_position + &pull_direction.into();
+
+                // Skips if the pull is invalid
                 if !self.map.in_bounds(new_player_position)
                     || self.map[new_box_position].intersects(Tiles::Wall)
                     || self.map[new_player_position].intersects(Tiles::Wall)
                 {
                     continue;
                 }
+
                 self.computes_minimum_push_to(
                     *goal_position,
                     new_player_position,
@@ -228,10 +231,12 @@ impl Solver {
         });
         for pull_direction in Direction::iter() {
             let new_box_position = box_position + &pull_direction.into();
+            let new_player_position = new_box_position + &pull_direction.into();
+
+            // Skips if the pull is invalid
             if self.map[new_box_position].intersects(Tiles::Wall) {
                 continue;
             }
-            let new_player_position = new_box_position + &pull_direction.into();
             if self.map[new_player_position].intersects(Tiles::Wall)
                 || !player_reachable_area.contains(&new_player_position)
             {
