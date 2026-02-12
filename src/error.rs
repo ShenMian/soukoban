@@ -24,17 +24,16 @@ pub enum ParseLevelError {
 pub enum ParseMapError {
     /// There is no player. There should be exactly one player.
     #[error("no player")]
-    NoPlayer,
+    MissingPlayer,
     /// There are multiple players. There should be exactly one player.
     #[error("more than one player")]
-    MoreThanOnePlayer,
+    MultiplePlayers,
     /// The number of boxes and goals do not match. They should be equal.
     #[error("mismatch between number of boxes and goals")]
     BoxGoalMismatch,
-    /// There are no boxes or goals. There should be at least one box and one
-    /// goal.
+    /// At least one box and one goal are required.
     #[error("no box or goal")]
-    NoBoxOrGoal,
+    MissingBoxOrGoal,
     /// Contains non-XSB format character.
     #[error("invalid character: `{0}`")]
     InvalidCharacter(char),

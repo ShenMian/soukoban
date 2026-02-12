@@ -66,7 +66,7 @@ impl Map {
         let box_positions = initial_box_positions;
         let goal_positions = current_box_positions;
         if box_positions.is_empty() {
-            return Err(ParseMapError::NoBoxOrGoal);
+            return Err(ParseMapError::MissingBoxOrGoal);
         }
         if box_positions.contains(&player_position) {
             return Err(ParseMapError::InvalidActions);
@@ -563,7 +563,7 @@ impl FromStr for Map {
                     }
                     '@' => {
                         if player_position.is_some() {
-                            return Err(ParseMapError::MoreThanOnePlayer);
+                            return Err(ParseMapError::MultiplePlayers);
                         }
                         player_position = Some(position);
                         Tiles::Player
@@ -575,7 +575,7 @@ impl FromStr for Map {
                     }
                     '+' => {
                         if player_position.is_some() {
-                            return Err(ParseMapError::MoreThanOnePlayer);
+                            return Err(ParseMapError::MultiplePlayers);
                         }
                         player_position = Some(position);
                         instance.goal_positions.insert(position);
@@ -589,12 +589,12 @@ impl FromStr for Map {
             return Err(ParseMapError::BoxGoalMismatch);
         }
         if instance.box_positions.is_empty() {
-            return Err(ParseMapError::NoBoxOrGoal);
+            return Err(ParseMapError::MissingBoxOrGoal);
         }
         if let Some(player_position) = player_position {
             instance.player_position = player_position;
         } else {
-            return Err(ParseMapError::NoPlayer);
+            return Err(ParseMapError::MissingPlayer);
         }
 
         instance.flood_fill(instance.player_position, Tiles::Floor, Tiles::Wall);

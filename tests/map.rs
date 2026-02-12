@@ -41,19 +41,19 @@ fn map_from_str() {
     "#;
     assert_eq!(
         Map::from_str(no_player_map).unwrap_err(),
-        ParseMapError::NoPlayer
+        ParseMapError::MissingPlayer
     );
     assert_eq!(
         Map::from_str(no_box_or_goal_map).unwrap_err(),
-        ParseMapError::NoBoxOrGoal
+        ParseMapError::MissingBoxOrGoal
     );
     assert_eq!(
         Map::from_str(more_than_one_player_map_1).unwrap_err(),
-        ParseMapError::MoreThanOnePlayer
+        ParseMapError::MultiplePlayers
     );
     assert_eq!(
         Map::from_str(more_than_one_player_map_2).unwrap_err(),
-        ParseMapError::MoreThanOnePlayer
+        ParseMapError::MultiplePlayers
     );
     assert_eq!(
         Map::from_str(mismatch_between_boxs_and_goals_map).unwrap_err(),
@@ -84,7 +84,7 @@ fn map_from_actions() {
     );
     assert_eq!(
         Map::from_actions(Actions::from_str("llurldd").unwrap()).unwrap_err(),
-        ParseMapError::NoBoxOrGoal
+        ParseMapError::MissingBoxOrGoal
     );
 }
 
