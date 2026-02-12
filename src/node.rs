@@ -89,14 +89,10 @@ impl Node {
                 }
 
                 let mut new_moves = self.moves
-                    + find_path(
-                        self.state.player_position,
-                        push_position,
-                        |position| {
-                            !solver.map()[position].intersects(Tiles::Wall)
-                                && !self.state.box_positions.contains(&position)
-                        },
-                    )
+                    + find_path(self.state.player_position, push_position, |position| {
+                        !solver.map()[position].intersects(Tiles::Wall)
+                            && !self.state.box_positions.contains(&position)
+                    })
                     .unwrap()
                     .len() as i32;
                 let mut new_pushes = self.pushes + 1;

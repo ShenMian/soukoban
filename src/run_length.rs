@@ -22,8 +22,8 @@ pub fn rle_encode(str: &str) -> Result<String, EncodeRleError> {
     let mut chars = str.chars().peekable();
     let mut count = 0;
     while let Some(char) = chars.next() {
-        if char.is_numeric() {
-            return Err(EncodeRleError::NumericCharacter(char));
+        if char.is_ascii_digit() {
+            return Err(EncodeRleError::DigitalCharacter(char));
         }
         count += 1;
         if chars.peek() != Some(&char) {
@@ -57,8 +57,8 @@ pub fn rle_decode(str: &str) -> Result<String, DecodeRleError> {
     let mut result = String::new();
 
     let mut length_string = String::new();
-    let mut iter = str.chars();
-    while let Some(char) = iter.next() {
+    let mut chars = str.chars();
+    while let Some(char) = chars.next() {
         if char.is_ascii_digit() {
             length_string.push(char);
             continue;
@@ -66,31 +66,36 @@ pub fn rle_decode(str: &str) -> Result<String, DecodeRleError> {
         let mut token = String::new();
         if char == '(' {
             let mut nesting_level = 0;
-            for char in &mut iter {
+            let mut matched = false;
+            for char in &mut chars {
                 if char == '(' {
                     nesting_level += 1;
                 } else if char == ')' {
                     if nesting_level == 0 {
+                        matched = true;
                         break;
                     }
                     nesting_level -= 1;
                 }
                 token.push(char);
             }
+            if nesting_level != 0 || !matched {
+                // Missing closing parenthesis
+                return Err(DecodeRleError::UnmatchedParenthesis);
+            }
+            token = rle_decode(&token)?;
+        } else if char == ')' {
+            // Extra closing parenthesis
+            return Err(DecodeRleError::UnmatchedParenthesis);
         } else {
             token = char.to_string();
         }
         let length = length_string.parse().unwrap_or(1);
-        result += &token.repeat(length);
         length_string.clear();
+        result += &token.repeat(length);
     }
     if !length_string.is_empty() {
-        return Err(DecodeRleError::EndWithDigits(
-            length_string.parse().unwrap(),
-        ));
-    }
-    if result.contains('(') {
-        return rle_decode(&result);
+        return Err(DecodeRleError::EndWithDigits);
     }
     Ok(result)
 }

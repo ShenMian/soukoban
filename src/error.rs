@@ -68,17 +68,23 @@ pub enum ParseActionError {
 /// An error which can be returned when encoding RLE.
 #[derive(Error, Clone, Eq, PartialEq, Debug)]
 pub enum EncodeRleError {
-    /// Encountered an unencodable numeric character.
-    #[error("numeric character encountered: `{0}`")]
-    NumericCharacter(char),
+    /// Encountered an unencodable digital character.
+    #[error("digital character encountered: `{0}`")]
+    DigitalCharacter(char),
 }
 
 /// An error which can be returned when decoding RLE.
 #[derive(Error, Clone, Eq, PartialEq, Debug)]
 pub enum DecodeRleError {
     /// The decoded string ends with digits.
-    #[error("end with digits: `{0}`")]
-    EndWithDigits(usize),
+    #[error("end with digits")]
+    EndWithDigits,
+    /// An unmatched parenthesis was encountered.
+    #[error("unmatched parenthesis")]
+    UnmatchedParenthesis,
+    /// The length prefix is invalid.
+    #[error("invalid length")]
+    InvalidLength,
 }
 
 /// An error which can be returned when searching for a solution.

@@ -14,7 +14,7 @@ fn rle_encode_single_char() {
 fn rle_encode_invalid_char() {
     assert_eq!(
         rle_encode("aa2bb").unwrap_err(),
-        EncodeRleError::NumericCharacter('2')
+        EncodeRleError::DigitalCharacter('2')
     );
 }
 
@@ -37,7 +37,7 @@ fn rle_decode_empty() {
 fn rle_decode_end_with_digits() {
     assert_eq!(
         rle_decode("32#22*11").unwrap_err(),
-        DecodeRleError::EndWithDigits(11)
+        DecodeRleError::EndWithDigits
     );
 }
 
@@ -52,6 +52,49 @@ fn rle_decode_single_char() {
 }
 
 #[test]
-fn rle_decode_with_nested_parentheses() {
+fn rle_decode_with_parentheses() {
     assert_eq!(rle_decode("3(2(a)b)").unwrap(), "aabaabaab");
+    assert_eq!(rle_decode("2(a(b)c)").unwrap(), "abcabc");
+    assert_eq!(rle_decode("2(3a)").unwrap(), "aaaaaa");
+}
+
+#[test]
+fn rle_decode_unmatched_parentheses() {
+    // Missing closing parenthesis
+    assert_eq!(
+        rle_decode("2(a").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
+    assert_eq!(
+        rle_decode("(abc").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
+    assert_eq!(
+        rle_decode("3(2(a)b").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
+
+    // Extra closing parenthesis
+    assert_eq!(
+        rle_decode("a)b").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
+    assert_eq!(
+        rle_decode("2(a))").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
+    assert_eq!(
+        rle_decode(")(").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
+
+    // Nested
+    assert_eq!(
+        rle_decode("2(a(b)c").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
+    assert_eq!(
+        rle_decode("(a(b(c)))(").unwrap_err(),
+        DecodeRleError::UnmatchedParenthesis
+    );
 }
