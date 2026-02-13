@@ -21,7 +21,7 @@ use crate::{
 pub enum Strategy {
     /// Search for any solution as quickly as possible.
     ///
-    /// Using this strategy, A* search degrades into greedy search.
+    /// Using this strategy, A* search degrades into greedy best-first search.
     #[default]
     Fast,
     /// Find the push optimal solution.
@@ -33,7 +33,9 @@ pub enum Strategy {
 /// A solver for the Sokoban problem.
 #[derive(Clone, Debug)]
 pub struct Solver {
+    /// The map to solve.
     map: Map,
+    /// The search strategy to use.
     strategy: Strategy,
     /// Lower bounds for heuristic calculation.
     lower_bounds: OnceCell<HashMap<Vector2<i32>, i32>>,
@@ -86,7 +88,7 @@ impl Solver {
         let mut path = vec![state];
         let mut visited = HashSet::new();
         visited.insert(node.state.canonicalized_hash(self.strategy, &self.map));
-        let mut threshold = node.estimated_total_cost();
+        let mut threshold = node.estimated_cost();
         loop {
             match self.ida_star_depth_search(&node, &mut path, &mut visited, threshold) {
                 Ok(_state) => return Ok(self.construct_actions(&path)),
