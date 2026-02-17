@@ -277,7 +277,7 @@ impl Solver {
 
                     let player_position = box_position + &down;
 
-                    // Tunnel patterns:
+                    // Tunnel template matching patterns:
                     //  .      .      .
                     // #$# or #$_ or _$#
                     // #@#    #@#    #@#
