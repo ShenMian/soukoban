@@ -125,21 +125,24 @@ pub fn box_move_waypoints(
 ) -> HashMap<(Vector2<i32>, Direction), u64> {
     debug_assert!(
         map.box_positions().contains(&initial_box_position),
-        "box position does not exist"
+        "no box at `initial_box_position`"
     );
 
     let mut deque = VecDeque::new();
     let mut path: HashMap<(Vector2<i32>, Direction), u64> = HashMap::new();
 
-    let player_reachable_area = compute_reachable_area(map.player_position(), |position| {
-        position == initial_box_position || map.can_move(position)
-    });
-    for direction in Direction::iter() {
-        if !player_reachable_area.contains(&(initial_box_position - &direction.into())) {
+    let player_reachable_area =
+        compute_reachable_area(map.player_position(), |position| map.can_move(position));
+    for push_direction in Direction::iter() {
+        let new_box_position = initial_box_position + &push_direction.into();
+        if !map.can_move(new_box_position) {
             continue;
         }
-        let node = (initial_box_position, direction, 0);
-        deque.push_back(node);
+        let new_player_position = initial_box_position - &push_direction.into();
+        if !player_reachable_area.contains(&new_player_position) {
+            continue;
+        }
+        deque.push_back((initial_box_position, push_direction, 0));
     }
 
     while let Some((box_position, push_direction, cost)) = deque.pop_front() {
@@ -181,7 +184,6 @@ pub fn construct_box_path(
 ) -> Vec<Vector2<i32>> {
     let mut path = Vec::new();
     let mut current = to;
-    // FIXME: 遇到回头路会提前退出
     while current != from {
         path.push(current);
         let mut directions = Vec::new();
@@ -194,6 +196,7 @@ pub fn construct_box_path(
         let mut min_cost = u64::MAX;
         for push_direction in &directions {
             let neighbor = current - &(*push_direction).into();
+            // FIXME: 遇到回头路会提前退出
             if path.contains(&neighbor) {
                 continue;
             }
