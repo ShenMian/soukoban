@@ -8,7 +8,11 @@ use std::{
 
 use nalgebra::Vector2;
 
-use crate::{action::Action, error::ParseActionsError, run_length::rle_decode};
+use crate::{
+    action::{Action, ForwardAction},
+    error::ParseActionsError,
+    run_length::rle_decode,
+};
 
 /// Secondary statistics for a sequence of actions.
 pub struct SecondaryValues {
@@ -24,9 +28,9 @@ pub struct SecondaryValues {
 
 /// A owned, mutable actions (akin to [`Vec<Action>`]).
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Default)]
-pub struct Actions(pub Vec<Action>);
+pub struct ForwardActions(pub Vec<ForwardAction>);
 
-impl Actions {
+impl ForwardActions {
     /// Creates an empty actions.
     pub fn new() -> Self {
         Default::default()
@@ -52,7 +56,7 @@ impl Actions {
         let mut player_position = Vector2::zeros();
         // Previous pushed box position
         let mut prev_box_position = None;
-        let mut prev_action: Option<Action> = None;
+        let mut prev_action: Option<ForwardAction> = None;
         for action in &self.0 {
             player_position += &action.direction().into();
             if let Some(prev_action) = prev_action {
@@ -93,37 +97,37 @@ impl Actions {
     }
 }
 
-impl FromStr for Actions {
+impl FromStr for ForwardActions {
     type Err = ParseActionsError;
 
     /// Creates a new `Actions` with LURD format string.
     fn from_str(lurd: &str) -> Result<Self, Self::Err> {
         if lurd.contains(char::is_numeric) {
-            return Actions::from_str(&rle_decode(lurd)?);
+            return ForwardActions::from_str(&rle_decode(lurd)?);
         }
-        let mut instance = Actions::default();
+        let mut instance = ForwardActions::default();
         for char in lurd.chars() {
-            instance.push(Action::try_from(char)?);
+            instance.push(ForwardAction::try_from(char)?);
         }
         Ok(instance)
     }
 }
 
-impl Deref for Actions {
-    type Target = Vec<Action>;
+impl Deref for ForwardActions {
+    type Target = Vec<ForwardAction>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl DerefMut for Actions {
+impl DerefMut for ForwardActions {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
 }
 
-impl fmt::Display for Actions {
+impl fmt::Display for ForwardActions {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for action in &self.0 {
             write!(f, "{action}")?;

@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use criterion::{BatchSize, Criterion, criterion_group};
 use soukoban::{
-    Level,
+    Forward, Level,
     solver::{Solver, Strategy},
 };
 
@@ -59,7 +59,7 @@ fn ida_star_search(c: &mut Criterion) {
 }
 
 fn tunnels(c: &mut Criterion) {
-    let level = Level::from_str(PATH).unwrap();
+    let level = Level::<Forward>::from_str(PATH).unwrap();
     let solver = Solver::new(level.map().clone(), Strategy::Fast);
     solver.lower_bounds();
     c.bench_function("Solver::tunnels", |b| {

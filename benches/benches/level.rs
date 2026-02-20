@@ -1,7 +1,7 @@
 use std::fs;
 
 use criterion::{Criterion, criterion_group};
-use soukoban::Level;
+use soukoban::{Forward, Level};
 
 fn load_from_str(c: &mut Criterion) {
     c.bench_function("Level::load_from_str", |b| {
@@ -10,7 +10,7 @@ fn load_from_str(c: &mut Criterion) {
             let path = entry.unwrap().path();
             buf += &(fs::read_to_string(path).unwrap() + "\n\n");
         }
-        b.iter(|| Level::load_from_str(&buf).count())
+        b.iter(|| Level::<Forward>::load_from_str(&buf).count())
     });
 }
 
@@ -21,7 +21,7 @@ fn load_nth_from_str(c: &mut Criterion) {
             let path = entry.unwrap().path();
             buf += &(fs::read_to_string(path).unwrap() + "\n\n");
         }
-        b.iter(|| Level::load_nth_from_str(&buf, 3371).unwrap())
+        b.iter(|| Level::<Forward>::load_nth_from_str(&buf, 3371).unwrap())
     });
 }
 

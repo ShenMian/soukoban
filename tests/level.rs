@@ -1,7 +1,7 @@
 use std::{fs, str::FromStr};
 
 use indoc::indoc;
-use soukoban::{Level, ParseLevelError, ParseMapError};
+use soukoban::{Forward, Level, ParseLevelError, ParseMapError};
 
 mod utils;
 use utils::*;
@@ -22,13 +22,13 @@ fn parse_level_error() {
         comment:
         unterminated block comment
     "#;
-    assert!(Level::from_str(SIMPLEST).is_ok());
+    assert!(Level::<Forward>::from_str(SIMPLEST).is_ok());
     assert_eq!(
-        Level::from_str(duplicate_metadata_level).unwrap_err(),
+        Level::<Forward>::from_str(duplicate_metadata_level).unwrap_err(),
         ParseLevelError::DuplicateMetadata("unknown".to_string())
     );
     assert_eq!(
-        Level::from_str(unterminated_block_comment_level).unwrap_err(),
+        Level::<Forward>::from_str(unterminated_block_comment_level).unwrap_err(),
         ParseLevelError::UnterminatedBlockComment
     );
 
@@ -38,7 +38,7 @@ fn parse_level_error() {
         ######
     "#;
     assert_eq!(
-        Level::from_str(invalid_character_level).unwrap_err(),
+        Level::<Forward>::from_str(invalid_character_level).unwrap_err(),
         ParseLevelError::ParseMapError(ParseMapError::InvalidCharacter('!'))
     );
 }
@@ -58,7 +58,7 @@ fn display() {
         comment-end:
         author: level author
     "#;
-    let level = Level::from_str(level_str).unwrap();
+    let level = Level::<Forward>::from_str(level_str).unwrap();
     assert_eq!(
         level.to_string(),
         indoc! {"
@@ -93,7 +93,7 @@ fn metadata() {
         comment-end:
         author: level author
     "#;
-    let level = Level::from_str(level_str).unwrap();
+    let level = Level::<Forward>::from_str(level_str).unwrap();
     assert_eq!(level.metadata()["tile"], "level title");
     assert_eq!(level.metadata()["author"], "level author");
     assert_eq!(
@@ -123,7 +123,7 @@ fn create_levels_from_str() {
             .parse()
             .unwrap();
         assert_eq!(
-            Level::load_from_str(&fs::read_to_string(path).unwrap())
+            Level::<Forward>::load_from_str(&fs::read_to_string(path).unwrap())
                 .filter_map(Result::ok)
                 .count(),
             count
@@ -147,7 +147,7 @@ fn create_levels_from_reader() {
             .unwrap();
         let reader = std::io::BufReader::new(fs::File::open(&path).unwrap());
         assert_eq!(
-            Level::load_from_reader(reader)
+            Level::<Forward>::load_from_reader(reader)
                 .filter_map(Result::ok)
                 .count(),
             count
@@ -158,11 +158,11 @@ fn create_levels_from_reader() {
 #[test]
 fn create_level_with_rle_xsb() {
     assert_eq!(
-        Level::from_str(MICROBAN_3_RLE).unwrap(),
+        Level::<Forward>::from_str(MICROBAN_3_RLE).unwrap(),
         load_level_from_file("assets/Microban_155.xsb", 3)
     );
     assert_eq!(
-        Level::from_str(MICROBAN2_132_RLE).unwrap(),
+        Level::<Forward>::from_str(MICROBAN2_132_RLE).unwrap(),
         load_level_from_file("assets/Microban II_135.xsb", 132)
     );
 }

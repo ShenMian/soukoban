@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use indoc::indoc;
 use nalgebra::Vector2;
-use soukoban::{Actions, Map, ParseMapError, tiles::Tiles};
+use soukoban::{ForwardActions, Map, ParseMapError, tiles::Tiles};
 
 mod utils;
 use utils::*;
@@ -67,23 +67,23 @@ fn map_from_str() {
 
 #[test]
 fn map_from_actions() {
-    assert!(Map::from_actions(Actions::from_str("R").unwrap()).is_ok());
-    assert!(Map::from_actions(Actions::from_str("DuLLrUUdrR").unwrap()).is_ok());
+    assert!(Map::from_actions(ForwardActions::from_str("R").unwrap()).is_ok());
+    assert!(Map::from_actions(ForwardActions::from_str("DuLLrUUdrR").unwrap()).is_ok());
 
     assert_eq!(
-        Map::from_actions(Actions::from_str("RddrU").unwrap()).unwrap_err(),
+        Map::from_actions(ForwardActions::from_str("RddrU").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(Actions::from_str("RdU").unwrap()).unwrap_err(),
+        Map::from_actions(ForwardActions::from_str("RdU").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(Actions::from_str("RL").unwrap()).unwrap_err(),
+        Map::from_actions(ForwardActions::from_str("RL").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(Actions::from_str("llurldd").unwrap()).unwrap_err(),
+        Map::from_actions(ForwardActions::from_str("llurldd").unwrap()).unwrap_err(),
         ParseMapError::MissingBoxOrGoal
     );
 }
@@ -146,7 +146,7 @@ fn display() {
 #[test]
 fn from_actions() {
     let actions =
-        Actions::from_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
+        ForwardActions::from_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
             .unwrap();
     assert_eq!(
         Map::from_actions(actions).unwrap(),

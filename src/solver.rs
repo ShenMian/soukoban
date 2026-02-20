@@ -9,7 +9,7 @@ use itertools::Itertools;
 use nalgebra::Vector2;
 
 use crate::{
-    Action, Actions, Map, SearchError, Tiles,
+    ForwardAction, ForwardActions, Map, SearchError, Tiles,
     direction::Direction,
     node::Node,
     path_finding::{compute_reachable_area, find_path},
@@ -55,7 +55,7 @@ impl Solver {
     }
 
     /// Searches for solution using the A* algorithm.
-    pub fn a_star_search(&self) -> Result<Actions, SearchError> {
+    pub fn a_star_search(&self) -> Result<ForwardActions, SearchError> {
         let mut open_set = BinaryHeap::new();
         let mut came_from = HashMap::new();
         let mut cost = HashMap::new();
@@ -81,7 +81,7 @@ impl Solver {
     }
 
     /// Searches for solution using the IDA* algorithm.
-    pub fn ida_star_search(&self) -> Result<Actions, SearchError> {
+    pub fn ida_star_search(&self) -> Result<ForwardActions, SearchError> {
         let state: State = self.map.clone().into();
         let node = Node::new(state.clone(), 0, 0, self);
 
@@ -301,8 +301,8 @@ impl Solver {
         tunnels
     }
 
-    fn construct_actions(&self, path: &[State]) -> Actions {
-        let mut actions = Actions::new();
+    fn construct_actions(&self, path: &[State]) -> ForwardActions {
+        let mut actions = ForwardActions::new();
         for window in path.windows(2) {
             let (state, next_state) = (&window[0], &window[1]);
             // Find the positions where the box was moved from and to
@@ -334,15 +334,15 @@ impl Solver {
             .unwrap()
             .windows(2)
             .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
-            .map(Action::Move)
+            .map(ForwardAction::Move)
             .collect();
 
-            new_actions.push(Action::Push(push_direction));
+            new_actions.push(ForwardAction::Push(push_direction));
 
             let mut new_box_position = previous_box_position + &push_direction.into();
             while self.tunnels().contains(&(new_box_position, push_direction)) {
                 new_box_position += &push_direction.into();
-                new_actions.push(Action::Push(push_direction));
+                new_actions.push(ForwardAction::Push(push_direction));
             }
             debug_assert_eq!(new_box_position, box_position);
 

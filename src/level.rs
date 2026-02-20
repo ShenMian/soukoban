@@ -4,14 +4,15 @@ use std::{
     collections::{BTreeMap, HashSet},
     fmt,
     io::BufRead,
+    marker::PhantomData,
     str::FromStr,
 };
 
 use nalgebra::Vector2;
 
 use crate::{
-    action::Action,
-    actions::Actions,
+    action::{Action, ForwardAction},
+    actions::ForwardActions,
     direction::Direction,
     error::{ActionError, ParseLevelError, ParseMapError},
     map::Map,
@@ -19,23 +20,74 @@ use crate::{
     tiles::Tiles,
 };
 
-/// A level.
-#[derive(Clone, Eq, PartialEq, Debug)]
-pub struct Level {
-    map: Map,
-    metadata: BTreeMap<String, String>,
-    actions: Actions,
-    undone_actions: Actions,
+/// TODO
+pub trait Mode: Clone + Sized + Eq + PartialEq + fmt::Debug + 'static {
+    /// Moves the player in the specified direction.
+    fn execute(level: &mut Level<Self>, direction: Direction) -> Result<(), ActionError>;
 }
 
-impl Level {
+#[derive(Clone, Eq, PartialEq, Debug)]
+/// Push mode.
+pub struct Forward;
+
+impl Mode for Forward {
+    fn execute(level: &mut Level<Self>, direction: Direction) -> Result<(), ActionError> {
+        if level.actions.last() == Some(&ForwardAction::Move(-direction)) {
+            level.undo().unwrap();
+            return Ok(());
+        }
+
+        let new_player_position = level.map.player_position() + &direction.into();
+        if level.map[new_player_position].intersects(Tiles::Wall) {
+            return Err(ActionError::MoveBlocked);
+        }
+        if level.map[new_player_position].intersects(Tiles::Box) {
+            let new_box_position = new_player_position + &direction.into();
+            if level.map[new_box_position].intersects(Tiles::Wall | Tiles::Box) {
+                return Err(ActionError::PushBlocked);
+            }
+            level
+                .map
+                .set_box_position(new_player_position, new_box_position);
+            level.actions.push(ForwardAction::Push(direction));
+        } else {
+            level.actions.push(ForwardAction::Move(direction));
+        }
+        level.map.set_player_position(new_player_position);
+        level.undone_actions.clear();
+        Ok(())
+    }
+}
+
+#[derive(Clone, Eq, PartialEq, Debug)]
+/// Pull mode.
+pub struct Reverse;
+
+impl Mode for Reverse {
+    fn execute(_level: &mut Level<Self>, _direction: Direction) -> Result<(), ActionError> {
+        unimplemented!()
+    }
+}
+
+/// A level.
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub struct Level<M: Mode = Forward> {
+    map: Map,
+    metadata: BTreeMap<String, String>,
+    actions: ForwardActions,
+    undone_actions: ForwardActions,
+    _phantom: PhantomData<M>,
+}
+
+impl<M: Mode> Level<M> {
     /// Creates a new `Level` from map.
     pub fn from_map(map: Map) -> Self {
         Self {
             map,
             metadata: BTreeMap::new(),
-            actions: Actions::default(),
-            undone_actions: Actions::default(),
+            actions: ForwardActions::default(),
+            undone_actions: ForwardActions::default(),
+            _phantom: PhantomData,
         }
     }
 
@@ -55,13 +107,13 @@ impl Level {
     }
 
     /// Returns a reference to the actions of the level.
-    pub fn actions(&self) -> &Actions {
+    pub fn actions(&self) -> &ForwardActions {
         &self.actions
     }
 
     /// Moves the player in the specified direction.
     pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
-        if self.actions.last() == Some(&Action::Move(-direction)) {
+        if self.actions.last() == Some(&ForwardAction::Move(-direction)) {
             self.undo().unwrap();
             return Ok(());
         }
@@ -77,9 +129,9 @@ impl Level {
             }
             self.map
                 .set_box_position(new_player_position, new_box_position);
-            self.actions.push(Action::Push(direction));
+            self.actions.push(ForwardAction::Push(direction));
         } else {
-            self.actions.push(Action::Move(direction));
+            self.actions.push(ForwardAction::Move(direction));
         }
         self.map.set_player_position(new_player_position);
         self.undone_actions.clear();
@@ -219,7 +271,7 @@ impl Level {
     }
 }
 
-impl fmt::Display for Level {
+impl<M: Mode> fmt::Display for Level<M> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.map)?;
         for key in self.metadata.keys() {
@@ -242,7 +294,7 @@ impl fmt::Display for Level {
     }
 }
 
-impl FromStr for Level {
+impl<M: Mode> FromStr for Level<M> {
     type Err = ParseLevelError;
 
     /// Creates a new `Level` from XSB format string.
@@ -336,14 +388,15 @@ impl FromStr for Level {
         Ok(Self {
             map: Map::from_str(&xsb[map_offset..map_offset + map_len])?,
             metadata,
-            actions: Actions::default(),
-            undone_actions: Actions::default(),
+            actions: ForwardActions::default(),
+            undone_actions: ForwardActions::default(),
+            _phantom: PhantomData,
         })
     }
 }
 
-impl From<Level> for Map {
-    fn from(level: Level) -> Self {
+impl<M: Mode> From<Level<M>> for Map {
+    fn from(level: Level<M>) -> Self {
         level.map
     }
 }

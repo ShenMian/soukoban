@@ -11,8 +11,16 @@ use std::{
 use nalgebra::Vector2;
 
 use crate::{
-    actions::Actions, deadlock::*, direction::Direction, error::ParseMapError, level::Level,
-    path_finding::*, run_length::rle_decode, state::State, tiles::Tiles,
+    action::Action,
+    actions::ForwardActions,
+    deadlock::*,
+    direction::Direction,
+    error::ParseMapError,
+    level::{Forward, Level},
+    path_finding::*,
+    run_length::rle_decode,
+    state::State,
+    tiles::Tiles,
 };
 
 /// A grid-based map.
@@ -36,7 +44,7 @@ impl Map {
     ///
     /// Tries to restore the map with a complete solution. This method can only
     /// restore the parts of the map that are used by the solution.
-    pub fn from_actions(actions: Actions) -> Result<Self, ParseMapError> {
+    pub fn from_actions(actions: ForwardActions) -> Result<Self, ParseMapError> {
         let (dimensions, player_position) = compute_dimensions_and_player_position(&actions);
 
         let mut instance = Map::with_dimensions(dimensions);
@@ -86,7 +94,7 @@ impl Map {
         instance.goal_positions = goal_positions;
 
         // Verify the solution
-        let mut level = Level::from_map(instance.clone());
+        let mut level = Level::<Forward>::from_map(instance.clone());
         let directions = actions.iter().map(|action| action.direction());
         level
             .execute_batch(directions)
@@ -644,7 +652,9 @@ impl From<Map> for State {
     }
 }
 
-fn compute_dimensions_and_player_position(actions: &Actions) -> (Vector2<i32>, Vector2<i32>) {
+fn compute_dimensions_and_player_position(
+    actions: &ForwardActions,
+) -> (Vector2<i32>, Vector2<i32>) {
     let mut min_position = Vector2::<i32>::zeros();
     let mut max_position = Vector2::<i32>::zeros();
 

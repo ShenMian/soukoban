@@ -1,19 +1,19 @@
 use std::str::FromStr;
 
-use soukoban::{Actions, ParseActionError, ParseActionsError, SecondaryValues};
+use soukoban::{ForwardActions, ParseActionError, ParseActionsError, SecondaryValues};
 
 #[test]
 fn actions_from_str() {
     assert_eq!(
-        Actions::from_str("lUrDL!uRd").unwrap_err(),
+        ForwardActions::from_str("lUrDL!uRd").unwrap_err(),
         ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
     );
     assert_eq!(
-        Actions::from_str("!lUrDLuRd").unwrap_err(),
+        ForwardActions::from_str("!lUrDLuRd").unwrap_err(),
         ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
     );
     assert_eq!(
-        Actions::from_str("lUrDLuRd!").unwrap_err(),
+        ForwardActions::from_str("lUrDLuRd!").unwrap_err(),
         ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
     );
 }
@@ -21,13 +21,13 @@ fn actions_from_str() {
 #[test]
 fn rle_decode() {
     assert_eq!(
-        Actions::from_str("ruu3LulD4rddlUru3Ldd3luurRDrdL3urDD")
+        ForwardActions::from_str("ruu3LulD4rddlUru3Ldd3luurRDrdL3urDD")
             .unwrap()
             .to_string(),
         "ruuLLLulDrrrrddlUruLLLddllluurRDrdLuuurDD"
     );
     assert_eq!(
-        Actions::from_str("ullDLdRuurrdLLrrddlUruL")
+        ForwardActions::from_str("ullDLdRuurrdLLrrddlUruL")
             .unwrap()
             .to_string(),
         "ullDLdRuurrdLLrrddlUruL"
@@ -36,7 +36,7 @@ fn rle_decode() {
 
 #[test]
 fn secondary_values() {
-    let empty_actions = Actions::new();
+    let empty_actions = ForwardActions::new();
     assert_eq!(empty_actions.moves(), 0);
     assert_eq!(empty_actions.pushes(), 0);
     let SecondaryValues {
@@ -57,7 +57,7 @@ fn secondary_values() {
     // # #  #$ #
     // # . .#@ #
     // #########
-    let actions = Actions::from_str("ruuLLLulDrrrrddlUruLLLddllluurRDrdLuuurDD").unwrap();
+    let actions = ForwardActions::from_str("ruuLLLulDrrrrddlUruLLLddllluurRDrdLuuurDD").unwrap();
     assert_eq!(actions.moves(), 41);
     assert_eq!(actions.pushes(), 13);
     let SecondaryValues {
@@ -77,7 +77,7 @@ fn secondary_values() {
     // #      #
     // #####  #
     //     ####
-    let actions = Actions::from_str("ullDLdRuurrdLLrrddlUruL").unwrap();
+    let actions = ForwardActions::from_str("ullDLdRuurrdLLrrddlUruL").unwrap();
     assert_eq!(actions.moves(), 23);
     assert_eq!(actions.pushes(), 7);
     let SecondaryValues {
@@ -98,7 +98,7 @@ fn secondary_values() {
     // #  .$. #
     // #      #
     // ########
-    let actions = Actions::from_str("LulDuu3rdLrrddlUlldRd3luR").unwrap();
+    let actions = ForwardActions::from_str("LulDuu3rdLrrddlUlldRd3luR").unwrap();
     assert_eq!(actions.moves(), 27);
     assert_eq!(actions.pushes(), 6);
     let SecondaryValues {
@@ -118,7 +118,7 @@ fn secondary_values() {
     // # $ #...   #
     // #   ########
     // #####
-    let actions = Actions::from_str(
+    let actions = ForwardActions::from_str(
         "ulld4lulDulld6Rd3ruullDurrddl3Lu5lddrUlu6Rd3ruullDurrddlLLu5lddrUlu5Rd3ruullDurrddlL",
     )
     .unwrap();

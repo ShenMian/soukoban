@@ -1,14 +1,14 @@
 use std::str::FromStr;
 
 use nalgebra::Vector2;
-use soukoban::{Actions, Level, solver::*};
+use soukoban::{Action, ForwardActions, Level, solver::*};
 
 mod utils;
 use utils::*;
 
 #[test]
 fn a_star_search() {
-    fn search(mut level: Level, strategy: Strategy) -> Actions {
+    fn search(mut level: Level, strategy: Strategy) -> ForwardActions {
         let solver = Solver::new(level.map().clone(), strategy);
         let solution = solver.a_star_search().unwrap();
 
@@ -38,7 +38,7 @@ fn a_star_search() {
             Strategy::OptimalPush,
         )
         .pushes(),
-        Actions::from_str("DuLLrUUdrR").unwrap().pushes()
+        ForwardActions::from_str("DuLLrUUdrR").unwrap().pushes()
     );
     assert_eq!(
         search(
@@ -46,7 +46,7 @@ fn a_star_search() {
             Strategy::OptimalMove,
         )
         .moves(),
-        Actions::from_str("DuLLrUUdrR").unwrap().moves()
+        ForwardActions::from_str("DuLLrUUdrR").unwrap().moves()
     );
 
     assert_eq!(
@@ -55,7 +55,7 @@ fn a_star_search() {
             Strategy::OptimalPush,
         )
         .pushes(),
-        Actions::from_str(
+        ForwardActions::from_str(
             "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
         )
         .unwrap()
@@ -67,7 +67,7 @@ fn a_star_search() {
             Strategy::OptimalMove,
         )
         .moves(),
-        Actions::from_str(
+        ForwardActions::from_str(
             "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
         )
         .unwrap()
@@ -80,7 +80,7 @@ fn a_star_search() {
             Strategy::OptimalPush,
         )
         .pushes(),
-        Actions::from_str(
+        ForwardActions::from_str(
             "rRRddrruULuu4l3D3u4rdd3L3ruu4ldDldRu6ruLd5luu4rDrd4LDu3ruu4ldDldRu3rddrUru4L3ruu4ldD"
         )
         .unwrap()
@@ -92,7 +92,7 @@ fn a_star_search() {
             Strategy::OptimalMove,
         )
         .pushes(),
-        Actions::from_str(
+        ForwardActions::from_str(
             "rRRddrruULuu4l3D3u4rdd3L3ruu4ldDldRu6ruLd5luu4rDrd4LDu3ruu4ldDldRu3rddrUru4L3ruu4ldD"
         )
         .unwrap()
@@ -102,7 +102,7 @@ fn a_star_search() {
 
 #[test]
 fn ida_star_search() {
-    fn search(mut level: Level, strategy: Strategy) -> Actions {
+    fn search(mut level: Level, strategy: Strategy) -> ForwardActions {
         let solver = Solver::new(level.map().clone(), strategy);
         let solution = solver.ida_star_search().unwrap();
 
@@ -132,7 +132,7 @@ fn ida_star_search() {
             Strategy::OptimalPush,
         )
         .pushes(),
-        Actions::from_str("DuLLrUUdrR").unwrap().pushes()
+        ForwardActions::from_str("DuLLrUUdrR").unwrap().pushes()
     );
     assert_eq!(
         search(
@@ -140,7 +140,7 @@ fn ida_star_search() {
             Strategy::OptimalMove,
         )
         .moves(),
-        Actions::from_str("DuLLrUUdrR").unwrap().moves()
+        ForwardActions::from_str("DuLLrUUdrR").unwrap().moves()
     );
 
     assert_eq!(
@@ -149,7 +149,7 @@ fn ida_star_search() {
             Strategy::OptimalPush,
         )
         .pushes(),
-        Actions::from_str(
+        ForwardActions::from_str(
             "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
         )
         .unwrap()
@@ -161,7 +161,7 @@ fn ida_star_search() {
             Strategy::OptimalMove,
         )
         .moves(),
-        Actions::from_str(
+        ForwardActions::from_str(
             "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
         )
         .unwrap()
