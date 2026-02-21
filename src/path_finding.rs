@@ -129,7 +129,7 @@ pub fn box_move_waypoints(
     );
 
     let mut deque = VecDeque::new();
-    let mut path: HashMap<(Vector2<i32>, Direction), u64> = HashMap::new();
+    let mut costs = HashMap::new();
 
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.can_move(position));
@@ -151,18 +151,21 @@ pub fn box_move_waypoints(
             (position == initial_box_position || map.can_move(position)) && position != box_position
         });
 
-        let new_cost = cost + 1;
         for push_direction in Direction::iter() {
+            // Checks if the box can be pushed
             let new_box_position = box_position + &push_direction.into();
             if !(new_box_position == initial_box_position || map.can_move(new_box_position)) {
                 continue;
             }
+
+            // Checks if the player can push the box
             let new_player_position = box_position - &push_direction.into();
             if !player_reachable_area.contains(&new_player_position) {
                 continue;
             }
 
-            if path
+            let new_cost = cost + 1;
+            if costs
                 .insert((new_box_position, push_direction), new_cost)
                 .is_some()
             {
@@ -172,7 +175,7 @@ pub fn box_move_waypoints(
         }
     }
 
-    path
+    costs
 }
 
 /// Creates a path for a box to move from its current position to a target
