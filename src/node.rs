@@ -3,7 +3,7 @@ use std::{cmp::Ordering, collections::HashSet};
 use crate::{
     Tiles,
     deadlock::is_freeze_deadlock,
-    direction::Direction,
+    direction::{DirectedPosition, Direction},
     path_finding::{compute_reachable_area, find_path},
     solver::{Solver, Strategy},
     state::State,
@@ -99,7 +99,7 @@ impl Node {
                 let mut new_player_position = *box_position;
                 while solver
                     .tunnels()
-                    .contains(&(new_box_position, push_direction))
+                    .contains(&DirectedPosition(new_box_position, push_direction))
                 {
                     new_player_position = new_box_position;
                     new_box_position += &push_direction.into();
