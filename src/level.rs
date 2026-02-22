@@ -186,7 +186,7 @@ impl<M: Mode> Level<M> {
     /// Returns the reachable area for the player.
     pub fn player_reachable_area(&self) -> HashSet<Vector2<i32>> {
         compute_reachable_area(self.map.player_position(), |position| {
-            self.map.can_move(position)
+            self.map.is_movable(position)
         })
     }
 
