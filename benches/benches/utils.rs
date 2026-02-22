@@ -154,7 +154,6 @@ pub const PATH_2: &str = r#"
     Author: David W. Skinner
 "#;
 
-#[expect(dead_code)]
 pub const PATH_3: &str = r#"
     ;2  (Atlas03, #67, beemaze by Eric F Tchong) 
     ----#--------#--------#--------#--------#--------#--------#--------#--------#----
