@@ -268,15 +268,13 @@ pub fn compute_reachable_area(
 ) -> HashSet<Vector2<i32>> {
     let mut reachable_area = HashSet::new();
     let mut deque = VecDeque::<Vector2<i32>>::new();
+    reachable_area.insert(position);
     deque.push_back(position);
 
     while let Some(position) = deque.pop_front() {
-        if !reachable_area.insert(position) {
-            continue;
-        }
         for direction in Direction::iter() {
             let neighbor = position + &direction.into();
-            if can_move(neighbor) {
+            if can_move(neighbor) && reachable_area.insert(neighbor) {
                 deque.push_back(neighbor);
             }
         }
