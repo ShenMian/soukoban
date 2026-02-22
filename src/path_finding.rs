@@ -117,20 +117,19 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 /// Calculates the waypoints for the box to move from their current position to
 /// reachable positions.
 // TODO:
-// 1. 支持移动数优先的寻路. 保持 costs 依然每次下降 1, 但是 deque 中的 cost
-//    改为实际代价, 比如移动数.
+// 1. 支持移动数优先的寻路.
 // 2. 增量更新玩家可达范围.
 pub fn box_move_waypoints(
     map: &Map,
     initial_box_position: Vector2<i32>,
-) -> HashMap<DirectedPosition, u64> {
+) -> HashMap<DirectedPosition, DirectedPosition> {
     debug_assert!(
         map.box_positions().contains(&initial_box_position),
         "no box at `initial_box_position`"
     );
 
     let mut deque = VecDeque::new();
-    let mut costs = HashMap::new();
+    let mut came_from = HashMap::new();
 
     let is_movable = |position| position == initial_box_position || map.is_movable(position);
 
@@ -154,11 +153,11 @@ pub fn box_move_waypoints(
         if !player_reachable_area.contains(&new_player_position) {
             continue;
         }
-        costs.insert(state, 0);
-        deque.push_back((state, 0));
+        came_from.insert(state, state);
+        deque.push_back(state);
     }
 
-    while let Some((state, cost)) = deque.pop_front() {
+    while let Some(state) = deque.pop_front() {
         let (box_position, player_position) = (state.position(), state.backward());
 
         for push_direction in Direction::iter() {
@@ -177,48 +176,42 @@ pub fn box_move_waypoints(
                 continue;
             }
 
-            let new_cost = cost + 1;
             let new_state = DirectedPosition(new_box_position, push_direction);
-            if let Entry::Vacant(entry) = costs.entry(new_state) {
-                entry.insert(new_cost);
-                deque.push_back((new_state, new_cost));
+            if let Entry::Vacant(entry) = came_from.entry(new_state) {
+                entry.insert(state);
+                deque.push_back(new_state);
             }
         }
     }
 
-    costs
+    came_from
 }
 
 /// Constructs a path for the box to move to a target position.
 pub fn construct_box_path(
     to: Vector2<i32>,
-    waypoints: &HashMap<DirectedPosition, u64>,
+    waypoints: &HashMap<DirectedPosition, DirectedPosition>,
 ) -> Vec<Vector2<i32>> {
-    // Computes the last push direction and cost
-    let (mut direction, mut cost) = Direction::iter()
+    Direction::iter()
         .filter_map(|direction| {
-            waypoints
-                .get(&DirectedPosition(to, direction))
-                .map(|&cost| (direction, cost))
+            let state = DirectedPosition(to, direction);
+            waypoints.get(&state).map(|_| {
+                let mut path = Vec::new();
+                let mut current = state;
+                while let Some(&prev) = waypoints.get(&current) {
+                    if prev == current {
+                        break;
+                    }
+                    path.push(current.position());
+                    current = prev;
+                }
+                path.push(current.position());
+                path.reverse();
+                path
+            })
         })
-        .min_by_key(|&(_, cost)| cost)
-        .unwrap();
-
-    let mut path = Vec::new();
-    let mut position = to;
-    // Gradient descent with a step size of 1
-    while cost > 0 {
-        path.push(position);
-        position -= &direction.into();
-        cost -= 1;
-
-        direction = Direction::iter()
-            .find(|&direction| waypoints.get(&DirectedPosition(position, direction)) == Some(&cost))
-            .unwrap();
-    }
-    path.push(position);
-    path.reverse();
-    path
+        .min_by_key(|path| path.len())
+        .unwrap()
 }
 
 /// Constructs player path based on box path.
