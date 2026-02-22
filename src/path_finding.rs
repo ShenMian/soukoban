@@ -132,9 +132,9 @@ pub fn box_move_waypoints(
     let mut deque = VecDeque::new();
     let mut costs = HashMap::new();
 
-    let bcc = BccGraph::new(map.player_position(), |position| {
-        position == initial_box_position || map.is_movable(position)
-    });
+    let is_movable = |position| position == initial_box_position || map.is_movable(position);
+
+    let bcc = BccGraph::new(map.player_position(), is_movable);
 
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_movable(position));
@@ -164,14 +164,13 @@ pub fn box_move_waypoints(
         for push_direction in Direction::iter() {
             // Checks if the box can be pushed
             let new_box_position = box_position + &push_direction.into();
-            if !(new_box_position == initial_box_position || map.is_movable(new_box_position)) {
+            if !is_movable(new_box_position) {
                 continue;
             }
 
             // Checks if the player can push the box
             let new_player_position = box_position - &push_direction.into();
-            if !(new_player_position == initial_box_position || map.is_movable(new_player_position))
-            {
+            if !is_movable(new_player_position) {
                 continue;
             }
             if !bcc.is_reachable(player_position, new_player_position, box_position) {
