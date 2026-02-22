@@ -9,6 +9,7 @@ use nalgebra::Vector2;
 
 use crate::{
     Tiles,
+    bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
     map::Map,
 };
@@ -116,12 +117,9 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 /// Calculates the waypoints for the box to move from their current position to
 /// reachable positions.
 // TODO:
-// 1. 通过预计算双连通分量, 实现常量时间内判断玩家可达性.
-//    该方法好像无法支持穿透功能.
-//    详情请参考: <http://sokoban.ws/blog/?p=843>
-// 2. 支持移动数优先的寻路. 保持 costs 依然每次下降 1, 但是 deque 中的 cost
+// 1. 支持移动数优先的寻路. 保持 costs 依然每次下降 1, 但是 deque 中的 cost
 //    改为实际代价, 比如移动数.
-// 3. 增量更新玩家可达范围.
+// 2. 增量更新玩家可达范围.
 pub fn box_move_waypoints(
     map: &Map,
     initial_box_position: Vector2<i32>,
@@ -133,6 +131,10 @@ pub fn box_move_waypoints(
 
     let mut deque = VecDeque::new();
     let mut costs = HashMap::new();
+
+    let bcc = BccGraph::new(map.player_position(), |position| {
+        position == initial_box_position || map.is_movable(position)
+    });
 
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_movable(position));
@@ -152,10 +154,6 @@ pub fn box_move_waypoints(
 
     while let Some((state, cost)) = deque.pop_front() {
         let (box_position, player_position) = (state.position(), state.backward());
-        let player_reachable_area = compute_reachable_area(player_position, |position| {
-            (position == initial_box_position || map.is_movable(position))
-                && position != box_position
-        });
 
         for push_direction in Direction::iter() {
             // Checks if the box can be pushed
@@ -166,7 +164,11 @@ pub fn box_move_waypoints(
 
             // Checks if the player can push the box
             let new_player_position = box_position - &push_direction.into();
-            if !player_reachable_area.contains(&new_player_position) {
+            if !(new_player_position == initial_box_position || map.is_movable(new_player_position))
+            {
+                continue;
+            }
+            if !bcc.is_reachable(player_position, new_player_position, box_position) {
                 continue;
             }
 
@@ -269,10 +271,9 @@ pub fn compute_reachable_area(
     is_movable: impl Fn(Vector2<i32>) -> bool,
 ) -> HashSet<Vector2<i32>> {
     let mut reachable_area = HashSet::new();
-    let mut deque = VecDeque::<Vector2<i32>>::new();
+    let mut deque = VecDeque::new();
     reachable_area.insert(position);
     deque.push_back(position);
-
     while let Some(position) = deque.pop_front() {
         for direction in Direction::iter() {
             let neighbor = position + &direction.into();
@@ -281,7 +282,6 @@ pub fn compute_reachable_area(
             }
         }
     }
-
     reachable_area
 }
 
