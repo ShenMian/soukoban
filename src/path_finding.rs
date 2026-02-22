@@ -7,7 +7,11 @@ use std::{
 
 use nalgebra::Vector2;
 
-use crate::{Tiles, direction::Direction, map::Map};
+use crate::{
+    Tiles,
+    direction::{DirectedPosition, Direction},
+    map::Map,
+};
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 struct Node {
@@ -122,7 +126,7 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 pub fn box_move_waypoints(
     map: &Map,
     initial_box_position: Vector2<i32>,
-) -> HashMap<(Vector2<i32>, Direction), u64> {
+) -> HashMap<DirectedPosition, u64> {
     debug_assert!(
         map.box_positions().contains(&initial_box_position),
         "no box at `initial_box_position`"
@@ -134,20 +138,21 @@ pub fn box_move_waypoints(
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.can_move(position));
     for push_direction in Direction::iter() {
-        let new_box_position = initial_box_position + &push_direction.into();
+        let state = DirectedPosition(initial_box_position, push_direction);
+        let new_box_position = state.forward();
         if !map.can_move(new_box_position) {
             continue;
         }
-        let new_player_position = initial_box_position - &push_direction.into();
+        let new_player_position = state.backward();
         if !player_reachable_area.contains(&new_player_position) {
             continue;
         }
-        costs.insert((initial_box_position, push_direction), 0);
-        deque.push_back((initial_box_position, push_direction, 0));
+        costs.insert(state, 0);
+        deque.push_back((state, 0));
     }
 
-    while let Some((box_position, push_direction, cost)) = deque.pop_front() {
-        let player_position = box_position - &push_direction.into();
+    while let Some((state, cost)) = deque.pop_front() {
+        let (box_position, player_position) = (state.position(), state.backward());
         let player_reachable_area = compute_reachable_area(player_position, |position| {
             (position == initial_box_position || map.can_move(position)) && position != box_position
         });
@@ -166,9 +171,10 @@ pub fn box_move_waypoints(
             }
 
             let new_cost = cost + 1;
-            if let Entry::Vacant(entry) = costs.entry((new_box_position, push_direction)) {
+            let new_state = DirectedPosition(new_box_position, push_direction);
+            if let Entry::Vacant(entry) = costs.entry(new_state) {
                 entry.insert(new_cost);
-                deque.push_back((new_box_position, push_direction, new_cost));
+                deque.push_back((new_state, new_cost));
             }
         }
     }
@@ -179,13 +185,13 @@ pub fn box_move_waypoints(
 /// Constructs a path for the box to move to a target position.
 pub fn construct_box_path(
     to: Vector2<i32>,
-    waypoints: &HashMap<(Vector2<i32>, Direction), u64>,
+    waypoints: &HashMap<DirectedPosition, u64>,
 ) -> Vec<Vector2<i32>> {
     // Computes the last push direction and cost
     let (mut direction, mut cost) = Direction::iter()
         .filter_map(|direction| {
             waypoints
-                .get(&(to, direction))
+                .get(&DirectedPosition(to, direction))
                 .map(|&cost| (direction, cost))
         })
         .min_by_key(|&(_, cost)| cost)
@@ -199,7 +205,7 @@ pub fn construct_box_path(
         cost -= 1;
 
         direction = Direction::iter()
-            .find(|&direction| waypoints.get(&(position, direction)) == Some(&cost))
+            .find(|&direction| waypoints.get(&DirectedPosition(position, direction)) == Some(&cost))
             .unwrap();
     }
     path.push(position);

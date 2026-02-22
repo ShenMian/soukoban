@@ -96,3 +96,29 @@ impl TryFrom<Vector2<i32>> for Direction {
         }
     }
 }
+
+/// A directed position.
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
+pub struct DirectedPosition(pub Vector2<i32>, pub Direction);
+
+impl DirectedPosition {
+    /// Returns the position.
+    pub fn position(&self) -> Vector2<i32> {
+        self.0
+    }
+
+    /// Returns the direction.
+    pub fn direction(&self) -> Direction {
+        self.1
+    }
+
+    /// Returns the position one step forward in the current direction.
+    pub fn forward(&self) -> Vector2<i32> {
+        self.position() + &self.direction().into()
+    }
+
+    /// Returns the position one step backward against the current direction.
+    pub fn backward(&self) -> Vector2<i32> {
+        self.position() - &self.direction().into()
+    }
+}

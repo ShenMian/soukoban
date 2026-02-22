@@ -10,7 +10,7 @@ use nalgebra::Vector2;
 
 use crate::{
     ForwardAction, ForwardActions, Map, SearchError, Tiles,
-    direction::Direction,
+    direction::{DirectedPosition, Direction},
     node::Node,
     path_finding::{compute_reachable_area, find_path},
     state::State,
@@ -40,7 +40,7 @@ pub struct Solver {
     /// Lower bounds for heuristic calculation.
     lower_bounds: OnceCell<HashMap<Vector2<i32>, i32>>,
     /// Set of tunnel positions and directions.
-    tunnels: OnceCell<HashSet<(Vector2<i32>, Direction)>>,
+    tunnels: OnceCell<HashSet<DirectedPosition>>,
 }
 
 impl Solver {
@@ -175,7 +175,7 @@ impl Solver {
     }
 
     /// Returns a reference to the set of tunnels.
-    pub fn tunnels(&self) -> &HashSet<(Vector2<i32>, Direction)> {
+    pub fn tunnels(&self) -> &HashSet<DirectedPosition> {
         self.tunnels.get_or_init(|| self.compute_tunnels())
     }
 
@@ -219,7 +219,7 @@ impl Solver {
         box_position: Vector2<i32>,
         player_position: Vector2<i32>,
         lower_bounds: &mut HashMap<Vector2<i32>, i32>,
-        visited: &mut HashSet<(Vector2<i32>, Direction)>,
+        visited: &mut HashSet<DirectedPosition>,
     ) {
         let player_reachable_area = compute_reachable_area(player_position, |position| {
             !(self.map[position].intersects(Tiles::Wall) || position == box_position)
@@ -239,7 +239,7 @@ impl Solver {
             }
 
             let lower_bound = *lower_bounds.get(&new_box_position).unwrap_or(&i32::MAX);
-            if !visited.insert((new_box_position, pull_direction)) {
+            if !visited.insert(DirectedPosition(new_box_position, pull_direction)) {
                 continue;
             }
             let new_lower_bound = lower_bounds[&box_position] + 1;
@@ -261,7 +261,7 @@ impl Solver {
     /// Tunnel is a common type of no influence push.
     /// Since tunnels are only determined by the map terrain, they can be
     /// pre-calculated.
-    fn compute_tunnels(&self) -> HashSet<(Vector2<i32>, Direction)> {
+    fn compute_tunnels(&self) -> HashSet<DirectedPosition> {
         let mut tunnels = HashSet::new();
         for x in 1..self.map.dimensions().x - 1 {
             for y in 1..self.map.dimensions().y - 1 {
@@ -293,7 +293,7 @@ impl Solver {
                         && self.lower_bounds().contains_key(&(box_position + &up))
                         && !self.map[box_position].intersects(Tiles::Goal)
                     {
-                        tunnels.insert((player_position, push_direction));
+                        tunnels.insert(DirectedPosition(player_position, push_direction));
                     }
                 }
             }
@@ -340,7 +340,10 @@ impl Solver {
             new_actions.push(ForwardAction::Push(push_direction));
 
             let mut new_box_position = previous_box_position + &push_direction.into();
-            while self.tunnels().contains(&(new_box_position, push_direction)) {
+            while self
+                .tunnels()
+                .contains(&DirectedPosition(new_box_position, push_direction))
+            {
                 new_box_position += &push_direction.into();
                 new_actions.push(ForwardAction::Push(push_direction));
             }
