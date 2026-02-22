@@ -14,6 +14,7 @@ pub mod run_length;
 pub mod solver;
 pub mod tiles;
 
+mod bcc_graph;
 mod node;
 mod state;
 
