@@ -2,7 +2,7 @@
 
 use std::{
     cmp::Ordering,
-    collections::{BinaryHeap, HashMap, HashSet, VecDeque},
+    collections::{BinaryHeap, HashMap, HashSet, VecDeque, hash_map::Entry},
 };
 
 use nalgebra::Vector2;
@@ -142,6 +142,7 @@ pub fn box_move_waypoints(
         if !player_reachable_area.contains(&new_player_position) {
             continue;
         }
+        costs.insert((initial_box_position, push_direction), 0);
         deque.push_back((initial_box_position, push_direction, 0));
     }
 
@@ -165,13 +166,10 @@ pub fn box_move_waypoints(
             }
 
             let new_cost = cost + 1;
-            if costs
-                .insert((new_box_position, push_direction), new_cost)
-                .is_some()
-            {
-                continue;
+            if let Entry::Vacant(entry) = costs.entry((new_box_position, push_direction)) {
+                entry.insert(new_cost);
+                deque.push_back((new_box_position, push_direction, new_cost));
             }
-            deque.push_back((new_box_position, push_direction, new_cost));
         }
     }
 
