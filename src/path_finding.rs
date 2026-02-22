@@ -140,11 +140,17 @@ pub fn box_move_waypoints(
         compute_reachable_area(map.player_position(), |position| map.is_movable(position));
     for push_direction in Direction::iter() {
         let state = DirectedPosition(initial_box_position, push_direction);
+        // Checks if the box can be pushed
         let new_box_position = state.forward();
         if !map.is_movable(new_box_position) {
             continue;
         }
+
+        // Checks if the player can push the box
         let new_player_position = state.backward();
+        if !(map.is_movable(new_player_position)) {
+            continue;
+        }
         if !player_reachable_area.contains(&new_player_position) {
             continue;
         }
