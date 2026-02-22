@@ -4,12 +4,16 @@ use nalgebra::Vector2;
 
 use crate::direction::Direction;
 
+/// A biconnected component graph.
 pub struct BccGraph {
+    /// Maps an undirected edge (represented by a pair of adjacent nodes) to its block (biconnected component) ID.
     edge_blocks: HashMap<[Vector2<i32>; 2], usize>,
+    /// The set of articulation points (cut vertices) in the graph.
     cut_vertices: HashSet<Vector2<i32>>,
 }
 
 impl BccGraph {
+    /// Creates a new `BccGraph`.
     pub fn new(start_node: Vector2<i32>, is_movable: impl Fn(Vector2<i32>) -> bool) -> Self {
         let mut edge_blocks = HashMap::new();
         let mut cut_vertices = HashSet::new();
@@ -17,14 +21,14 @@ impl BccGraph {
         let mut low = HashMap::new();
         let mut edge_stack = Vec::new();
         let mut block_count = 0;
-        let mut current_time = 0;
+        let mut time = 0;
         let mut root_children = 0;
 
         let mut stack = Vec::new();
 
-        current_time += 1;
-        depth.insert(start_node, current_time);
-        low.insert(start_node, current_time);
+        time += 1;
+        depth.insert(start_node, time);
+        low.insert(start_node, time);
         stack.push((start_node, None::<Vector2<i32>>, 0));
 
         let directions = Direction::iter().collect::<Vec<_>>();
@@ -57,9 +61,9 @@ impl BccGraph {
                         root_children += 1;
                     }
 
-                    current_time += 1;
-                    depth.insert(v, current_time);
-                    low.insert(v, current_time);
+                    time += 1;
+                    depth.insert(v, time);
+                    low.insert(v, time);
                     edge_stack.push(canonicalize_edge(u, v));
 
                     stack.push((u, p, next_direction_idx));
@@ -104,12 +108,20 @@ impl BccGraph {
         }
     }
 
+    /// Checks if a path exists from `from` to `to` without passing through the given `obstacle`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `from` and `to` are not adjacent to the `obstacle`, or are outside the movable area.
     pub fn is_reachable(
         &self,
         from: Vector2<i32>,
         to: Vector2<i32>,
         obstacle: Vector2<i32>,
     ) -> bool {
+        debug_assert_eq!((from - obstacle).abs().sum(), 1);
+        debug_assert_eq!((to - obstacle).abs().sum(), 1);
+
         if !self.cut_vertices.contains(&obstacle) {
             return true;
         }
@@ -127,6 +139,7 @@ impl BccGraph {
     }
 }
 
+/// Normalizes an undirected edge between two nodes.
 fn canonicalize_edge(a: Vector2<i32>, b: Vector2<i32>) -> [Vector2<i32>; 2] {
     if (a.y, a.x) < (b.y, b.x) {
         [a, b]
