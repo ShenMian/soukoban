@@ -176,45 +176,33 @@ pub fn box_move_waypoints(
     costs
 }
 
-/// Creates a path for a box to move from its current position to a target
-/// position.
+/// Constructs a path for the box to move to a target position.
 pub fn construct_box_path(
-    from: Vector2<i32>,
     to: Vector2<i32>,
     waypoints: &HashMap<(Vector2<i32>, Direction), u64>,
 ) -> Vec<Vector2<i32>> {
+    // Computes the last push direction and cost
+    let (mut direction, mut cost) = Direction::iter()
+        .filter_map(|direction| {
+            waypoints
+                .get(&(to, direction))
+                .map(|&cost| (direction, cost))
+        })
+        .min_by_key(|&(_, cost)| cost)
+        .unwrap();
+
     let mut path = Vec::new();
-    let mut current = to;
-    while current != from {
-        path.push(current);
-        let mut directions = Vec::new();
-        for push_direction in Direction::iter() {
-            if waypoints.get(&(current, push_direction)).is_some() {
-                directions.push(push_direction);
-            }
-        }
-        let mut min_neighbor = Vector2::zeros();
-        let mut min_cost = u64::MAX;
-        for push_direction in &directions {
-            let neighbor = current - &(*push_direction).into();
-            // FIXME: 遇到回头路会提前退出
-            if path.contains(&neighbor) {
-                continue;
-            }
-            for push_direction in Direction::iter() {
-                if let Some(cost) = waypoints.get(&(neighbor, push_direction))
-                    && *cost < min_cost
-                {
-                    min_cost = *cost;
-                    min_neighbor = neighbor;
-                    break;
-                }
-            }
-        }
-        debug_assert_ne!(min_cost, u64::MAX);
-        current = min_neighbor;
+    let mut position = to;
+    while cost > 0 {
+        path.push(position);
+        position -= &direction.into();
+        cost -= 1;
+
+        direction = Direction::iter()
+            .find(|&direction| waypoints.get(&(position, direction)) == Some(&cost))
+            .unwrap();
     }
-    path.push(from);
+    path.push(position);
     path.reverse();
     path
 }
