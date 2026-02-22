@@ -34,12 +34,12 @@ impl PartialOrd for Node {
 /// Finds a path from one position to another on the map.
 ///
 /// This function uses the A* algorithm to find the shortest path from the
-/// starting position to the target position, based on the provided `can_move`
+/// starting position to the target position, based on the provided `is_movable`
 /// function.
 pub fn find_path(
     from: Vector2<i32>,
     to: Vector2<i32>,
-    can_move: impl Fn(Vector2<i32>) -> bool,
+    is_movable: impl Fn(Vector2<i32>) -> bool,
 ) -> Option<Vec<Vector2<i32>>> {
     let mut open_set = BinaryHeap::new();
     let mut came_from = HashMap::new();
@@ -58,7 +58,7 @@ pub fn find_path(
 
         for direction in Direction::iter() {
             let new_position = node.position + &direction.into();
-            if !can_move(new_position) {
+            if !is_movable(new_position) {
                 continue;
             }
 
@@ -97,9 +97,12 @@ fn construct_path(
 /// target position.
 ///
 /// This function finds a path using the A* algorithm from the player's current
-/// position to the target position, based on the provided `can_move` function.
+/// position to the target position, based on the provided `is_movable`
+/// function.
 pub fn player_move_path(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
-    let path = find_path(map.player_position(), to, |position| map.can_move(position))?;
+    let path = find_path(map.player_position(), to, |position| {
+        map.is_movable(position)
+    })?;
     Some(convert_path_from_points_to_directions(path))
 }
 
@@ -116,8 +119,8 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
 // 1. 通过预计算双连通分量, 实现常量时间内判断玩家可达性.
 //    该方法好像无法支持穿透功能.
 //    详情请参考: <http://sokoban.ws/blog/?p=843>
-// 2. 支持移动数优先的寻路.
-//    保持 costs 依然每次下降 1, 但是 deque 中的 cost 改为实际代价, 比如移动数.
+// 2. 支持移动数优先的寻路. 保持 costs 依然每次下降 1, 但是 deque 中的 cost
+//    改为实际代价, 比如移动数.
 // 3. 增量更新玩家可达范围.
 pub fn box_move_waypoints(
     map: &Map,
@@ -132,11 +135,11 @@ pub fn box_move_waypoints(
     let mut costs = HashMap::new();
 
     let player_reachable_area =
-        compute_reachable_area(map.player_position(), |position| map.can_move(position));
+        compute_reachable_area(map.player_position(), |position| map.is_movable(position));
     for push_direction in Direction::iter() {
         let state = DirectedPosition(initial_box_position, push_direction);
         let new_box_position = state.forward();
-        if !map.can_move(new_box_position) {
+        if !map.is_movable(new_box_position) {
             continue;
         }
         let new_player_position = state.backward();
@@ -150,13 +153,14 @@ pub fn box_move_waypoints(
     while let Some((state, cost)) = deque.pop_front() {
         let (box_position, player_position) = (state.position(), state.backward());
         let player_reachable_area = compute_reachable_area(player_position, |position| {
-            (position == initial_box_position || map.can_move(position)) && position != box_position
+            (position == initial_box_position || map.is_movable(position))
+                && position != box_position
         });
 
         for push_direction in Direction::iter() {
             // Checks if the box can be pushed
             let new_box_position = box_position + &push_direction.into();
-            if !(new_box_position == initial_box_position || map.can_move(new_box_position)) {
+            if !(new_box_position == initial_box_position || map.is_movable(new_box_position)) {
                 continue;
             }
 
@@ -238,14 +242,15 @@ pub fn construct_player_path(
 /// Returns a set of positions of the boxes that can be pushed by the player.
 pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
     let player_reachable_area =
-        compute_reachable_area(map.player_position(), |position| map.can_move(position));
+        compute_reachable_area(map.player_position(), |position| map.is_movable(position));
     let mut pushable_boxes = HashSet::new();
     for box_position in map.box_positions() {
         // Check if the player can push the box from any direction
         for direction in Direction::iter() {
             let player_position = box_position - &direction.into();
             let new_box_position = box_position + &direction.into();
-            if player_reachable_area.contains(&player_position) && map.can_move(new_box_position) {
+            if player_reachable_area.contains(&player_position) && map.is_movable(new_box_position)
+            {
                 pushable_boxes.insert(*box_position);
                 break;
             }
@@ -258,10 +263,10 @@ pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
 ///
 /// This function performs a breadth-first search to determine all positions
 /// that can be reached from the starting position, based on the provided
-/// `can_move` function.
+/// `is_movable` function.
 pub fn compute_reachable_area(
     position: Vector2<i32>,
-    can_move: impl Fn(Vector2<i32>) -> bool,
+    is_movable: impl Fn(Vector2<i32>) -> bool,
 ) -> HashSet<Vector2<i32>> {
     let mut reachable_area = HashSet::new();
     let mut deque = VecDeque::<Vector2<i32>>::new();
@@ -271,7 +276,7 @@ pub fn compute_reachable_area(
     while let Some(position) = deque.pop_front() {
         for direction in Direction::iter() {
             let neighbor = position + &direction.into();
-            if can_move(neighbor) && reachable_area.insert(neighbor) {
+            if is_movable(neighbor) && reachable_area.insert(neighbor) {
                 deque.push_back(neighbor);
             }
         }
