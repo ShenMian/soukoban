@@ -56,24 +56,25 @@ impl Solver {
 
     /// Searches for solution using the A* algorithm.
     pub fn a_star_search(&self) -> Result<Actions, SearchError> {
-        let mut open_set = BinaryHeap::new();
+        let mut queue = BinaryHeap::new();
+        let mut costs = HashMap::new();
         let mut came_from = HashMap::new();
-        let mut cost = HashMap::new();
 
         let state: State = self.map.clone().into();
-        cost.insert(state.canonicalized_hash(self.strategy, &self.map), 0);
-        open_set.push(Node::new(state, 0, 0, self));
+        costs.insert(state.canonicalized_hash(self.strategy, &self.map), 0);
+        queue.push(Node::new(state, 0, 0, self));
 
-        while let Some(node) = open_set.pop() {
+        while let Some(node) = queue.pop() {
             if node.is_solved() {
                 return Ok(self.construct_actions(&construct_path(node.state, &came_from)));
             }
             for successor in node.successors(self) {
                 let hash = successor.state.canonicalized_hash(self.strategy, &self.map);
-                if !cost.contains_key(&hash) || successor.cost() < cost[&hash] {
-                    cost.insert(hash, successor.cost());
+                let current_cost = costs.entry(hash).or_insert(i32::MAX);
+                if successor.cost() < *current_cost {
+                    *current_cost = successor.cost();
                     came_from.insert(successor.state.clone(), node.state.clone());
-                    open_set.push(successor);
+                    queue.push(successor);
                 }
             }
         }
