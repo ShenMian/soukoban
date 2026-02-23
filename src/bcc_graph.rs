@@ -6,16 +6,15 @@ use crate::direction::Direction;
 
 /// A biconnected component graph.
 pub struct BccGraph {
-    /// Maps an undirected edge (represented by a pair of adjacent nodes) to its
-    /// block (biconnected component) ID.
+    /// Maps an undirected edge to its block ID.
     edge_blocks: HashMap<[Vector2<i32>; 2], usize>,
-    /// The set of articulation points (cut vertices) in the graph.
+    /// The set of cut vertices (articulation points) in the graph.
     cut_vertices: HashSet<Vector2<i32>>,
 }
 
 impl BccGraph {
     /// Creates a new `BccGraph`.
-    pub fn new(start_node: Vector2<i32>, is_movable: impl Fn(Vector2<i32>) -> bool) -> Self {
+    pub fn new(start: Vector2<i32>, is_movable: impl Fn(Vector2<i32>) -> bool) -> Self {
         let mut edge_blocks = HashMap::new();
         let mut cut_vertices = HashSet::new();
         let mut depth = HashMap::new();
@@ -28,9 +27,9 @@ impl BccGraph {
         let mut stack = Vec::new();
 
         time += 1;
-        depth.insert(start_node, time);
-        low.insert(start_node, time);
-        stack.push((start_node, None::<Vector2<i32>>, 0));
+        depth.insert(start, time);
+        low.insert(start, time);
+        stack.push((start, None::<Vector2<i32>>, 0));
 
         let directions = Direction::iter().collect::<Vec<_>>();
         while let Some((u, p, direction_idx)) = stack.pop() {
@@ -84,7 +83,7 @@ impl BccGraph {
                 *low_p = (*low_p).min(low_u);
 
                 if low_u >= depth[&parent] {
-                    if parent != start_node {
+                    if parent != start {
                         cut_vertices.insert(parent);
                     }
                     block_count += 1;
@@ -100,7 +99,7 @@ impl BccGraph {
         }
 
         if root_children > 1 {
-            cut_vertices.insert(start_node);
+            cut_vertices.insert(start);
         }
 
         Self {
@@ -125,6 +124,8 @@ impl BccGraph {
         debug_assert_eq!((from - obstacle).abs().sum(), 1);
         debug_assert_eq!((to - obstacle).abs().sum(), 1);
 
+        // If the obstacle is not located at a cut vertex, it indicates that the entire
+        // graph remains connected
         if !self.cut_vertices.contains(&obstacle) {
             return true;
         }
