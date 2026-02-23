@@ -2,7 +2,7 @@
 
 use std::{
     cmp::Ordering,
-    collections::{BinaryHeap, HashMap, HashSet, VecDeque, hash_map::Entry},
+    collections::{BinaryHeap, HashMap, HashSet, VecDeque},
 };
 
 use nalgebra::Vector2;
@@ -128,7 +128,8 @@ pub fn box_move_waypoints(
         "no box at `initial_box_position`"
     );
 
-    let mut deque = VecDeque::new();
+    let mut queue = VecDeque::new();
+    let mut costs = HashMap::new();
     let mut came_from = HashMap::new();
 
     let is_movable = |position| position == initial_box_position || map.is_movable(position);
@@ -153,11 +154,14 @@ pub fn box_move_waypoints(
         if !player_reachable_area.contains(&new_player_position) {
             continue;
         }
+
+        let cost = 0;
         came_from.insert(state, state);
-        deque.push_back(state);
+        queue.push_back((cost, state));
+        costs.insert(state, cost);
     }
 
-    while let Some(state) = deque.pop_front() {
+    while let Some((cost, state)) = queue.pop_front() {
         let (box_position, player_position) = (state.position(), state.backward());
 
         for push_direction in Direction::iter() {
@@ -176,10 +180,13 @@ pub fn box_move_waypoints(
                 continue;
             }
 
+            let new_cost = cost + 1;
             let new_state = DirectedPosition(new_box_position, push_direction);
-            if let Entry::Vacant(entry) = came_from.entry(new_state) {
-                entry.insert(state);
-                deque.push_back(new_state);
+            let current_cost = costs.entry(new_state).or_insert(i32::MAX);
+            if new_cost < *current_cost {
+                *current_cost = new_cost;
+                came_from.insert(new_state, state);
+                queue.push_back((new_cost, new_state));
             }
         }
     }
