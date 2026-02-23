@@ -6,7 +6,8 @@ use crate::direction::Direction;
 
 /// A biconnected component graph.
 pub struct BccGraph {
-    /// Maps an undirected edge (represented by a pair of adjacent nodes) to its block (biconnected component) ID.
+    /// Maps an undirected edge (represented by a pair of adjacent nodes) to its
+    /// block (biconnected component) ID.
     edge_blocks: HashMap<[Vector2<i32>; 2], usize>,
     /// The set of articulation points (cut vertices) in the graph.
     cut_vertices: HashSet<Vector2<i32>>,
@@ -108,11 +109,13 @@ impl BccGraph {
         }
     }
 
-    /// Checks if a path exists from `from` to `to` without passing through the given `obstacle`.
+    /// Checks if a path exists from `from` to `to` without passing through the
+    /// given `obstacle`.
     ///
     /// # Panics
     ///
-    /// Panics if `from` and `to` are not adjacent to the `obstacle`, or are outside the movable area.
+    /// Panics if `from` and `to` are not adjacent to the `obstacle`, or are
+    /// outside the movable area.
     pub fn is_reachable(
         &self,
         from: Vector2<i32>,

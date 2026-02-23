@@ -12,6 +12,7 @@ use crate::{
     bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
     map::Map,
+    solver::Strategy,
 };
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
@@ -114,21 +115,43 @@ fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direct
         .collect()
 }
 
+#[derive(Clone, Copy, Eq, PartialEq, Hash)]
+struct BoxNode {
+    state: DirectedPosition,
+    cost: i32,
+}
+
+impl BoxNode {
+    fn new(state: DirectedPosition, cost: i32) -> Self {
+        Self { state, cost }
+    }
+}
+
+impl Ord for BoxNode {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.cost.cmp(&other.cost).reverse()
+    }
+}
+
+impl PartialOrd for BoxNode {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 /// Calculates the waypoints for the box to move from their current position to
 /// reachable positions.
-// TODO:
-// 1. 支持移动数优先的寻路.
-// 2. 增量更新玩家可达范围.
 pub fn box_move_waypoints(
     map: &Map,
     initial_box_position: Vector2<i32>,
+    strategy: Strategy,
 ) -> HashMap<DirectedPosition, DirectedPosition> {
     debug_assert!(
         map.box_positions().contains(&initial_box_position),
         "no box at `initial_box_position`"
     );
 
-    let mut queue = VecDeque::new();
+    let mut queue = BinaryHeap::new();
     let mut costs = HashMap::new();
     let mut came_from = HashMap::new();
 
@@ -155,13 +178,22 @@ pub fn box_move_waypoints(
             continue;
         }
 
-        let cost = 0;
+        let cost = match strategy {
+            Strategy::OptimalPush | Strategy::Fast => 0,
+            Strategy::OptimalMove => {
+                find_path(map.player_position(), new_player_position, |position| {
+                    map.is_movable(position)
+                })
+                .unwrap()
+                .len() as i32
+            }
+        };
         came_from.insert(state, state);
-        queue.push_back((cost, state));
+        queue.push(BoxNode::new(state, cost));
         costs.insert(state, cost);
     }
 
-    while let Some((cost, state)) = queue.pop_front() {
+    while let Some(BoxNode { state, cost }) = queue.pop() {
         let (box_position, player_position) = (state.position(), state.backward());
 
         for push_direction in Direction::iter() {
@@ -180,13 +212,23 @@ pub fn box_move_waypoints(
                 continue;
             }
 
-            let new_cost = cost + 1;
+            let new_cost = cost
+                + match strategy {
+                    Strategy::OptimalPush | Strategy::Fast => 1,
+                    Strategy::OptimalMove => {
+                        find_path(player_position, new_player_position, |position| {
+                            position == initial_box_position || map.is_movable(position)
+                        })
+                        .unwrap()
+                        .len() as i32
+                    }
+                };
             let new_state = DirectedPosition(new_box_position, push_direction);
             let current_cost = costs.entry(new_state).or_insert(i32::MAX);
             if new_cost < *current_cost {
                 *current_cost = new_cost;
                 came_from.insert(new_state, state);
-                queue.push_back((new_cost, new_state));
+                queue.push(BoxNode::new(new_state, new_cost));
             }
         }
     }
