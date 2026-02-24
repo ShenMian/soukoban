@@ -238,29 +238,22 @@ pub fn box_move_waypoints(
 
 /// Constructs a path for the box to move to a target position.
 pub fn construct_box_path(
-    to: Vector2<i32>,
+    to: DirectedPosition,
     waypoints: &HashMap<DirectedPosition, DirectedPosition>,
 ) -> Vec<Vector2<i32>> {
-    Direction::iter()
-        .filter_map(|direction| {
-            let state = DirectedPosition(to, direction);
-            waypoints.get(&state).map(|_| {
-                let mut path = Vec::new();
-                let mut current = state;
-                while let Some(&prev) = waypoints.get(&current) {
-                    if prev == current {
-                        break;
-                    }
-                    path.push(current.position());
-                    current = prev;
-                }
-                path.push(current.position());
-                path.reverse();
-                path
-            })
-        })
-        .min_by_key(|path| path.len())
-        .unwrap()
+    let mut path = Vec::new();
+    let mut current = to;
+    debug_assert!(waypoints.contains_key(&current));
+    while let Some(&prev) = waypoints.get(&current) {
+        if prev == current {
+            break;
+        }
+        path.push(current.position());
+        current = prev;
+    }
+    path.push(current.position());
+    path.reverse();
+    path
 }
 
 /// Constructs player path based on box path.

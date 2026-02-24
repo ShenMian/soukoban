@@ -33,7 +33,10 @@ fn test_box_move_waypoints() {
         .keys()
         .map(|DirectedPosition(position, _)| position)
         .collect();
-    let box_path = construct_box_path(Vector2::new(9, 8), &waypoints);
+    let box_path = construct_box_path(
+        DirectedPosition(Vector2::new(9, 8), Direction::Left),
+        &waypoints,
+    );
     let player_path = construct_player_path(&map, Vector2::new(7, 6), &box_path);
     assert_eq!(positions.len(), 4 * 35);
     assert_eq!(box_path.len() - 1, 110);
@@ -45,7 +48,10 @@ fn test_box_move_waypoints() {
         .keys()
         .map(|DirectedPosition(position, _)| position)
         .collect();
-    let box_path = construct_box_path(Vector2::new(17, 18), &waypoints);
+    let box_path = construct_box_path(
+        DirectedPosition(Vector2::new(17, 18), Direction::Right),
+        &waypoints,
+    );
     let player_path = construct_player_path(&map, Vector2::new(16, 18), &box_path);
     assert_eq!(positions.len(), 4 * 6);
     assert_eq!(box_path.len() - 1, 11);
@@ -53,14 +59,20 @@ fn test_box_move_waypoints() {
 
     let map = load_level_from_file("assets/Microban II_135.xsb", 134).into();
     let waypoints = box_move_waypoints(&map, Vector2::new(16, 34), Strategy::OptimalPush);
-    let box_path = construct_box_path(Vector2::new(20, 34), &waypoints);
+    let box_path = construct_box_path(
+        DirectedPosition(Vector2::new(20, 34), Direction::Left),
+        &waypoints,
+    );
     let player_path = construct_player_path(&map, Vector2::new(18, 18), &box_path);
     assert_eq!(box_path.len() - 1, 124);
     assert_eq!(player_path.len() - 1, 5037);
 
     let map = load_level_from_file("assets/Microban II_135.xsb", 135).into();
     let waypoints = box_move_waypoints(&map, Vector2::new(21, 36), Strategy::OptimalPush);
-    let box_path = construct_box_path(Vector2::new(21, 37), &waypoints);
+    let box_path = construct_box_path(
+        DirectedPosition(Vector2::new(21, 37), Direction::Down),
+        &waypoints,
+    );
     assert_eq!(box_path.len() - 1, 591);
     let player_path = construct_player_path(&map, Vector2::new(21, 38), &box_path);
     assert_eq!(player_path.len() - 1, 1108);
