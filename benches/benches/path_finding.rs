@@ -11,7 +11,7 @@ fn box_move_waypoints(c: &mut Criterion) {
         b.iter_batched_ref(
             || Level::from_str(PATH_1).unwrap(),
             |level| {
-                path_finding::box_move_waypoints(level.map(), Vector2::new(6, 4), Strategy::Fast)
+                path_finding::compute_box_waypoints(level.map(), Vector2::new(6, 4), Strategy::Fast)
             },
             criterion::BatchSize::SmallInput,
         )
@@ -21,7 +21,11 @@ fn box_move_waypoints(c: &mut Criterion) {
         b.iter_batched_ref(
             || Level::from_str(PATH_2).unwrap(),
             |level| {
-                path_finding::box_move_waypoints(level.map(), Vector2::new(43, 6), Strategy::Fast)
+                path_finding::compute_box_waypoints(
+                    level.map(),
+                    Vector2::new(43, 6),
+                    Strategy::Fast,
+                )
             },
             criterion::BatchSize::SmallInput,
         )
@@ -37,7 +41,11 @@ fn box_move_waypoints(c: &mut Criterion) {
                 level
             },
             |level| {
-                path_finding::box_move_waypoints(level.map(), Vector2::new(4, 44), Strategy::Fast)
+                path_finding::compute_box_waypoints(
+                    level.map(),
+                    Vector2::new(4, 44),
+                    Strategy::Fast,
+                )
             },
             criterion::BatchSize::SmallInput,
         )

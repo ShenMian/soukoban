@@ -105,14 +105,12 @@ pub fn player_move_path(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
     let path = find_path(map.player_position(), to, |position| {
         map.is_movable(position)
     })?;
-    Some(convert_path_from_points_to_directions(path))
-}
-
-/// Converts a position path into a direction path.
-fn convert_path_from_points_to_directions(path: Vec<Vector2<i32>>) -> Vec<Direction> {
-    path.windows(2)
+    // Converts the path of positions into a path of directions.
+    let directions = path
+        .windows(2)
         .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
-        .collect()
+        .collect();
+    Some(directions)
 }
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
@@ -141,7 +139,7 @@ impl PartialOrd for BoxNode {
 
 /// Calculates the waypoints for the box to move from their current position to
 /// reachable positions.
-pub fn box_move_waypoints(
+pub fn compute_box_waypoints(
     map: &Map,
     initial_box_position: Vector2<i32>,
     strategy: Strategy,
@@ -286,7 +284,7 @@ pub fn construct_player_path(
 }
 
 /// Returns a set of positions of the boxes that can be pushed by the player.
-pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
+pub fn compute_pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_movable(position));
     let mut pushable_boxes = HashSet::new();
@@ -295,7 +293,7 @@ pub fn pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
         for direction in Direction::iter() {
             let player_position = box_position - &direction.into();
             let new_box_position = box_position + &direction.into();
-            if player_reachable_area.contains(&player_position) && map.is_movable(new_box_position)
+            if map.is_movable(new_box_position) && player_reachable_area.contains(&player_position)
             {
                 pushable_boxes.insert(*box_position);
                 break;
