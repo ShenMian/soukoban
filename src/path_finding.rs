@@ -145,7 +145,10 @@ pub fn box_move_waypoints(
     map: &Map,
     initial_box_position: Vector2<i32>,
     strategy: Strategy,
-) -> HashMap<DirectedPosition, DirectedPosition> {
+) -> (
+    HashMap<DirectedPosition, DirectedPosition>,
+    HashMap<DirectedPosition, i32>,
+) {
     debug_assert!(
         map.box_positions().contains(&initial_box_position),
         "no box at `initial_box_position`"
@@ -217,7 +220,8 @@ pub fn box_move_waypoints(
                     Strategy::OptimalPush | Strategy::Fast => 1,
                     Strategy::OptimalMove => {
                         find_path(player_position, new_player_position, |position| {
-                            position == initial_box_position || map.is_movable(position)
+                            (position == initial_box_position || map.is_movable(position))
+                                && position != box_position
                         })
                         .unwrap()
                         .len() as i32
@@ -233,34 +237,27 @@ pub fn box_move_waypoints(
         }
     }
 
-    came_from
+    (came_from, costs)
 }
 
 /// Constructs a path for the box to move to a target position.
 pub fn construct_box_path(
-    to: Vector2<i32>,
+    to: DirectedPosition,
     waypoints: &HashMap<DirectedPosition, DirectedPosition>,
 ) -> Vec<Vector2<i32>> {
-    Direction::iter()
-        .filter_map(|direction| {
-            let state = DirectedPosition(to, direction);
-            waypoints.get(&state).map(|_| {
-                let mut path = Vec::new();
-                let mut current = state;
-                while let Some(&prev) = waypoints.get(&current) {
-                    if prev == current {
-                        break;
-                    }
-                    path.push(current.position());
-                    current = prev;
-                }
-                path.push(current.position());
-                path.reverse();
-                path
-            })
-        })
-        .min_by_key(|path| path.len())
-        .unwrap()
+    let mut path = Vec::new();
+    let mut current = to;
+    debug_assert!(waypoints.contains_key(&current));
+    while let Some(&prev) = waypoints.get(&current) {
+        if prev == current {
+            break;
+        }
+        path.push(current.position());
+        current = prev;
+    }
+    path.push(current.position());
+    path.reverse();
+    path
 }
 
 /// Constructs player path based on box path.
