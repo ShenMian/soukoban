@@ -27,8 +27,7 @@ impl Action {
     /// ```
     pub fn direction(&self) -> Direction {
         match *self {
-            Action::Move(direction) => direction,
-            Action::Push(direction) => direction,
+            Action::Move(direction) | Action::Push(direction) => direction,
         }
     }
 
