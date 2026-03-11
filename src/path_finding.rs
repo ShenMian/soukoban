@@ -267,8 +267,8 @@ pub fn construct_player_path(
     let mut path = Vec::new();
     let initial_box_position = *box_path.first().unwrap();
     for box_positions in box_path.windows(2) {
-        let direction = box_positions[1] - box_positions[0];
-        let new_player_position = box_positions[0] - direction;
+        let push_direction = box_positions[1] - box_positions[0];
+        let new_player_position = box_positions[0] - push_direction;
         path.append(
             &mut find_path(player_position, new_player_position, |position| {
                 (position == initial_box_position
@@ -290,9 +290,9 @@ pub fn compute_pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
     let mut pushable_boxes = HashSet::new();
     for box_position in map.box_positions() {
         // Check if the player can push the box from any direction
-        for direction in Direction::iter() {
-            let player_position = box_position - &direction.into();
-            let new_box_position = box_position + &direction.into();
+        for push_direction in Direction::iter() {
+            let player_position = box_position - &push_direction.into();
+            let new_box_position = box_position + &push_direction.into();
             if map.is_movable(new_box_position) && player_reachable_area.contains(&player_position)
             {
                 pushable_boxes.insert(*box_position);
