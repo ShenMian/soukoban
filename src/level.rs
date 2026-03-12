@@ -59,6 +59,11 @@ impl Level {
         &self.actions
     }
 
+    /// Returns a reference to the undone actions of the level.
+    pub fn undone_actions(&self) -> &Actions {
+        &self.undone_actions
+    }
+
     /// Moves the player in the specified direction.
     pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
         if self.actions.last() == Some(&Action::Move(-direction)) {
