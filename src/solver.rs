@@ -3,6 +3,10 @@
 use std::{
     cell::OnceCell,
     collections::{BinaryHeap, HashMap, HashSet},
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
 };
 
 use itertools::Itertools;
@@ -41,6 +45,8 @@ pub struct Solver {
     lower_bounds: OnceCell<HashMap<Vector2<i32>, i32>>,
     /// Set of tunnel positions and directions.
     tunnels: OnceCell<HashSet<DirectedPosition>>,
+    /// Flag to request stopping the search.
+    stop_flag: Arc<AtomicBool>,
 }
 
 impl Solver {
@@ -51,11 +57,14 @@ impl Solver {
             strategy,
             lower_bounds: OnceCell::new(),
             tunnels: OnceCell::new(),
+            stop_flag: Arc::new(AtomicBool::new(false)),
         }
     }
 
     /// Searches for solution using the A* algorithm.
     pub fn a_star_search(&self) -> Result<Actions, SearchError> {
+        self.stop_flag.store(false, Ordering::Relaxed);
+
         let mut queue = BinaryHeap::new();
         let mut costs = HashMap::new();
         let mut came_from = HashMap::new();
@@ -65,6 +74,9 @@ impl Solver {
         queue.push(Node::new(state, 0, 0, self));
 
         while let Some(node) = queue.pop() {
+            if self.is_stopped() {
+                return Err(SearchError::Interrupted);
+            }
             if node.is_solved() {
                 return Ok(self.construct_actions(&construct_path(node.state, &came_from)));
             }
@@ -83,6 +95,8 @@ impl Solver {
 
     /// Searches for solution using the IDA* algorithm.
     pub fn ida_star_search(&self) -> Result<Actions, SearchError> {
+        self.stop_flag.store(false, Ordering::Relaxed);
+
         let state: State = self.map.clone().into();
         let node = Node::new(state.clone(), 0, 0, self);
 
@@ -94,6 +108,9 @@ impl Solver {
             match self.ida_star_depth_search(&node, &mut path, &mut visited, threshold) {
                 Ok(_state) => return Ok(self.construct_actions(&path)),
                 Err(new_threshold) => {
+                    if new_threshold == i32::MIN {
+                        return Err(SearchError::Interrupted);
+                    }
                     if new_threshold == i32::MAX {
                         return Err(SearchError::NoSolution);
                     }
@@ -114,6 +131,10 @@ impl Solver {
         visited: &mut HashSet<u64>,
         threshold: i32,
     ) -> Result<State, i32> {
+        if self.is_stopped() {
+            return Err(i32::MIN);
+        }
+
         if node.estimated_total_cost() > threshold {
             return Err(node.estimated_total_cost());
         }
@@ -144,6 +165,12 @@ impl Solver {
         }
 
         Err(min_threshold)
+    }
+
+    /// Request to stop the ongoing search. This sets a shared flag checked by
+    /// the search routines.
+    pub fn request_stop(&self) {
+        self.stop_flag.store(true, Ordering::Relaxed);
     }
 
     /// Returns a reference to the map.
@@ -178,6 +205,11 @@ impl Solver {
     /// Returns a reference to the set of tunnels.
     pub fn tunnels(&self) -> &HashSet<DirectedPosition> {
         self.tunnels.get_or_init(|| self.compute_tunnels())
+    }
+
+    /// Returns true if a stop has been requested.
+    fn is_stopped(&self) -> bool {
+        self.stop_flag.load(Ordering::Relaxed)
     }
 
     /// Computes and returns the minimum number of pushes to push the box to

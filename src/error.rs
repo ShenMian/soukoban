@@ -92,6 +92,9 @@ pub enum SearchError {
     /// No solution found.
     #[error("no solution found")]
     NoSolution,
+    /// Search was interrupted by user request.
+    #[error("search interrupted")]
+    Interrupted,
 }
 
 /// An error which can be returned when level do/undo/redo actions.
