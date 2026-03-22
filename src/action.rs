@@ -60,6 +60,48 @@ impl Action {
     pub fn is_push(&self) -> bool {
         matches!(&self, Action::Push(_))
     }
+
+    /// Rotates the action's direction 90° clockwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
+    ///
+    /// assert_eq!(
+    ///     Action::Move(Direction::Up).rotate(),
+    ///     Action::Move(Direction::Right)
+    /// );
+    /// ```
+    pub fn rotate(self) -> Action {
+        self.map(Direction::rotate)
+    }
+
+    /// Flips the action's direction.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
+    ///
+    /// assert_eq!(
+    ///     Action::Move(Direction::Up).flip(),
+    ///     Action::Move(Direction::Down)
+    /// );
+    /// ```
+    pub fn flip(self) -> Action {
+        self.map(Direction::flip)
+    }
+
+    /// Applies a transformation function to the `Direction`.
+    fn map(self, f: impl Fn(Direction) -> Direction) -> Action {
+        match self {
+            Action::Move(direction) => Action::Move(f(direction)),
+            Action::Push(direction) => Action::Push(f(direction)),
+        }
+    }
 }
 
 impl TryFrom<char> for Action {

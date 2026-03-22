@@ -136,6 +136,20 @@ impl Level {
         self.map.box_positions() == self.map.goal_positions()
     }
 
+    /// Rotates the level 90° clockwise.
+    pub fn rotate(&mut self) {
+        self.map.rotate();
+        self.actions.rotate();
+        self.undone_actions.rotate();
+    }
+
+    /// Flips the level.
+    pub fn flip(&mut self) {
+        self.map.flip();
+        self.actions.flip();
+        self.undone_actions.flip();
+    }
+
     /// Returns the reachable area for the player.
     pub fn player_reachable_area(&self) -> HashSet<Vector2<i32>> {
         compute_reachable_area(self.map.player_position(), |position| {

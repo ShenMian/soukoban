@@ -23,7 +23,7 @@ impl Direction {
         [Self::Up, Self::Down, Self::Left, Self::Right].into_iter()
     }
 
-    /// Rotate the direction 90° clockwise.
+    /// Rotates the direction 90° clockwise.
     ///
     /// # Examples
     ///
@@ -43,7 +43,7 @@ impl Direction {
         }
     }
 
-    /// Flip the direction.
+    /// Flips the direction.
     ///
     /// # Examples
     ///

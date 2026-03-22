@@ -42,6 +42,20 @@ impl Actions {
         self.iter().filter(|action| action.is_push()).count()
     }
 
+    /// Rotates all actions 90° clockwise.
+    pub fn rotate(&mut self) {
+        for action in &mut self.0 {
+            *action = action.rotate();
+        }
+    }
+
+    /// Flips all actions.
+    pub fn flip(&mut self) {
+        for action in &mut self.0 {
+            *action = action.flip();
+        }
+    }
+
     /// Returns the secondary values.
     pub fn secondary_values(&self) -> SecondaryValues {
         let mut box_lines = 0;
