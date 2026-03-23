@@ -14,7 +14,7 @@ fn find_path() {
 }
 
 #[test]
-fn test_box_move_waypoints() {
+fn test_compute_box_waypoints() {
     let map = load_level_from_file("assets/Microban_155.xsb", 3).into();
     assert_eq!(
         compute_box_waypoints(&map, Vector2::new(6, 3), Strategy::OptimalPush)
