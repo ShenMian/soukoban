@@ -1,8 +1,10 @@
-use std::{fs, path::Path};
+use std::{fs::File, io::BufReader, path::Path};
 
 use soukoban::Level;
 
 pub fn load_level_from_file<P: AsRef<Path>>(path: P, id: usize) -> Level {
     debug_assert!(id >= 1);
-    Level::load_nth_from_str(&fs::read_to_string(path).unwrap(), id).unwrap()
+    let file = File::open(path).unwrap();
+    let reader = BufReader::new(file);
+    Level::load_nth_from_reader(reader, id).unwrap()
 }
