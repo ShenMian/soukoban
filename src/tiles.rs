@@ -39,8 +39,6 @@ impl fmt::Display for Tiles {
             write!(f, ".")?;
         } else if tiles == Tiles::Player {
             write!(f, "@")?;
-        } else if tiles == Tiles::Floor {
-            write!(f, "_")?;
         } else if tiles == Tiles::Wall {
             write!(f, "#")?;
         } else if tiles.is_empty() {
