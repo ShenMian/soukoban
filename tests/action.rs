@@ -31,7 +31,7 @@ fn action_to_char() {
 }
 
 #[test]
-fn rotate_action() {
+fn rotate() {
     use {Action::*, Direction::*};
 
     assert_eq!(Move(Up).rotate(), Move(Right));
@@ -46,7 +46,7 @@ fn rotate_action() {
 }
 
 #[test]
-fn flip_action() {
+fn flip() {
     use {Action::*, Direction::*};
 
     assert_eq!(Move(Up).flip(), Move(Down));
@@ -58,4 +58,32 @@ fn flip_action() {
     assert_eq!(Push(Down).flip(), Push(Up));
     assert_eq!(Push(Left).flip(), Push(Right));
     assert_eq!(Push(Right).flip(), Push(Left));
+}
+
+#[test]
+fn is_move() {
+    use {Action::*, Direction::*};
+
+    assert!(Move(Up).is_move());
+    assert!(Move(Down).is_move());
+    assert!(Move(Left).is_move());
+    assert!(Move(Right).is_move());
+    assert!(!Push(Up).is_move());
+    assert!(!Push(Down).is_move());
+    assert!(!Push(Left).is_move());
+    assert!(!Push(Right).is_move());
+}
+
+#[test]
+fn is_push() {
+    use {Action::*, Direction::*};
+
+    assert!(Push(Up).is_push());
+    assert!(Push(Down).is_push());
+    assert!(Push(Left).is_push());
+    assert!(Push(Right).is_push());
+    assert!(!Move(Up).is_push());
+    assert!(!Move(Down).is_push());
+    assert!(!Move(Left).is_push());
+    assert!(!Move(Right).is_push());
 }
