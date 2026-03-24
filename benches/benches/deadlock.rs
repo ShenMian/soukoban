@@ -1,13 +1,11 @@
-use std::str::FromStr;
-
 use criterion::{BatchSize, Criterion, criterion_group};
-use soukoban::{Level, deadlock};
+use soukoban::deadlock;
 
 use super::utils::*;
 
 fn compute_unused_floors(c: &mut Criterion) {
     c.bench_function("deadlock::compute_useless_floors", |b| {
-        let level = Level::from_str(WORLDCUP2014).unwrap();
+        let level = load_level_from_file("assets/Benchmark_3.xsb", 3);
         b.iter_batched(
             || level.map().clone(),
             deadlock::compute_useless_floors,
@@ -18,7 +16,7 @@ fn compute_unused_floors(c: &mut Criterion) {
 
 fn compute_static_deadlocks(c: &mut Criterion) {
     c.bench_function("deadlock::compute_static_deadlocks", |b| {
-        let level = Level::from_str(WORLDCUP2014).unwrap();
+        let level = load_level_from_file("assets/Benchmark_3.xsb", 3);
         b.iter(|| deadlock::compute_static_deadlocks(level.map()))
     });
 }

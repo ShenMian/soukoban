@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use criterion::{BatchSize, Criterion, criterion_group};
 use soukoban::{
     Level,
@@ -26,7 +24,7 @@ fn a_star_search(c: &mut Criterion) {
         );
     };
 
-    let level = Level::from_str(PATH_1).unwrap();
+    let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
     bench_search(level, Strategy::Fast);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
@@ -51,7 +49,7 @@ fn ida_star_search(c: &mut Criterion) {
         );
     };
 
-    let level = Level::from_str(PATH_1).unwrap();
+    let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
     bench_search(level, Strategy::Fast);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
@@ -59,7 +57,7 @@ fn ida_star_search(c: &mut Criterion) {
 }
 
 fn tunnels(c: &mut Criterion) {
-    let level = Level::from_str(PATH_1).unwrap();
+    let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
     let solver = Solver::new(level.map().clone(), Strategy::Fast);
     solver.lower_bounds();
     c.bench_function("Solver::tunnels", |b| {
