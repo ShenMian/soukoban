@@ -49,10 +49,17 @@ impl Actions {
         }
     }
 
-    /// Flips all actions.
-    pub fn flip(&mut self) {
+    /// Flips all actions horizontally.
+    pub fn flip_horizontal(&mut self) {
         for action in &mut self.0 {
-            *action = action.flip();
+            *action = action.flip_horizontal();
+        }
+    }
+
+    /// Flips all actions vertically.
+    pub fn flip_vertical(&mut self) {
+        for action in &mut self.0 {
+            *action = action.flip_vertical();
         }
     }
 

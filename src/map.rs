@@ -330,10 +330,18 @@ impl Map {
     }
 
     /// Flips the map horizontally.
-    pub fn flip(&mut self) {
+    pub fn flip_horizontal(&mut self) {
         let dimensions = self.dimensions;
         let flip_position =
             |position: Vector2<i32>| Vector2::new(dimensions.x - 1 - position.x, position.y);
+        self.transform(flip_position, self.dimensions);
+    }
+
+    /// Flips the map vertically.
+    pub fn flip_vertical(&mut self) {
+        let dimensions = self.dimensions;
+        let flip_position =
+            |position: Vector2<i32>| Vector2::new(position.x, dimensions.y - 1 - position.y);
         self.transform(flip_position, self.dimensions);
     }
 
@@ -422,7 +430,7 @@ impl Map {
         let mut min_hash = u64::MAX;
         for i in 0..8 {
             if i == 4 {
-                self.flip();
+                self.flip_horizontal();
             }
             self.rotate();
             self.canonicalize_player();

@@ -46,21 +46,6 @@ fn rotate() {
 }
 
 #[test]
-fn flip() {
-    use {Action::*, Direction::*};
-
-    assert_eq!(Move(Up).flip(), Move(Down));
-    assert_eq!(Move(Down).flip(), Move(Up));
-    assert_eq!(Move(Left).flip(), Move(Right));
-    assert_eq!(Move(Right).flip(), Move(Left));
-
-    assert_eq!(Push(Up).flip(), Push(Down));
-    assert_eq!(Push(Down).flip(), Push(Up));
-    assert_eq!(Push(Left).flip(), Push(Right));
-    assert_eq!(Push(Right).flip(), Push(Left));
-}
-
-#[test]
 fn is_move() {
     use {Action::*, Direction::*};
 

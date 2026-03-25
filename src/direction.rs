@@ -43,21 +43,37 @@ impl Direction {
         }
     }
 
-    /// Flips the direction.
+    /// Flips the direction horizontally.
     ///
     /// # Examples
     ///
     /// ```
     /// # use soukoban::direction::Direction;
-    /// assert_eq!(Direction::Left.flip(), Direction::Right);
-    /// assert_eq!(Direction::Up.flip(), Direction::Down);
+    /// assert_eq!(Direction::Left.flip_horizontal(), Direction::Right);
+    /// assert_eq!(Direction::Up.flip_horizontal(), Direction::Up);
     /// ```
-    pub fn flip(self) -> Direction {
+    pub fn flip_horizontal(self) -> Direction {
+        match self {
+            Self::Up | Self::Down => self,
+            Self::Left => Self::Right,
+            Self::Right => Self::Left,
+        }
+    }
+
+    /// Flips the direction vertically.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use soukoban::direction::Direction;
+    /// assert_eq!(Direction::Up.flip_vertical(), Direction::Down);
+    /// assert_eq!(Direction::Left.flip_vertical(), Direction::Left);
+    /// ```
+    pub fn flip_vertical(self) -> Direction {
         match self {
             Self::Up => Self::Down,
             Self::Down => Self::Up,
-            Self::Left => Self::Right,
-            Self::Right => Self::Left,
+            Self::Left | Self::Right => self,
         }
     }
 }
@@ -66,7 +82,7 @@ impl Neg for Direction {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        self.flip()
+        self.flip_horizontal().flip_vertical()
     }
 }
 

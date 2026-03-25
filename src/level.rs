@@ -143,11 +143,18 @@ impl Level {
         self.undone_actions.rotate();
     }
 
-    /// Flips the level.
-    pub fn flip(&mut self) {
-        self.map.flip();
-        self.actions.flip();
-        self.undone_actions.flip();
+    /// Flips the level horizontally.
+    pub fn flip_horizontal(&mut self) {
+        self.map.flip_horizontal();
+        self.actions.flip_horizontal();
+        self.undone_actions.flip_horizontal();
+    }
+
+    /// Flips the level vertically.
+    pub fn flip_vertical(&mut self) {
+        self.map.flip_vertical();
+        self.actions.flip_vertical();
+        self.undone_actions.flip_vertical();
     }
 
     /// Returns the reachable area for the player.

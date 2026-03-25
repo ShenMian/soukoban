@@ -78,21 +78,14 @@ impl Action {
         self.map(Direction::rotate)
     }
 
-    /// Flips the action's direction.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
-    ///
-    /// assert_eq!(
-    ///     Action::Move(Direction::Up).flip(),
-    ///     Action::Move(Direction::Down)
-    /// );
-    /// ```
-    pub fn flip(self) -> Action {
-        self.map(Direction::flip)
+    /// Flips the action's direction horizontally.
+    pub fn flip_horizontal(self) -> Action {
+        self.map(Direction::flip_horizontal)
+    }
+
+    /// Flips the action's direction vertically.
+    pub fn flip_vertical(self) -> Action {
+        self.map(Direction::flip_vertical)
     }
 
     /// Applies a transformation function to the `Direction`.
