@@ -325,7 +325,7 @@ impl Map {
     pub fn rotate(&mut self) {
         let dimensions = self.dimensions;
         let rotate_position =
-            |position: Vector2<i32>| Vector2::new(position.y, dimensions.x - 1 - position.x);
+            |position: Vector2<i32>| Vector2::new(dimensions.y - 1 - position.y, position.x);
         self.transform(rotate_position, self.dimensions.yx());
     }
 
