@@ -591,11 +591,7 @@ impl FromStr for Map {
         if instance.box_positions.is_empty() {
             return Err(ParseMapError::MissingBoxOrGoal);
         }
-        if let Some(player_position) = player_position {
-            instance.player_position = player_position;
-        } else {
-            return Err(ParseMapError::MissingPlayer);
-        }
+        instance.player_position = player_position.ok_or(ParseMapError::MissingPlayer)?;
 
         instance.flood_fill(instance.player_position, Tiles::Floor, Tiles::Wall);
 
