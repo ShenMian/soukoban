@@ -611,13 +611,13 @@ impl Index<Vector2<i32>> for Map {
     type Output = Tiles;
 
     fn index(&self, position: Vector2<i32>) -> &Tiles {
-        unsafe { self.get_unchecked(position) }
+        self.get(position).expect("index out of bounds")
     }
 }
 
 impl IndexMut<Vector2<i32>> for Map {
     fn index_mut(&mut self, position: Vector2<i32>) -> &mut Tiles {
-        unsafe { self.get_unchecked_mut(position) }
+        self.get_mut(position).expect("index out of bounds")
     }
 }
 
