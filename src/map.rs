@@ -21,7 +21,7 @@ use crate::{
 /// bit array and can be accessed through two-dimensional coordinates. The
 /// positions of the player and the boxes are stored in other data structures to
 /// speed up query operations.
-#[derive(Clone, Eq, PartialEq, Debug)]
+#[derive(Clone, Eq, Debug)]
 pub struct Map {
     data: Vec<Tiles>,
     dimensions: Vector2<i32>,
@@ -621,9 +621,16 @@ impl IndexMut<Vector2<i32>> for Map {
     }
 }
 
+impl PartialEq for Map {
+    fn eq(&self, other: &Self) -> bool {
+        self.data == other.data && self.dimensions == other.dimensions
+    }
+}
+
 impl Hash for Map {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.data.hash(state);
+        self.dimensions.hash(state);
     }
 }
 
