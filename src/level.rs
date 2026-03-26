@@ -66,6 +66,7 @@ impl Level {
 
     /// Moves the player in the specified direction.
     pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
+        // If the next move is opposite to the last one, treat it as an undo.
         if self.actions.last() == Some(&Action::Move(-direction)) {
             self.undo().unwrap();
             return Ok(());
@@ -177,6 +178,10 @@ impl Level {
     }
 
     /// Loads the nth level from an XSB format string.
+    ///
+    /// # Panics
+    ///
+    /// May panic if the index is out of bounds.
     pub fn load_nth_from_str(str: &str, id: usize) -> Result<Self, ParseLevelError> {
         let group = Self::split_by_group_from_str(str)
             .nth(id - 1)
@@ -185,6 +190,10 @@ impl Level {
     }
 
     /// Loads the nth level from a reader.
+    ///
+    /// # Panics
+    ///
+    /// May panic if the index is out of bounds.
     pub fn load_nth_from_reader<R: BufRead>(reader: R, id: usize) -> Result<Self, ParseLevelError> {
         let group = Self::split_by_group_from_reader(reader)
             .nth(id - 1)
