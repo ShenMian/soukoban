@@ -1,5 +1,5 @@
 #![allow(clippy::op_ref)]
-#![deny(missing_docs)]
+#![deny(missing_docs, clippy::missing_panics_doc)]
 #![doc = include_str!("../README.md")]
 
 pub mod action;

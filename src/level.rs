@@ -68,6 +68,7 @@ impl Level {
     pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
         // If the next move is opposite to the last one, treat it as an undo.
         if self.actions.last() == Some(&Action::Move(-direction)) {
+            #[expect(clippy::missing_panics_doc, reason = "infallible")]
             self.undo().unwrap();
             return Ok(());
         }
@@ -124,6 +125,7 @@ impl Level {
     pub fn redo(&mut self) -> Result<(), ActionError> {
         if let Some(last_undone_action) = self.undone_actions.pop() {
             let undone_actions = std::mem::take(&mut self.undone_actions);
+            #[expect(clippy::missing_panics_doc, reason = "infallible")]
             self.execute(last_undone_action.direction()).unwrap();
             self.undone_actions = undone_actions;
             Ok(())
@@ -181,7 +183,7 @@ impl Level {
     ///
     /// # Panics
     ///
-    /// May panic if the index is out of bounds.
+    /// Panics if the index is out of bounds.
     pub fn load_nth_from_str(str: &str, index: usize) -> Result<Self, ParseLevelError> {
         let group = Self::split_by_group_from_str(str)
             .nth(index)
@@ -193,7 +195,7 @@ impl Level {
     ///
     /// # Panics
     ///
-    /// May panic if the index is out of bounds.
+    /// Panics if the index is out of bounds.
     pub fn load_nth_from_reader<R: BufRead>(
         reader: R,
         index: usize,
@@ -207,6 +209,10 @@ impl Level {
     /// Lazily splits text from a reader into groups separated by empty lines
     /// (excluding empty lines within block comment), and filter out groups
     /// without map data.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `std::io::BufRead::read_line` on `reader` returns an error.
     pub fn split_by_group_from_reader<R: BufRead>(reader: R) -> impl Iterator<Item = String> {
         reader.group().map(|group| group.unwrap())
     }

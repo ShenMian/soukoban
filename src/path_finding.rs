@@ -101,11 +101,12 @@ fn construct_path(
 /// This function finds a path using the A* algorithm from the player's current
 /// position to the target position, based on the provided `is_movable`
 /// function.
-pub fn player_move_path(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
+pub fn compute_player_move_directions(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
     let path = find_path(map.player_position(), to, |position| {
         map.is_movable(position)
     })?;
     // Converts the path of positions into a path of directions.
+    #[expect(clippy::missing_panics_doc, reason = "infallible")]
     let directions = path
         .windows(2)
         .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
@@ -179,6 +180,7 @@ pub fn compute_box_waypoints(
             continue;
         }
 
+        #[expect(clippy::missing_panics_doc, reason = "infallible")]
         let cost = match strategy {
             Strategy::OptimalPush | Strategy::Fast => 0,
             Strategy::OptimalMove => {
@@ -213,6 +215,7 @@ pub fn compute_box_waypoints(
                 continue;
             }
 
+            #[expect(clippy::missing_panics_doc, reason = "infallible")]
             let new_cost = cost
                 + match strategy {
                     Strategy::OptimalPush | Strategy::Fast => 1,
@@ -259,6 +262,10 @@ pub fn construct_box_path(
 }
 
 /// Constructs player path based on box path.
+///
+/// # Panics
+///
+/// Panics if parameters are invalid.
 pub fn construct_player_path(
     map: &Map,
     mut player_position: Vector2<i32>,
