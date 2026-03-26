@@ -182,9 +182,9 @@ impl Level {
     /// # Panics
     ///
     /// May panic if the index is out of bounds.
-    pub fn load_nth_from_str(str: &str, id: usize) -> Result<Self, ParseLevelError> {
+    pub fn load_nth_from_str(str: &str, index: usize) -> Result<Self, ParseLevelError> {
         let group = Self::split_by_group_from_str(str)
-            .nth(id - 1)
+            .nth(index)
             .expect("level index out of bounds");
         Self::from_str(group)
     }
@@ -194,9 +194,12 @@ impl Level {
     /// # Panics
     ///
     /// May panic if the index is out of bounds.
-    pub fn load_nth_from_reader<R: BufRead>(reader: R, id: usize) -> Result<Self, ParseLevelError> {
+    pub fn load_nth_from_reader<R: BufRead>(
+        reader: R,
+        index: usize,
+    ) -> Result<Self, ParseLevelError> {
         let group = Self::split_by_group_from_reader(reader)
-            .nth(id - 1)
+            .nth(index)
             .expect("level index out of bounds");
         Self::from_str(&group)
     }
