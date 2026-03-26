@@ -106,10 +106,10 @@ pub enum ActionError {
     /// Push in the specified direction is blocked.
     #[error("push in the specified direction is blocked")]
     PushBlocked,
-    /// No actions available.
-    #[error("no actions")]
+    /// No actions available to undo.
+    #[error("no actions to undo")]
     NoActions,
-    /// No undone actions available.
-    #[error("no undone actions")]
+    /// No undone actions available to redo.
+    #[error("no actions to redo")]
     NoUndoneActions,
 }
