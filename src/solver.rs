@@ -336,53 +336,50 @@ impl Solver {
 
     fn construct_actions(&self, path: &[State]) -> Actions {
         let mut actions = Actions::new();
-        for window in path.windows(2) {
-            let (state, next_state) = (&window[0], &window[1]);
+        for (from_state, to_state) in path.iter().tuple_windows() {
             // Find the positions where the box was moved from and to
-            let previous_box_position = *state
+            let box_from_position = *from_state
                 .box_positions
-                .difference(&next_state.box_positions)
+                .difference(&to_state.box_positions)
                 .next()
                 .unwrap();
-            let box_position = *next_state
+            let box_to_position = *to_state
                 .box_positions
-                .difference(&state.box_positions)
+                .difference(&from_state.box_positions)
                 .next()
                 .unwrap();
 
             // Determine the direction of the push
-            let diff = box_position - previous_box_position;
-            let push_direction =
-                Direction::try_from(Vector2::new(diff.x.signum(), diff.y.signum())).unwrap();
+            let delta = box_to_position - box_from_position;
+            let push_direction = Direction::try_from((delta).map(i32::signum)).unwrap();
 
             // Find the path for the player to reach the box position before pushing it
-            let mut new_actions: Vec<_> = find_path(
-                state.player_position,
-                previous_box_position - &push_direction.into(),
-                |position| {
-                    !self.map()[position].intersects(Tiles::Wall)
-                        && !state.box_positions.contains(&position)
-                },
-            )
-            .unwrap()
-            .windows(2)
-            .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
-            .map(Action::Move)
-            .collect();
+            actions.extend(
+                find_path(
+                    from_state.player_position,
+                    box_from_position - &push_direction.into(),
+                    |position| {
+                        !self.map()[position].intersects(Tiles::Wall)
+                            && !from_state.box_positions.contains(&position)
+                    },
+                )
+                .unwrap()
+                .windows(2)
+                .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
+                .map(Action::Move),
+            );
 
-            new_actions.push(Action::Push(push_direction));
+            actions.push(Action::Push(push_direction));
 
-            let mut new_box_position = previous_box_position + &push_direction.into();
+            let mut new_box_position = box_from_position + &push_direction.into();
             while self
                 .tunnels()
                 .contains(&DirectedPosition(new_box_position, push_direction))
             {
                 new_box_position += &push_direction.into();
-                new_actions.push(Action::Push(push_direction));
+                actions.push(Action::Push(push_direction));
             }
-            debug_assert_eq!(new_box_position, box_position);
-
-            actions.extend(new_actions.iter());
+            debug_assert_eq!(new_box_position, box_to_position);
         }
         actions
     }
