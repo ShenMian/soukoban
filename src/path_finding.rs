@@ -106,7 +106,10 @@ pub fn compute_player_move_directions(map: &Map, to: Vector2<i32>) -> Option<Vec
         map.is_movable(position)
     })?;
     // Converts the path of positions into a path of directions.
-    #[expect(clippy::missing_panics_doc, reason = "infallible")]
+    #[expect(
+        clippy::missing_panics_doc,
+        reason = "infallible: `find_path` always returns an orthogonally contiguous path"
+    )]
     let directions = path
         .windows(2)
         .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
@@ -157,10 +160,6 @@ pub fn compute_box_waypoints(
     let mut costs = HashMap::new();
     let mut came_from = HashMap::new();
 
-    let is_movable = |position| position == initial_box_position || map.is_movable(position);
-
-    let bcc = BccGraph::new(map.player_position(), is_movable);
-
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_movable(position));
     for push_direction in Direction::iter() {
@@ -180,7 +179,10 @@ pub fn compute_box_waypoints(
             continue;
         }
 
-        #[expect(clippy::missing_panics_doc, reason = "infallible")]
+        #[expect(
+            clippy::missing_panics_doc,
+            reason = "infallible: path is guaranteed to exist"
+        )]
         let cost = match strategy {
             Strategy::OptimalPush | Strategy::Fast => 0,
             Strategy::OptimalMove => {
@@ -196,6 +198,8 @@ pub fn compute_box_waypoints(
         costs.insert(state, cost);
     }
 
+    let is_movable = |position| position == initial_box_position || map.is_movable(position);
+    let bcc = BccGraph::new(map.player_position(), is_movable);
     while let Some(BoxNode { state, cost }) = queue.pop() {
         let (box_position, player_position) = (state.position(), state.backward());
 
@@ -215,7 +219,10 @@ pub fn compute_box_waypoints(
                 continue;
             }
 
-            #[expect(clippy::missing_panics_doc, reason = "infallible")]
+            #[expect(
+                clippy::missing_panics_doc,
+                reason = "infallible: path is guaranteed to exist"
+            )]
             let new_cost = cost
                 + match strategy {
                     Strategy::OptimalPush | Strategy::Fast => 1,

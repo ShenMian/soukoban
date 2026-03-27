@@ -68,7 +68,10 @@ impl Level {
     pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
         // If the next move is opposite to the last one, treat it as an undo.
         if self.actions.last() == Some(&Action::Move(-direction)) {
-            #[expect(clippy::missing_panics_doc, reason = "infallible")]
+            #[expect(
+                clippy::missing_panics_doc,
+                reason = "infallible: at least one action exists"
+            )]
             self.undo().unwrap();
             return Ok(());
         }
@@ -125,7 +128,10 @@ impl Level {
     pub fn redo(&mut self) -> Result<(), ActionError> {
         if let Some(last_undone_action) = self.undone_actions.pop() {
             let undone_actions = std::mem::take(&mut self.undone_actions);
-            #[expect(clippy::missing_panics_doc, reason = "infallible")]
+            #[expect(
+                clippy::missing_panics_doc,
+                reason = "infallible: `undone_actions` contains only valid actions"
+            )]
             self.execute(last_undone_action.direction()).unwrap();
             self.undone_actions = undone_actions;
             Ok(())
