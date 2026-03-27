@@ -169,14 +169,14 @@ impl Level {
 
     /// Lazily loads levels from an XSB format string.
     pub fn load_from_str(str: &str) -> impl Iterator<Item = Result<Self, ParseLevelError>> + '_ {
-        Self::split_by_group_from_str(str).map(Self::from_str)
+        Self::split_into_groups_from_str(str).map(Self::from_str)
     }
 
-    /// Lazily loads levels from a reader.
+    /// Lazily loads levels from a buffer reader.
     pub fn load_from_reader<R: BufRead>(
         reader: R,
     ) -> impl Iterator<Item = Result<Self, ParseLevelError>> {
-        Self::split_by_group_from_reader(reader).map(|group| Self::from_str(&group))
+        Self::split_into_groups_from_reader(reader).map(|group| Self::from_str(&group))
     }
 
     /// Loads the nth level from an XSB format string.
@@ -185,13 +185,13 @@ impl Level {
     ///
     /// Panics if the index is out of bounds.
     pub fn load_nth_from_str(str: &str, index: usize) -> Result<Self, ParseLevelError> {
-        let group = Self::split_by_group_from_str(str)
+        let group = Self::split_into_groups_from_str(str)
             .nth(index)
             .expect("level index out of bounds");
         Self::from_str(group)
     }
 
-    /// Loads the nth level from a reader.
+    /// Loads the nth level from a buffer reader.
     ///
     /// # Panics
     ///
@@ -200,7 +200,7 @@ impl Level {
         reader: R,
         index: usize,
     ) -> Result<Self, ParseLevelError> {
-        let group = Self::split_by_group_from_reader(reader)
+        let group = Self::split_into_groups_from_reader(reader)
             .nth(index)
             .expect("level index out of bounds");
         Self::from_str(&group)
@@ -213,14 +213,14 @@ impl Level {
     /// # Panics
     ///
     /// Panics if `std::io::BufRead::read_line` on `reader` returns an error.
-    pub fn split_by_group_from_reader<R: BufRead>(reader: R) -> impl Iterator<Item = String> {
+    pub fn split_into_groups_from_reader<R: BufRead>(reader: R) -> impl Iterator<Item = String> {
         reader.group().map(|group| group.unwrap())
     }
 
-    /// Lazily and zero-copy splits a string into groups (string slices) by
-    /// empty lines (excluding empty lines within block comment), and filter out
-    /// groups without map data.
-    fn split_by_group_from_str(str: &str) -> impl Iterator<Item = &str> + '_ {
+    /// Lazily and zero-copy splits a str into groups by empty lines (excluding
+    /// empty lines within block comment), and filter out groups without map
+    /// data.
+    fn split_into_groups_from_str(str: &str) -> impl Iterator<Item = &str> + '_ {
         str.split(['\n', '|']).filter_map({
             let mut offset = 0;
             let mut len = 0;
