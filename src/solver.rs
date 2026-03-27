@@ -372,10 +372,7 @@ impl Solver {
             actions.push(Action::Push(push_direction));
 
             let mut new_box_position = box_from_position + &push_direction.into();
-            while self
-                .tunnels()
-                .contains(&DirectedPosition(new_box_position, push_direction))
-            {
+            while new_box_position != box_to_position {
                 new_box_position += &push_direction.into();
                 actions.push(Action::Push(push_direction));
             }
