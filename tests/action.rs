@@ -1,7 +1,7 @@
 use soukoban::{Action, direction::Direction};
 
 #[test]
-fn action_from_char() {
+fn from_char() {
     use {Action::*, Direction::*};
 
     assert_eq!(Action::try_from('u'), Ok(Move(Up)));
@@ -17,7 +17,7 @@ fn action_from_char() {
 }
 
 #[test]
-fn action_to_char() {
+fn to_char() {
     use {Action::*, Direction::*};
 
     assert_eq!(char::from(Move(Up)), 'u');

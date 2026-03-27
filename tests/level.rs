@@ -7,7 +7,7 @@ mod utils;
 use utils::*;
 
 #[test]
-fn parse_level_error() {
+fn from_str() {
     let duplicate_metadata_level = r#"
         #####
         #@$.#
@@ -109,7 +109,7 @@ fn metadata() {
 }
 
 #[test]
-fn create_levels_from_str() {
+fn load_from_str() {
     for entry in fs::read_dir("assets/").unwrap() {
         let path = entry.unwrap().path();
         if path.extension() != Some(std::ffi::OsStr::new("xsb")) {
@@ -132,7 +132,7 @@ fn create_levels_from_str() {
 }
 
 #[test]
-fn create_levels_from_reader() {
+fn load_from_reader() {
     for entry in fs::read_dir("assets/").unwrap() {
         let path = entry.unwrap().path();
         if path.extension() != Some(std::ffi::OsStr::new("xsb")) {
@@ -156,7 +156,7 @@ fn create_levels_from_reader() {
 }
 
 #[test]
-fn create_level_with_rle_xsb() {
+fn load_nth_from_reader() {
     assert_eq!(
         Level::from_str(MICROBAN_3_RLE).unwrap(),
         load_level_from_file("assets/Microban_155.xsb", 3)

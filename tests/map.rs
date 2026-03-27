@@ -8,7 +8,7 @@ mod utils;
 use utils::*;
 
 #[test]
-fn map_from_str() {
+fn from_str() {
     let no_player_map = r#"
         #####
         # $.#
@@ -66,7 +66,7 @@ fn map_from_str() {
 }
 
 #[test]
-fn map_from_actions() {
+fn from_actions() {
     assert!(Map::from_actions(Actions::from_str("R").unwrap()).is_ok());
     assert!(Map::from_actions(Actions::from_str("DuLLrUUdrR").unwrap()).is_ok());
 
@@ -85,6 +85,26 @@ fn map_from_actions() {
     assert_eq!(
         Map::from_actions(Actions::from_str("llurldd").unwrap()).unwrap_err(),
         ParseMapError::MissingBoxOrGoal
+    );
+
+    let actions =
+        Actions::from_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
+            .unwrap();
+    assert_eq!(
+        Map::from_actions(actions).unwrap(),
+        Map::from_str(
+            r#"
+            -----####-
+            ######  #-
+            # $  $  #-
+            # #  .# ##
+            #  . #.@ #
+            ##$# *   #
+            -#   #####
+            -#####----
+        "#
+        )
+        .unwrap()
     );
 }
 
@@ -140,29 +160,6 @@ fn display() {
             -#____#-
             --####--
         "}
-    );
-}
-
-#[test]
-fn from_actions() {
-    let actions =
-        Actions::from_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
-            .unwrap();
-    assert_eq!(
-        Map::from_actions(actions).unwrap(),
-        Map::from_str(
-            r#"
-            -----####-
-            ######  #-
-            # $  $  #-
-            # #  .# ##
-            #  . #.@ #
-            ##$# *   #
-            -#   #####
-            -#####----
-        "#
-        )
-        .unwrap()
     );
 }
 
@@ -261,7 +258,7 @@ fn canonicalize() {
 }
 
 #[test]
-fn trimmed() {
+fn shrink_to_fit() {
     let mut oversize_map = Map::from_str(
         r#"
         ---------------

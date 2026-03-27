@@ -3,7 +3,7 @@ use std::str::FromStr;
 use soukoban::{Actions, ParseActionError, ParseActionsError, SecondaryValues};
 
 #[test]
-fn actions_from_str() {
+fn from_str() {
     assert_eq!(
         Actions::from_str("lUrDL!uRd").unwrap_err(),
         ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
@@ -19,7 +19,7 @@ fn actions_from_str() {
 }
 
 #[test]
-fn rle_decode() {
+fn from_rle_str() {
     assert_eq!(
         Actions::from_str("ruu3LulD4rddlUru3Ldd3luurRDrdL3urDD")
             .unwrap()

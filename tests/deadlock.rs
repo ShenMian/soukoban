@@ -9,7 +9,7 @@ mod utils;
 use utils::*;
 
 #[test]
-fn static_deadlocks() {
+fn compute_static_deadlocks() {
     let map: Map = load_level_from_file("assets/Deadlock_3.xsb", 1).into();
     assert_eq!(deadlock::compute_static_deadlocks(&map).len(), 9);
 
@@ -21,7 +21,7 @@ fn static_deadlocks() {
 }
 
 #[test]
-fn freeze_deadlocks() {
+fn is_freeze_deadlock() {
     let mut map: Map = load_level_from_file("assets/Deadlock_3.xsb", 2).into();
     map.set_box_position(Vector2::new(3, 2), Vector2::new(3, 1));
     assert!(deadlock::is_freeze_deadlock(

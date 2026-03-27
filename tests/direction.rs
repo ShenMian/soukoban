@@ -10,7 +10,7 @@ fn rotate() {
 }
 
 #[test]
-fn flip() {
+fn negate() {
     use Direction::*;
     assert_eq!(-Up, Down);
     assert_eq!(-Down, Up);

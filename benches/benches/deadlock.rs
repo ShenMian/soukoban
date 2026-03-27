@@ -3,7 +3,7 @@ use soukoban::deadlock;
 
 use super::utils::*;
 
-fn compute_unused_floors(c: &mut Criterion) {
+fn compute_useless_floors(c: &mut Criterion) {
     c.bench_function("deadlock::compute_useless_floors", |b| {
         let level = load_level_from_file("assets/Benchmark_3.xsb", 3);
         b.iter_batched(
@@ -21,4 +21,4 @@ fn compute_static_deadlocks(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, compute_unused_floors, compute_static_deadlocks);
+criterion_group!(benches, compute_useless_floors, compute_static_deadlocks);
