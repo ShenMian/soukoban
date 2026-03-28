@@ -8,37 +8,44 @@ use utils::*;
 
 #[test]
 fn from_str() {
-    let duplicate_metadata_level = r#"
+    const SIMPLEST: &str = r#"
+        #####
+        #@$.#
+        #####
+    "#;
+    assert!(Level::from_str(SIMPLEST).is_ok());
+
+    const DUPLICATE_METADATA_LEVEL: &str = r#"
         #####
         #@$.#
         #####
         unknown: 1
         unknown: 2
     "#;
-    let unterminated_block_comment_level = r#"
+    assert_eq!(
+        Level::from_str(DUPLICATE_METADATA_LEVEL).unwrap_err(),
+        ParseLevelError::DuplicateMetadata("unknown".to_string())
+    );
+
+    const UNTERMINATED_BLOCK_COMMENT_LEVEL: &str = r#"
         #####
         #@$.#
         #####
         comment:
         unterminated block comment
     "#;
-    assert!(Level::from_str(SIMPLEST).is_ok());
     assert_eq!(
-        Level::from_str(duplicate_metadata_level).unwrap_err(),
-        ParseLevelError::DuplicateMetadata("unknown".to_string())
-    );
-    assert_eq!(
-        Level::from_str(unterminated_block_comment_level).unwrap_err(),
+        Level::from_str(UNTERMINATED_BLOCK_COMMENT_LEVEL).unwrap_err(),
         ParseLevelError::UnterminatedBlockComment
     );
 
-    let invalid_character_level = r#"
+    const INVALID_CHARACTER_LEVEL: &str = r#"
         ######
         #@!$.#
         ######
     "#;
     assert_eq!(
-        Level::from_str(invalid_character_level).unwrap_err(),
+        Level::from_str(INVALID_CHARACTER_LEVEL).unwrap_err(),
         ParseLevelError::ParseMapError(ParseMapError::InvalidCharacter('!'))
     );
 }
@@ -157,25 +164,17 @@ fn load_from_reader() {
 
 #[test]
 fn load_nth_from_reader() {
+    // Microban #3
+    const MICROBAN_3_RLE: &str = "--4#|3#--4#|#5-$-#|#-#--#$-#|#-.-.#@-#|9#";
     assert_eq!(
         Level::from_str(MICROBAN_3_RLE).unwrap(),
         load_level_from_file("assets/Microban_155.xsb", 3)
     );
+
+    // Microban II #132
+    const MICROBAN2_132_RLE: &str = "18-5#|12-5#-#3-#|12-#3-3#-#-#|6-5#-#-#7-#|5#-#3-#-#3-4#-##|#3-3#-#-#-3#-#--#-#|#-#4-@--#3-#-#--#-3#|#3-4#$6#-4#3-#|3#-#--#-.6-#4-#-#|--#-#--#--##--#4-#3-#|-##-5#--##4-#-5#|-#9-##--3#-#|-#-#-3#-#--5#--#-5#|-#3-#-#4-#-#4-#-#3-#|-5#-#--5#--#-3#-#-#|7-#-3#--##9-#|3-5#-#4-##--5#-##|3-#3-#4-#--##--#--#-#|3-#-#4-#8-#--#-3#|3-#3-4#-6#-4#3-#|3-3#-#--#-#3-#7-#-#|5-#-#--#-3#-#-#-3#3-#|4-##-4#3-#-#3-#-5#|4-#7-#-#-5#|4-#-#-3#3-#|4-#3-#-5#|4-5#";
     assert_eq!(
         Level::from_str(MICROBAN2_132_RLE).unwrap(),
         load_level_from_file("assets/Microban II_135.xsb", 132)
     );
 }
-
-// Simplest level
-const SIMPLEST: &str = r#"
-    #####
-    #@$.#
-    #####
-"#;
-
-// Microban #3
-const MICROBAN_3_RLE: &str = "--4#|3#--4#|#5-$-#|#-#--#$-#|#-.-.#@-#|9#";
-
-// Microban II #132
-const MICROBAN2_132_RLE: &str = "18-5#|12-5#-#3-#|12-#3-3#-#-#|6-5#-#-#7-#|5#-#3-#-#3-4#-##|#3-3#-#-#-3#-#--#-#|#-#4-@--#3-#-#--#-3#|#3-4#$6#-4#3-#|3#-#--#-.6-#4-#-#|--#-#--#--##--#4-#3-#|-##-5#--##4-#-5#|-#9-##--3#-#|-#-#-3#-#--5#--#-5#|-#3-#-#4-#-#4-#-#3-#|-5#-#--5#--#-3#-#-#|7-#-3#--##9-#|3-5#-#4-##--5#-##|3-#3-#4-#--##--#--#-#|3-#-#4-#8-#--#-3#|3-#3-4#-6#-4#3-#|3-3#-#--#-#3-#7-#-#|5-#-#--#-3#-#-#-3#3-#|4-##-4#3-#-#3-#-5#|4-#7-#-#-5#|4-#-#-3#3-#|4-#3-#-5#|4-5#";
