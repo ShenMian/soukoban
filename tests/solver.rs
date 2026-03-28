@@ -21,21 +21,21 @@ fn a_star_search() {
 
     search(
         load_level_from_file("assets/BoxWorld_100.xsb", 1),
-        Strategy::Fast,
+        Strategy::Quick,
     );
     search(
         load_level_from_file("assets/BoxWorld_100.xsb", 2),
-        Strategy::Fast,
+        Strategy::Quick,
     );
     search(
         load_level_from_file("assets/BoxWorld_100.xsb", 3),
-        Strategy::Fast,
+        Strategy::Quick,
     );
 
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 1),
-            Strategy::OptimalPush,
+            Strategy::PushOptimal,
         )
         .pushes(),
         Actions::from_str("DuLLrUUdrR").unwrap().pushes()
@@ -43,7 +43,7 @@ fn a_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 1),
-            Strategy::OptimalMove,
+            Strategy::MoveOptimal,
         )
         .moves(),
         Actions::from_str("DuLLrUUdrR").unwrap().moves()
@@ -52,7 +52,7 @@ fn a_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 2),
-            Strategy::OptimalPush,
+            Strategy::PushOptimal,
         )
         .pushes(),
         Actions::from_str(
@@ -64,7 +64,7 @@ fn a_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 2),
-            Strategy::OptimalMove,
+            Strategy::MoveOptimal,
         )
         .moves(),
         Actions::from_str(
@@ -77,7 +77,7 @@ fn a_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 3),
-            Strategy::OptimalPush,
+            Strategy::PushOptimal,
         )
         .pushes(),
         Actions::from_str(
@@ -89,7 +89,7 @@ fn a_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 3),
-            Strategy::OptimalMove,
+            Strategy::MoveOptimal,
         )
         .pushes(),
         Actions::from_str(
@@ -115,21 +115,21 @@ fn ida_star_search() {
 
     search(
         load_level_from_file("assets/BoxWorld_100.xsb", 1),
-        Strategy::Fast,
+        Strategy::Quick,
     );
     search(
         load_level_from_file("assets/BoxWorld_100.xsb", 2),
-        Strategy::Fast,
+        Strategy::Quick,
     );
     search(
         load_level_from_file("assets/BoxWorld_100.xsb", 3),
-        Strategy::Fast,
+        Strategy::Quick,
     );
 
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 1),
-            Strategy::OptimalPush,
+            Strategy::PushOptimal,
         )
         .pushes(),
         Actions::from_str("DuLLrUUdrR").unwrap().pushes()
@@ -137,7 +137,7 @@ fn ida_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 1),
-            Strategy::OptimalMove,
+            Strategy::MoveOptimal,
         )
         .moves(),
         Actions::from_str("DuLLrUUdrR").unwrap().moves()
@@ -146,7 +146,7 @@ fn ida_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 2),
-            Strategy::OptimalPush,
+            Strategy::PushOptimal,
         )
         .pushes(),
         Actions::from_str(
@@ -158,7 +158,7 @@ fn ida_star_search() {
     assert_eq!(
         search(
             load_level_from_file("assets/BoxWorld_100.xsb", 2),
-            Strategy::OptimalMove,
+            Strategy::MoveOptimal,
         )
         .moves(),
         Actions::from_str(

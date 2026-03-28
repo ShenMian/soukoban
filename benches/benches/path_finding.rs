@@ -9,7 +9,11 @@ fn compute_box_waypoints(c: &mut Criterion) {
         b.iter_batched_ref(
             || load_level_from_file("assets/Benchmark_3.xsb", 1),
             |level| {
-                path_finding::compute_box_waypoints(level.map(), Vector2::new(6, 4), Strategy::Fast)
+                path_finding::compute_box_waypoints(
+                    level.map(),
+                    Vector2::new(6, 4),
+                    Strategy::Quick,
+                )
             },
             criterion::BatchSize::SmallInput,
         )
@@ -28,7 +32,7 @@ fn compute_box_waypoints(c: &mut Criterion) {
                 path_finding::compute_box_waypoints(
                     level.map(),
                     Vector2::new(4, 44),
-                    Strategy::Fast,
+                    Strategy::Quick,
                 )
             },
             criterion::BatchSize::SmallInput,

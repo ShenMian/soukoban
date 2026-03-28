@@ -39,9 +39,9 @@ impl Node {
     /// Returns the actual cost from the start node to this node (g-value).
     pub fn cost(&self) -> i32 {
         match self.strategy {
-            Strategy::Fast => 0,
-            Strategy::OptimalPush => self.pushes,
-            Strategy::OptimalMove => self.moves,
+            Strategy::Quick => 0,
+            Strategy::PushOptimal => self.pushes,
+            Strategy::MoveOptimal => self.moves,
         }
     }
 
@@ -142,9 +142,9 @@ impl Node {
     /// Lower values indicate higher priority.
     fn priority(&self) -> (i32, i32) {
         match self.strategy {
-            Strategy::Fast => (self.heuristic, self.pushes),
-            Strategy::OptimalPush => (self.pushes + self.heuristic, self.moves),
-            Strategy::OptimalMove => (self.moves + self.heuristic, self.pushes),
+            Strategy::Quick => (self.heuristic, self.pushes),
+            Strategy::PushOptimal => (self.pushes + self.heuristic, self.moves),
+            Strategy::MoveOptimal => (self.moves + self.heuristic, self.pushes),
         }
     }
 }

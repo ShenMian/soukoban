@@ -184,8 +184,8 @@ pub fn compute_box_waypoints(
             reason = "infallible: path is guaranteed to exist"
         )]
         let cost = match strategy {
-            Strategy::OptimalPush | Strategy::Fast => 0,
-            Strategy::OptimalMove => {
+            Strategy::PushOptimal | Strategy::Quick => 0,
+            Strategy::MoveOptimal => {
                 find_path(map.player_position(), new_player_position, |position| {
                     map.is_movable(position)
                 })
@@ -225,8 +225,8 @@ pub fn compute_box_waypoints(
             )]
             let new_cost = cost
                 + match strategy {
-                    Strategy::OptimalPush | Strategy::Fast => 1,
-                    Strategy::OptimalMove => {
+                    Strategy::PushOptimal | Strategy::Quick => 1,
+                    Strategy::MoveOptimal => {
                         find_path(player_position, new_player_position, |position| {
                             (position == initial_box_position || map.is_movable(position))
                                 && position != box_position

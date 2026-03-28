@@ -22,13 +22,13 @@ impl State {
     pub fn canonicalized_hash(&self, strategy: Strategy, map: &Map) -> u64 {
         let mut hasher = DefaultHasher::new();
         match strategy {
-            Strategy::Fast | Strategy::OptimalPush => {
+            Strategy::Quick | Strategy::PushOptimal => {
                 let mut canonicalized_state = self.clone();
                 canonicalized_state.canonicalize_player(map);
                 canonicalized_state.hash(&mut hasher);
                 hasher.finish()
             }
-            Strategy::OptimalMove => {
+            Strategy::MoveOptimal => {
                 self.hash(&mut hasher);
                 hasher.finish()
             }

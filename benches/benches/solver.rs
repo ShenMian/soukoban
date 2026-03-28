@@ -25,10 +25,10 @@ fn a_star_search(c: &mut Criterion) {
     };
 
     let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
-    bench_search(level, Strategy::Fast);
+    bench_search(level, Strategy::Quick);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
-    bench_search(level, Strategy::Fast);
+    bench_search(level, Strategy::Quick);
 }
 
 fn ida_star_search(c: &mut Criterion) {
@@ -50,15 +50,15 @@ fn ida_star_search(c: &mut Criterion) {
     };
 
     let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
-    bench_search(level, Strategy::Fast);
+    bench_search(level, Strategy::Quick);
 
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 3);
-    bench_search(level, Strategy::Fast);
+    bench_search(level, Strategy::Quick);
 }
 
 fn tunnels(c: &mut Criterion) {
     let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
-    let solver = Solver::new(level.map().clone(), Strategy::Fast);
+    let solver = Solver::new(level.map().clone(), Strategy::Quick);
     solver.lower_bounds();
     c.bench_function("Solver::tunnels", |b| {
         b.iter_batched_ref(

@@ -27,11 +27,11 @@ pub enum Strategy {
     ///
     /// Using this strategy, A* search degrades into greedy best-first search.
     #[default]
-    Fast,
+    Quick,
     /// Find the push optimal solution.
-    OptimalPush,
+    PushOptimal,
     /// Find the move optimal solution.
-    OptimalMove,
+    MoveOptimal,
 }
 
 /// A solver for the Sokoban problem.
