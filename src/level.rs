@@ -44,11 +44,6 @@ impl Level {
         &self.map
     }
 
-    /// Returns a mutable reference to the map of the level.
-    pub fn map_mut(&mut self) -> &mut Map {
-        &mut self.map
-    }
-
     /// Returns a reference to the metadata of the level.
     pub fn metadata(&self) -> &BTreeMap<String, String> {
         &self.metadata
