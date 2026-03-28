@@ -79,11 +79,35 @@ impl Action {
     }
 
     /// Flips the action's direction horizontally.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
+    ///
+    /// assert_eq!(
+    ///     Action::Move(Direction::Left).flip_horizontal(),
+    ///     Action::Move(Direction::Right)
+    /// );
+    /// ```
     pub fn flip_horizontal(self) -> Action {
         self.map(Direction::flip_horizontal)
     }
 
     /// Flips the action's direction vertically.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
+    ///
+    /// assert_eq!(
+    ///     Action::Move(Direction::Up).flip_vertical(),
+    ///     Action::Move(Direction::Down)
+    /// );
+    /// ```
     pub fn flip_vertical(self) -> Action {
         self.map(Direction::flip_vertical)
     }

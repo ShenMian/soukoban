@@ -35,6 +35,27 @@ fn from_rle_str() {
 }
 
 #[test]
+fn rotate() {
+    let mut actions = Actions::from_str("lurdLURD").unwrap();
+    actions.rotate();
+    assert_eq!(actions.to_string(), "urdlURDL");
+}
+
+#[test]
+fn flip_horizontal() {
+    let mut actions = Actions::from_str("lurdLURD").unwrap();
+    actions.flip_horizontal();
+    assert_eq!(actions.to_string(), "ruldRULD");
+}
+
+#[test]
+fn flip_vertical() {
+    let mut actions = Actions::from_str("lurdLURD").unwrap();
+    actions.flip_vertical();
+    assert_eq!(actions.to_string(), "ldruLDRU");
+}
+
+#[test]
 fn secondary_values() {
     let empty_actions = Actions::new();
     assert_eq!(empty_actions.moves(), 0);

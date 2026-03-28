@@ -124,46 +124,6 @@ fn get() {
 }
 
 #[test]
-fn display() {
-    let map = load_level_from_file("assets/Holland_81.xsb", 9)
-        .map()
-        .clone();
-    assert_eq!(
-        map.to_string(),
-        indoc! {"
-            --####--
-            -#____#-
-            -#._*_#-
-            #_._$__#
-            #_#**#_#
-            #__*+*_#
-            -#_$$_#-
-            -#____#-
-            --####--
-        "}
-    );
-
-    let mut map = load_level_from_file("assets/Holland_81.xsb", 9)
-        .map()
-        .clone();
-    map[Vector2::new(4, 2)].insert(Tiles::Player);
-    assert_eq!(
-        map.to_string(),
-        indoc! {"
-            --####--
-            -#____#-
-            -#._?_#-
-            #_._$__#
-            #_#**#_#
-            #__*+*_#
-            -#_$$_#-
-            -#____#-
-            --####--
-        "}
-    );
-}
-
-#[test]
 fn canonicalize() {
     // Steaming Hot
     let mut actual = Map::from_str(
@@ -228,9 +188,9 @@ fn canonicalize() {
     actual.canonicalize();
     assert_eq!(actual, expected);
 
-    // Title: World Cup 2014 (MF8 61st Sokoban Competition, Extra)
-    // Author: laizhufu
-    let mut actual = Map::from_str(WORLDCUP2014).unwrap();
+    let mut actual = load_level_from_file("assets/Benchmark_3.xsb", 3)
+        .map()
+        .clone();
     let expected = Map::from_str(
         r#"
         ----#####--------
@@ -286,46 +246,42 @@ fn shrink_to_fit() {
     assert_eq!(actual, expected);
 }
 
-// Title: World Cup 2014 (MF8 61st Sokoban Competition, Extra)
-// Author: laizhufu
-const WORLDCUP2014: &str = r#"
-    -------#########-------
-    -----##---------##-----
-    ---##---#####--#--##---
-    --#---##------#--#--#--
-    --####---##--#--#--##--
-    -#-----##---#--#--#--#-
-    -######----#--#--#--##-
-    #-------##---#--#--#--#
-    ########----#--#--#--##
-    #-------.*#---#--#--#-#
-    #-#-#-#-*-*-$*--*--**-#
-    #-#-#-#---*-*-*-*-*-*-#
-    #--#-#-#-*--*-*-*-*@*-#
-    ##-#-#-#-*-**-*-*-$***#
-    -#--#-#-#-*-*-*-*---*#-
-    -##-#-#-#----*--.-#-##-
-    --#--#-#-#-#-#-#-#--#--
-    --##-#-#-#-#-#-#-#-##--
-    ---##-#-#-#-#-#-#-##---
-    ------#-#-#-#-#-#------
-    -----#-#-#-#-#-#-#-----
-    -----#-#-#-#-#-#-#-----
-    ------#-#-#-#-#-#------
-    ------#-#-#-#-#-#------
-    ------#--#-#-#-#-#-----
-    ------##-#-#-#-#-#-----
-    ------##--#-#-#-#------
-    ------###-#-#-#-#------
-    -----####--#-#-#-#-----
-    -----#####-#-#-#-#-----
-    -----#####--#-#-#-#----
-    ----#######-#-#-#-#----
-    ----#######--#-#-#-#---
-    -----#######---#-#-#---
-    ---#--########----#-#--
-    -#--#--##########----#-
-    --#--#--#############--
-    ---#--#-###########----
-    -------#--######-------
-"#;
+#[test]
+fn display() {
+    let map = load_level_from_file("assets/Holland_81.xsb", 9)
+        .map()
+        .clone();
+    assert_eq!(
+        map.to_string(),
+        indoc! {"
+            --####--
+            -#____#-
+            -#._*_#-
+            #_._$__#
+            #_#**#_#
+            #__*+*_#
+            -#_$$_#-
+            -#____#-
+            --####--
+        "}
+    );
+
+    let mut map = load_level_from_file("assets/Holland_81.xsb", 9)
+        .map()
+        .clone();
+    map[Vector2::new(4, 2)].insert(Tiles::Player);
+    assert_eq!(
+        map.to_string(),
+        indoc! {"
+            --####--
+            -#____#-
+            -#._?_#-
+            #_._$__#
+            #_#**#_#
+            #__*+*_#
+            -#_$$_#-
+            -#____#-
+            --####--
+        "}
+    );
+}
