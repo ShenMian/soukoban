@@ -59,6 +59,11 @@ impl Level {
         &self.undone_actions
     }
 
+    /// Returns the current facing direction of the player.
+    pub fn player_direction(&self) -> Option<Direction> {
+        self.actions.last().map(Action::direction)
+    }
+
     /// Moves the player in the specified direction.
     pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
         // If the next move is opposite to the last one, treat it as an undo.
