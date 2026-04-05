@@ -56,6 +56,20 @@ fn ida_star_search(c: &mut Criterion) {
     bench_search(level, Strategy::Quick);
 }
 
+fn lower_bounds(c: &mut Criterion) {
+    let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67);
+    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    c.bench_function("Solver::lower_bounds", |b| {
+        b.iter_batched_ref(
+            || solver.clone(),
+            |solver| {
+                solver.lower_bounds();
+            },
+            BatchSize::SmallInput,
+        )
+    });
+}
+
 fn tunnels(c: &mut Criterion) {
     let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
     let solver = Solver::new(level.map().clone(), Strategy::Quick);
@@ -71,4 +85,10 @@ fn tunnels(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, a_star_search, ida_star_search, tunnels);
+criterion_group!(
+    benches,
+    a_star_search,
+    ida_star_search,
+    lower_bounds,
+    tunnels
+);
