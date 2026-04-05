@@ -237,7 +237,6 @@ impl Solver {
                     &mut lower_bounds,
                     &mut HashSet::new(),
                 );
-                break;
             }
         }
         lower_bounds
@@ -257,6 +256,9 @@ impl Solver {
         let player_reachable_area = compute_reachable_area(player_position, |position| {
             !(self.map[position].intersects(Tiles::Wall) || position == box_position)
         });
+        if player_reachable_area.len() < 2 {
+            return;
+        }
         for pull_direction in Direction::iter() {
             let new_box_position = box_position + &pull_direction.into();
             let new_player_position = new_box_position + &pull_direction.into();
