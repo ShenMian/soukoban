@@ -164,13 +164,13 @@ pub fn compute_box_waypoints(
         compute_reachable_area(map.player_position(), |position| map.is_movable(position));
     for push_direction in Direction::iter() {
         let state = DirectedPosition(initial_box_position, push_direction);
-        // Checks if the box can be pushed
+        // Check if the box can be pushed
         let new_box_position = state.forward();
         if !map.is_movable(new_box_position) {
             continue;
         }
 
-        // Checks if the player can push the box
+        // Check if the player can push the box
         let new_player_position = state.backward();
         if !(map.is_movable(new_player_position)) {
             continue;
@@ -198,19 +198,21 @@ pub fn compute_box_waypoints(
         costs.insert(state, cost);
     }
 
+    // Treat other boxes as obstacles
     let is_movable = |position| position == initial_box_position || map.is_movable(position);
     let bcc = BccGraph::new(map.player_position(), is_movable);
+
     while let Some(BoxNode { state, cost }) = queue.pop() {
         let (box_position, player_position) = (state.position(), state.backward());
 
         for push_direction in Direction::iter() {
-            // Checks if the box can be pushed
+            // Check if the box can be pushed
             let new_box_position = box_position + &push_direction.into();
             if !is_movable(new_box_position) {
                 continue;
             }
 
-            // Checks if the player can push the box
+            // Check if the player can push the box
             let new_player_position = box_position - &push_direction.into();
             if !is_movable(new_player_position) {
                 continue;

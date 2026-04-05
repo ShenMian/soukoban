@@ -71,7 +71,7 @@ impl Node {
         // Creates successor states by pushing boxes
         for box_position in &self.state.box_positions {
             for push_direction in Direction::iter() {
-                // Checks if the box can be pushed
+                // Check if the box can be pushed
                 let mut new_box_position = box_position + &push_direction.into();
                 if solver.map()[new_box_position].intersects(Tiles::Wall)
                     || self.state.box_positions.contains(&new_box_position)
@@ -80,7 +80,7 @@ impl Node {
                     continue;
                 }
 
-                // Checks if the player can push the box
+                // Check if the player can push the box
                 let push_position = box_position - &push_direction.into();
                 if !player_reachable_area.contains(&push_position) {
                     continue;

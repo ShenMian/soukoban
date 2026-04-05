@@ -2,7 +2,7 @@
 
 use std::{
     cell::OnceCell,
-    collections::{BinaryHeap, HashMap, HashSet},
+    collections::{BinaryHeap, HashMap, HashSet, VecDeque},
     sync::{
         Arc,
         atomic::{AtomicBool, Ordering},
@@ -14,9 +14,10 @@ use nalgebra::Vector2;
 
 use crate::{
     Action, Actions, Map, SearchError, Tiles,
+    bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
     node::Node,
-    path_finding::{compute_reachable_area, find_path},
+    path_finding::find_path,
     state::State,
 };
 
@@ -216,79 +217,64 @@ impl Solver {
     /// the nearest goal.
     fn compute_minimum_push(&self) -> HashMap<Vector2<i32>, i32> {
         let mut lower_bounds = HashMap::new();
-        for goal_position in self.map.goal_positions() {
-            lower_bounds.insert(*goal_position, 0);
+        let mut costs = HashMap::new();
+        let mut queue = VecDeque::new();
 
+        // Ignore other boxes
+        let is_movable = |position| !self.map[position].intersects(Tiles::Wall);
+        let bcc = BccGraph::new(self.map.player_position(), is_movable);
+
+        for goal_position in self.map.goal_positions() {
             for pull_direction in Direction::iter() {
-                let new_box_position = goal_position + &pull_direction.into();
+                let new_box_position = *goal_position + &pull_direction.into();
                 let new_player_position = new_box_position + &pull_direction.into();
 
-                // Skips if the pull is invalid
-                if !self.map.in_bounds(new_player_position)
-                    || self.map[new_box_position].intersects(Tiles::Wall)
-                    || self.map[new_player_position].intersects(Tiles::Wall)
-                {
+                if is_movable(new_box_position) && is_movable(new_player_position) {
+                    let state = DirectedPosition(new_box_position, pull_direction);
+                    costs.insert(state, 1);
+                    queue.push_back((state, 1));
+                    lower_bounds.insert(new_box_position, 1);
+                }
+            }
+        }
+
+        for goal in self.map.goal_positions() {
+            lower_bounds.insert(*goal, 0);
+        }
+
+        while let Some((state, cost)) = queue.pop_front() {
+            let box_position = state.position();
+            let player_position = state.forward();
+
+            for pull_direction in Direction::iter() {
+                let new_box_position = box_position + &pull_direction.into();
+                let new_player_position = new_box_position + &pull_direction.into();
+
+                // Check if the player can pull the box
+                if !is_movable(new_box_position) || !is_movable(new_player_position) {
+                    continue;
+                }
+                if !bcc.is_reachable(player_position, new_box_position, box_position) {
                     continue;
                 }
 
-                self.computes_minimum_push_to(
-                    *goal_position,
-                    new_player_position,
-                    &mut lower_bounds,
-                    &mut HashSet::new(),
-                );
+                let new_state = DirectedPosition(new_box_position, pull_direction);
+                let new_cost = cost + 1;
+
+                let current_cost = costs.entry(new_state).or_insert(i32::MAX);
+                if new_cost < *current_cost {
+                    *current_cost = new_cost;
+                    queue.push_back((new_state, new_cost));
+
+                    let current_min = lower_bounds.entry(new_box_position).or_insert(i32::MAX);
+                    if new_cost < *current_min {
+                        *current_min = new_cost;
+                    }
+                }
             }
         }
+
         lower_bounds
-    }
-
-    /// Computes the minimum push of the box to the specified position.
-    ///
-    /// Place the box on the goal, then computes all the positions the box can
-    /// be pulled to and the minimum pulls it can be pulled to that position.
-    fn computes_minimum_push_to(
-        &self,
-        box_position: Vector2<i32>,
-        player_position: Vector2<i32>,
-        lower_bounds: &mut HashMap<Vector2<i32>, i32>,
-        visited: &mut HashSet<DirectedPosition>,
-    ) {
-        let player_reachable_area = compute_reachable_area(player_position, |position| {
-            !(self.map[position].intersects(Tiles::Wall) || position == box_position)
-        });
-        if player_reachable_area.len() < 2 {
-            return;
-        }
-        for pull_direction in Direction::iter() {
-            let new_box_position = box_position + &pull_direction.into();
-            let new_player_position = new_box_position + &pull_direction.into();
-
-            // Skips if the pull is invalid
-            if self.map[new_box_position].intersects(Tiles::Wall) {
-                continue;
-            }
-            if self.map[new_player_position].intersects(Tiles::Wall)
-                || !player_reachable_area.contains(&new_player_position)
-            {
-                continue;
-            }
-
-            let lower_bound = *lower_bounds.get(&new_box_position).unwrap_or(&i32::MAX);
-            if !visited.insert(DirectedPosition(new_box_position, pull_direction)) {
-                continue;
-            }
-            let new_lower_bound = lower_bounds[&box_position] + 1;
-            if new_lower_bound < lower_bound {
-                lower_bounds.insert(new_box_position, new_lower_bound);
-            }
-
-            self.computes_minimum_push_to(
-                new_box_position,
-                new_player_position,
-                lower_bounds,
-                visited,
-            );
-        }
     }
 
     /// Computes and returns the set of tunnels.
