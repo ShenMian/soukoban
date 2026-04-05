@@ -9,18 +9,18 @@ use nalgebra::Vector2;
 pub enum Direction {
     /// Upward direction (negative Y-axis).
     Up,
+    /// Rightward direction (positive X-axis).
+    Right,
     /// Downward direction (positive Y-axis).
     Down,
     /// Leftward direction (negative X-axis).
     Left,
-    /// Rightward direction (positive X-axis).
-    Right,
 }
 
 impl Direction {
     /// Returns an iterator over all directions.
     pub fn iter() -> std::array::IntoIter<Direction, 4> {
-        [Self::Up, Self::Down, Self::Left, Self::Right].into_iter()
+        [Self::Up, Self::Right, Self::Down, Self::Left].into_iter()
     }
 
     /// Rotates the direction 90° clockwise.
@@ -54,9 +54,9 @@ impl Direction {
     /// ```
     pub fn flip_horizontal(self) -> Direction {
         match self {
-            Self::Up | Self::Down => self,
             Self::Left => Self::Right,
             Self::Right => Self::Left,
+            Self::Up | Self::Down => self,
         }
     }
 
@@ -91,9 +91,9 @@ impl From<Direction> for Vector2<i32> {
         use Direction as E;
         match direction {
             E::Up => -Vector2::y(),
+            E::Right => Vector2::x(),
             E::Down => Vector2::y(),
             E::Left => -Vector2::x(),
-            E::Right => Vector2::x(),
         }
     }
 }
@@ -105,9 +105,9 @@ impl TryFrom<Vector2<i32>> for Direction {
         use Direction::*;
         match vector {
             v if v == -Vector2::<i32>::y() => Ok(Up),
+            v if v == Vector2::<i32>::x() => Ok(Right),
             v if v == Vector2::<i32>::y() => Ok(Down),
             v if v == -Vector2::<i32>::x() => Ok(Left),
-            v if v == Vector2::<i32>::x() => Ok(Right),
             _ => Err(()),
         }
     }

@@ -318,15 +318,15 @@ impl Solver {
                         && self.map[player_position + &right].intersects(Tiles::Wall)
                         && (self.map[box_position + &left].intersects(Tiles::Wall)
                             && self.map[box_position + &right].intersects(Tiles::Wall)
-                            || self.map[box_position + &right].intersects(Tiles::Wall)
-                                && self.map[box_position + &left].intersects(Tiles::Floor)
-                            || self.map[box_position + &right].intersects(Tiles::Floor)
-                                && self.map[box_position + &left].intersects(Tiles::Wall))
-                        && self.map[box_position].intersects(Tiles::Floor)
+                            || self.map[box_position + &left].intersects(Tiles::Wall)
+                                && self.map[box_position + &right].intersects(Tiles::Floor)
+                            || self.map[box_position + &left].intersects(Tiles::Floor)
+                                && self.map[box_position + &right].intersects(Tiles::Wall))
+                        && self.map[player_position].intersects(Tiles::Floor)
                         && self.lower_bounds().contains_key(&(box_position + &up))
                         && !self.map[box_position].intersects(Tiles::Goal)
                     {
-                        tunnels.insert(DirectedPosition(player_position, push_direction));
+                        tunnels.insert(DirectedPosition(box_position, push_direction));
                     }
                 }
             }
@@ -337,6 +337,7 @@ impl Solver {
     fn construct_actions(&self, path: &[State]) -> Actions {
         let mut actions = Actions::new();
         for (from_state, to_state) in path.iter().tuple_windows() {
+            debug_assert_eq!(from_state.box_positions.len(), to_state.box_positions.len());
             // Find the positions where the box was moved from and to
             let box_from_position = *from_state
                 .box_positions

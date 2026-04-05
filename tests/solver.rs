@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use nalgebra::Vector2;
 use soukoban::{Actions, Level, solver::*};
 
 mod utils;
@@ -205,17 +204,9 @@ fn ida_star_search() {
     // );
 }
 
-#[expect(dead_code)]
-fn print_lower_bounds(solver: &Solver) {
-    for y in 0..solver.map().dimensions().y {
-        for x in 0..solver.map().dimensions().x {
-            let position = Vector2::new(x, y);
-            if let Some(lower_bound) = solver.lower_bounds().get(&position) {
-                print!("{lower_bound:3} ");
-            } else {
-                print!("{:3} ", "###");
-            }
-        }
-        println!();
-    }
+#[test]
+fn tunnels() {
+    let level = load_level_from_file("assets/BoxWorld_100.xsb", 2);
+    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    assert_eq!(solver.tunnels().len(), 4);
 }

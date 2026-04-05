@@ -101,6 +101,13 @@ impl Node {
                     .tunnels()
                     .contains(&DirectedPosition(new_box_position, push_direction))
                 {
+                    if self
+                        .state
+                        .box_positions
+                        .contains(&(new_box_position + &push_direction.into()))
+                    {
+                        break;
+                    }
                     new_player_position = new_box_position;
                     new_box_position += &push_direction.into();
                     new_pushes += 1;
