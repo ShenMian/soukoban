@@ -29,18 +29,30 @@ impl Direction {
     ///
     /// ```
     /// # use soukoban::direction::Direction;
-    /// assert_eq!(Direction::Up.rotate(), Direction::Right);
+    /// assert_eq!(Direction::Up.rotate_cw(), Direction::Right);
     ///
     /// // Rotate the direction 90° counter clockwis.
-    /// assert_eq!(-Direction::Right.rotate(), Direction::Up);
+    /// assert_eq!(-Direction::Right.rotate_cw(), Direction::Up);
     /// ```
-    pub fn rotate(self) -> Direction {
+    pub fn rotate_cw(self) -> Direction {
         match self {
             Self::Up => Self::Right,
             Self::Right => Self::Down,
             Self::Down => Self::Left,
             Self::Left => Self::Up,
         }
+    }
+
+    /// Rotates the direction 90° counter-clockwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use soukoban::direction::Direction;
+    /// assert_eq!(Direction::Up.rotate_ccw(), Direction::Left);
+    /// ```
+    pub fn rotate_ccw(self) -> Direction {
+        -self.rotate_cw()
     }
 
     /// Flips the direction horizontally.

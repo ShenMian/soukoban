@@ -1,12 +1,21 @@
 use soukoban::direction::*;
 
 #[test]
-fn rotate() {
+fn rotate_cw() {
     use Direction::*;
-    assert_eq!(Up.rotate(), Right);
-    assert_eq!(Right.rotate(), Down);
-    assert_eq!(Down.rotate(), Left);
-    assert_eq!(Left.rotate(), Up);
+    assert_eq!(Up.rotate_cw(), Right);
+    assert_eq!(Right.rotate_cw(), Down);
+    assert_eq!(Down.rotate_cw(), Left);
+    assert_eq!(Left.rotate_cw(), Up);
+}
+
+#[test]
+fn rotate_ccw() {
+    use Direction::*;
+    assert_eq!(Up.rotate_ccw(), Left);
+    assert_eq!(Right.rotate_ccw(), Up);
+    assert_eq!(Down.rotate_ccw(), Right);
+    assert_eq!(Left.rotate_ccw(), Down);
 }
 
 #[test]

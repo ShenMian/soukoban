@@ -75,7 +75,7 @@ impl Action {
     /// );
     /// ```
     pub fn rotate(self) -> Action {
-        self.map(Direction::rotate)
+        self.map(Direction::rotate_cw)
     }
 
     /// Flips the action's direction horizontally.
