@@ -291,7 +291,15 @@ impl Solver {
                     continue;
                 }
 
-                for (up, right, down, left) in Direction::iter().circular_tuple_windows() {
+                for (up, right, down, left) in [
+                    Direction::Up,
+                    Direction::Right,
+                    Direction::Down,
+                    Direction::Left,
+                ]
+                .into_iter()
+                .circular_tuple_windows()
+                {
                     let push_direction = up;
                     let (up, right, down, left) =
                         (up.into(), right.into(), down.into(), left.into());
