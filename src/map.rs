@@ -12,7 +12,7 @@ use nalgebra::Vector2;
 
 use crate::{
     actions::Actions, deadlock::*, direction::Direction, error::ParseMapError, level::Level,
-    path_finding::*, run_length::rle_decode, state::State, tiles::Tiles,
+    path_finding::*, run_length::rle_decode, solver::state::State, tiles::Tiles,
 };
 
 /// A grid-based map.
