@@ -23,7 +23,7 @@ impl Node {
     /// Creates a new `Node`.
     pub fn new(state: State, pushes: i32, moves: i32, ctx: &SolverContext) -> Self {
         Self {
-            heuristic: ctx.heuristic(&state),
+            heuristic: state.heuristic(ctx),
             state,
             pushes,
             moves,
