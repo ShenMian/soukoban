@@ -10,7 +10,7 @@ use crate::{
     direction::{DirectedPosition, Direction},
 };
 
-use super::{Strategy, state::State};
+use super::Strategy;
 
 /// Pre-computed data and configuration shared across search algorithms.
 ///
@@ -62,15 +62,6 @@ impl SolverContext {
     /// Returns a reference to the set of tunnels.
     pub fn tunnels(&self) -> &HashSet<DirectedPosition> {
         &self.tunnels
-    }
-
-    /// Returns the heuristic value of the state.
-    pub fn heuristic(&self, state: &State) -> i32 {
-        state
-            .box_positions
-            .iter()
-            .map(|box_position| self.lower_bounds[box_position])
-            .sum()
     }
 
     /// Computes and returns the minimum number of pushes to push the box to
