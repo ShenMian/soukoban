@@ -98,8 +98,8 @@ fn a_star_search() {
         .pushes()
     );
 
-    // FIXME: The following levels are incorrectly identified as unsolvable by the solver, but they are actually solvable.
-    // search(
+    // FIXME: The following levels are incorrectly identified as unsolvable by
+    // the solver, but they are actually solvable. search(
     //     load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67),
     //     Strategy::Quick,
     // );

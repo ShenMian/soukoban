@@ -5,9 +5,9 @@ use crate::{
     deadlock::is_freeze_deadlock,
     direction::{DirectedPosition, Direction},
     path_finding::{compute_reachable_area, find_path},
-    solver::{Solver, Strategy},
-    state::State,
 };
+
+use super::{Strategy, context::SolverContext, state::State};
 
 /// A node in the search tree.
 #[derive(Clone, Eq, Debug)]
@@ -21,13 +21,13 @@ pub struct Node {
 
 impl Node {
     /// Creates a new `Node`.
-    pub fn new(state: State, pushes: i32, moves: i32, solver: &Solver) -> Self {
+    pub fn new(state: State, pushes: i32, moves: i32, ctx: &SolverContext) -> Self {
         Self {
-            heuristic: solver.heuristic(&state),
+            heuristic: ctx.heuristic(&state),
             state,
             pushes,
             moves,
-            strategy: solver.strategy(),
+            strategy: ctx.strategy(),
         }
     }
 
@@ -61,11 +61,11 @@ impl Node {
     }
 
     /// Returns the successors of the node.
-    pub fn successors(&self, solver: &Solver) -> Vec<Node> {
+    pub fn successors(&self, ctx: &SolverContext) -> Vec<Node> {
         let mut successors = Vec::new();
         let player_reachable_area =
             compute_reachable_area(self.state.player_position, |position| {
-                !solver.map()[position].intersects(Tiles::Wall)
+                !ctx.map()[position].intersects(Tiles::Wall)
                     && !self.state.box_positions.contains(&position)
             });
         // Creates successor states by pushing boxes
@@ -73,9 +73,9 @@ impl Node {
             for push_direction in Direction::iter() {
                 // Check if the box can be pushed
                 let mut new_box_position = box_position + &push_direction.into();
-                if solver.map()[new_box_position].intersects(Tiles::Wall)
+                if ctx.map()[new_box_position].intersects(Tiles::Wall)
                     || self.state.box_positions.contains(&new_box_position)
-                    || !solver.lower_bounds().contains_key(&new_box_position)
+                    || !ctx.lower_bounds().contains_key(&new_box_position)
                 {
                     continue;
                 }
@@ -88,7 +88,7 @@ impl Node {
 
                 let mut new_moves = self.moves
                     + find_path(self.state.player_position, push_position, |position| {
-                        !solver.map()[position].intersects(Tiles::Wall)
+                        !ctx.map()[position].intersects(Tiles::Wall)
                             && !self.state.box_positions.contains(&position)
                     })
                     .unwrap()
@@ -97,7 +97,7 @@ impl Node {
 
                 // Skips pushes in tunnels
                 let mut new_player_position = *box_position;
-                while solver
+                while ctx
                     .tunnels()
                     .contains(&DirectedPosition(new_box_position, push_direction))
                 {
@@ -119,9 +119,9 @@ impl Node {
                 new_box_positions.insert(new_box_position);
 
                 // Skips freeze deadlocks
-                if !solver.map()[new_box_position].intersects(Tiles::Goal)
+                if !ctx.map()[new_box_position].intersects(Tiles::Goal)
                     && is_freeze_deadlock(
-                        solver.map(),
+                        ctx.map(),
                         new_box_position,
                         &new_box_positions,
                         &mut HashSet::new(),
@@ -137,7 +137,7 @@ impl Node {
                     },
                     new_pushes,
                     new_moves,
-                    solver,
+                    ctx,
                 ));
             }
         }
