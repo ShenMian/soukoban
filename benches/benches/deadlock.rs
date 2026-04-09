@@ -8,9 +8,15 @@ use super::utils::*;
 
 fn is_freeze_deadlock(c: &mut Criterion) {
     c.bench_function("deadlock::is_freeze_deadlock", |b| {
-        let level = load_level_from_file("assets/Deadlock_3.xsb", 2);
+        let map = load_level_from_file("assets/Deadlock_3.xsb", 2)
+            .map()
+            .clone();
         b.iter_batched(
-            || level.map().clone(),
+            || {
+                let mut map = map.clone();
+                map.set_box_position(Vector2::new(3, 2), Vector2::new(3, 1));
+                map
+            },
             |map| {
                 deadlock::is_freeze_deadlock(
                     &map,
