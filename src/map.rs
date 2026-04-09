@@ -141,6 +141,10 @@ impl Map {
     }
 
     /// Sets a box position from one to another.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there is no box at the `from` position or there is already a box at the `to` position.
     pub fn set_box_position(&mut self, from: Vector2<i32>, to: Vector2<i32>) {
         self.remove_box_position(from);
         self.add_box_position(to);
@@ -346,33 +350,36 @@ impl Map {
     }
 
     /// Adds a box at the given position.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there is already a box at the given position.
     fn add_box_position(&mut self, position: Vector2<i32>) {
-        debug_assert!(
-            !self.box_positions.contains(&position),
-            "box position already exists"
-        );
         self[position].insert(Tiles::Box);
-        self.box_positions.insert(position);
+        let inserted = self.box_positions.insert(position);
+        assert!(inserted, "box position already exists");
     }
 
     /// Removes a box at the given position.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there is no box at the given position.
     fn remove_box_position(&mut self, position: Vector2<i32>) {
-        debug_assert!(
-            self.box_positions.contains(&position),
-            "box position does not exist"
-        );
         self[position].remove(Tiles::Box);
-        self.box_positions.remove(&position);
+        let removed = self.box_positions.remove(&position);
+        assert!(removed, "box position does not exist");
     }
 
     /// Removes a goal at the given position.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the position does not contain a goal.
     fn remove_goal_position(&mut self, position: Vector2<i32>) {
-        debug_assert!(
-            self.goal_positions.contains(&position),
-            "goal position does not exist"
-        );
         self[position].remove(Tiles::Goal);
-        self.goal_positions.remove(&position);
+        let removed = self.goal_positions.remove(&position);
+        assert!(removed, "goal position does not exist");
     }
 
     /// Sets unused floors to walls.
