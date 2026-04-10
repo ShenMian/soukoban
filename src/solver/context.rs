@@ -24,7 +24,7 @@ pub struct Context {
     map: Map,
     /// The search strategy to use.
     strategy: Strategy,
-    /// Lower bounds for heuristic calculation.
+    /// Lower bounds for a single box to the nearest goal.
     lower_bounds: HashMap<Vector2<i32>, i32>,
     /// Set of tunnel positions and directions.
     tunnels: HashSet<DirectedPosition>,
