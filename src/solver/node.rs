@@ -7,7 +7,7 @@ use crate::{
     path_finding::{compute_reachable_area, find_path},
 };
 
-use super::{Strategy, context::SolverContext, state::State};
+use super::{Strategy, context::Context, state::State};
 
 /// A node in the search tree.
 #[derive(Clone, Eq, Debug)]
@@ -21,7 +21,7 @@ pub struct Node {
 
 impl Node {
     /// Creates a new `Node`.
-    pub fn new(state: State, pushes: i32, moves: i32, ctx: &SolverContext) -> Self {
+    pub fn new(state: State, pushes: i32, moves: i32, ctx: &Context) -> Self {
         Self {
             heuristic: state.heuristic(ctx),
             state,
@@ -61,7 +61,7 @@ impl Node {
     }
 
     /// Returns the successors of the node.
-    pub fn successors(&self, ctx: &SolverContext) -> Vec<Node> {
+    pub fn successors(&self, ctx: &Context) -> Vec<Node> {
         let mut successors = Vec::new();
         let player_reachable_area =
             compute_reachable_area(self.state.player_position, |position| {

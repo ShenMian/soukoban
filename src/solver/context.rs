@@ -19,7 +19,7 @@ use super::Strategy;
 /// `Node` can reference the context without a circular dependency on the
 /// solver itself.
 #[derive(Clone, Debug)]
-pub struct SolverContext {
+pub struct Context {
     /// The map to solve.
     map: Map,
     /// The search strategy to use.
@@ -30,8 +30,8 @@ pub struct SolverContext {
     tunnels: HashSet<DirectedPosition>,
 }
 
-impl SolverContext {
-    /// Creates a new `SolverContext`, eagerly computing lower bounds and
+impl Context {
+    /// Creates a new `Context`, eagerly computing lower bounds and
     /// tunnels.
     pub fn new(map: Map, strategy: Strategy) -> Self {
         let lower_bounds = Self::compute_minimum_push(&map);
