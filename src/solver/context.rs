@@ -34,13 +34,11 @@ impl Context {
     /// Creates a new `Context`, eagerly computing lower bounds and
     /// tunnels.
     pub fn new(map: Map, strategy: Strategy) -> Self {
-        let lower_bounds = Self::compute_minimum_push(&map);
-        let tunnels = Self::compute_tunnels(&map, &lower_bounds);
         Self {
+            lower_bounds: Self::compute_minimum_push(&map),
+            tunnels: Self::compute_tunnels(&map),
             map,
             strategy,
-            lower_bounds,
-            tunnels,
         }
     }
 
@@ -133,10 +131,7 @@ impl Context {
     /// Tunnel is a common type of no influence push.
     /// Since tunnels are only determined by the map terrain, they can be
     /// pre-calculated.
-    fn compute_tunnels(
-        map: &Map,
-        lower_bounds: &HashMap<Vector2<i32>, i32>,
-    ) -> HashSet<DirectedPosition> {
+    fn compute_tunnels(map: &Map) -> HashSet<DirectedPosition> {
         use itertools::Itertools;
 
         let mut tunnels = HashSet::new();
@@ -175,7 +170,7 @@ impl Context {
                             || map[box_position + &left].intersects(Tiles::Floor)
                                 && map[box_position + &right].intersects(Tiles::Wall))
                         && map[player_position].intersects(Tiles::Floor)
-                        && lower_bounds.contains_key(&(box_position + &up))
+                        && map[box_position + &up].intersects(Tiles::Floor)
                         && !map[box_position].intersects(Tiles::Goal)
                     {
                         tunnels.insert(DirectedPosition(box_position, push_direction));
