@@ -321,7 +321,7 @@ impl Map {
     }
 
     /// Checks if a position is traversable.
-    pub fn is_movable(&self, position: Vector2<i32>) -> bool {
+    pub fn is_walkable(&self, position: Vector2<i32>) -> bool {
         self.in_bounds(position) && !self[position].intersects(Tiles::Wall | Tiles::Box)
     }
 
@@ -455,7 +455,7 @@ impl Map {
     /// Canonicalizes the position of the player.
     fn canonicalize_player(&mut self) {
         let player_reachable_area =
-            compute_reachable_area(self.player_position, |position| self.is_movable(position));
+            compute_reachable_area(self.player_position, |position| self.is_walkable(position));
         self.set_player_position(compute_area_anchor(&player_reachable_area).unwrap());
     }
 

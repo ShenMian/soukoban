@@ -14,7 +14,7 @@ pub struct BccGraph {
 
 impl BccGraph {
     /// Creates a new `BccGraph`.
-    pub fn new(start: Vector2<i32>, is_movable: impl Fn(Vector2<i32>) -> bool) -> Self {
+    pub fn new(start: Vector2<i32>, is_walkable: impl Fn(Vector2<i32>) -> bool) -> Self {
         let mut edge_blocks = HashMap::new();
         let mut cut_vertices = HashSet::new();
         let mut depth = HashMap::new();
@@ -41,7 +41,7 @@ impl BccGraph {
                 next_direction_idx += 1;
 
                 let v = u + &direction.into();
-                if !is_movable(v) {
+                if !is_walkable(v) {
                     continue;
                 }
                 if Some(v) == p {

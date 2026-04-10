@@ -70,15 +70,15 @@ impl Context {
         let mut queue = VecDeque::new();
 
         // Ignore other boxes
-        let is_movable = |position| !map[position].intersects(Tiles::Wall);
-        let bcc = BccGraph::new(map.player_position(), is_movable);
+        let is_walkable = |position| !map[position].intersects(Tiles::Wall);
+        let bcc = BccGraph::new(map.player_position(), is_walkable);
 
         for goal_position in map.goal_positions() {
             for pull_direction in Direction::iter() {
                 let new_box_position = *goal_position + &pull_direction.into();
                 let new_player_position = new_box_position + &pull_direction.into();
 
-                if is_movable(new_box_position) && is_movable(new_player_position) {
+                if is_walkable(new_box_position) && is_walkable(new_player_position) {
                     let state = DirectedPosition(new_box_position, pull_direction);
                     costs.insert(state, 1);
                     queue.push_back((state, 1));
@@ -100,7 +100,7 @@ impl Context {
                 let new_player_position = new_box_position + &pull_direction.into();
 
                 // Check if the player can pull the box
-                if !is_movable(new_box_position) || !is_movable(new_player_position) {
+                if !is_walkable(new_box_position) || !is_walkable(new_player_position) {
                     continue;
                 }
                 if !bcc.is_reachable(player_position, new_box_position, box_position) {
