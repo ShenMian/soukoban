@@ -16,18 +16,18 @@ use crate::{
 };
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
-struct Node {
-    position: Vector2<i32>,
+struct Node<T> {
+    state: T,
     priority: i32,
 }
 
-impl Ord for Node {
+impl<T: Eq> Ord for Node<T> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.priority.cmp(&other.priority).reverse()
     }
 }
 
-impl PartialOrd for Node {
+impl<T: Eq> PartialOrd for Node<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -49,29 +49,29 @@ pub fn find_path(
 
     cost.insert(from, 0);
     open_set.push(Node {
-        position: from,
+        state: from,
         priority: manhattan_distance(from, to),
     });
 
     while let Some(node) = open_set.pop() {
-        if node.position == to {
+        if node.state == to {
             return Some(construct_path(from, to, came_from));
         }
 
         for direction in Direction::iter() {
-            let new_position = node.position + &direction.into();
+            let new_position = node.state + &direction.into();
             if !is_walkable(new_position) {
                 continue;
             }
 
-            let new_cost = cost[&node.position] + 1;
+            let new_cost = cost[&node.state] + 1;
             if !cost.contains_key(&new_position) || new_cost < cost[&new_position] {
                 cost.insert(new_position, new_cost);
                 open_set.push(Node {
-                    position: new_position,
+                    state: new_position,
                     priority: new_cost + manhattan_distance(new_position, to),
                 });
-                came_from.insert(new_position, node.position);
+                came_from.insert(new_position, node.state);
             }
         }
     }
@@ -113,30 +113,6 @@ pub fn compute_player_move_directions(map: &Map, to: Vector2<i32>) -> Option<Vec
         .map(|position| Direction::try_from(position[1] - position[0]).unwrap())
         .collect();
     Some(directions)
-}
-
-#[derive(Clone, Copy, Eq, PartialEq, Hash)]
-struct BoxNode {
-    state: DirectedPosition,
-    cost: i32,
-}
-
-impl BoxNode {
-    fn new(state: DirectedPosition, cost: i32) -> Self {
-        Self { state, cost }
-    }
-}
-
-impl Ord for BoxNode {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.cost.cmp(&other.cost).reverse()
-    }
-}
-
-impl PartialOrd for BoxNode {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 /// Calculates the waypoints for the box to move from their current position to
@@ -192,7 +168,10 @@ pub fn compute_box_waypoints(
             }
         };
         came_from.insert(state, state);
-        queue.push(BoxNode::new(state, cost));
+        queue.push(Node {
+            state,
+            priority: cost,
+        });
         costs.insert(state, cost);
     }
 
@@ -200,7 +179,11 @@ pub fn compute_box_waypoints(
     let is_walkable = |position| position == initial_box_position || map.is_walkable(position);
     let bcc = BccGraph::new(map.player_position(), is_walkable);
 
-    while let Some(BoxNode { state, cost }) = queue.pop() {
+    while let Some(Node {
+        state,
+        priority: cost,
+    }) = queue.pop()
+    {
         let (box_position, player_position) = (state.position(), state.backward());
 
         for push_direction in Direction::iter() {
@@ -240,7 +223,10 @@ pub fn compute_box_waypoints(
             if new_cost < *current_cost {
                 *current_cost = new_cost;
                 came_from.insert(new_state, state);
-                queue.push(BoxNode::new(new_state, new_cost));
+                queue.push(Node {
+                    state: new_state,
+                    priority: new_cost,
+                });
             }
         }
     }
