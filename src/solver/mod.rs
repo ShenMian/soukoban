@@ -17,7 +17,7 @@ use nalgebra::Vector2;
 
 use crate::{Actions, Map, SearchError, direction::DirectedPosition};
 
-use context::SolverContext;
+use context::Context;
 
 /// The strategy to use when searching for a solution.
 #[derive(Clone, Copy, Eq, PartialEq, Debug, Default)]
@@ -37,7 +37,7 @@ pub enum Strategy {
 #[derive(Clone, Debug)]
 pub struct Solver {
     /// Pre-computed context shared by search algorithms.
-    ctx: SolverContext,
+    ctx: Context,
     /// Flag to request stopping the search.
     stop_flag: Arc<AtomicBool>,
 }
@@ -46,7 +46,7 @@ impl Solver {
     /// Creates a new `Solver`.
     pub fn new(map: Map, strategy: Strategy) -> Self {
         Self {
-            ctx: SolverContext::new(map, strategy),
+            ctx: Context::new(map, strategy),
             stop_flag: Arc::new(AtomicBool::new(false)),
         }
     }

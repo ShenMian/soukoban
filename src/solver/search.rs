@@ -9,10 +9,10 @@ use itertools::Itertools;
 
 use crate::{Action, Actions, SearchError, Tiles, direction::Direction, path_finding::find_path};
 
-use super::{context::SolverContext, node::Node, state::State};
+use super::{context::Context, node::Node, state::State};
 
 /// Searches for a solution using the A* algorithm.
-pub fn a_star_search(ctx: &SolverContext, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
+pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
     let mut queue = BinaryHeap::new();
     let mut costs = HashMap::new();
     let mut came_from = HashMap::new();
@@ -47,10 +47,7 @@ pub fn a_star_search(ctx: &SolverContext, stop_flag: &AtomicBool) -> Result<Acti
 }
 
 /// Searches for a solution using the IDA* algorithm.
-pub fn ida_star_search(
-    ctx: &SolverContext,
-    stop_flag: &AtomicBool,
-) -> Result<Actions, SearchError> {
+pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
     let state: State = ctx.map().clone().into();
     let node = Node::new(state.clone(), 0, 0, ctx);
 
@@ -79,7 +76,7 @@ pub fn ida_star_search(
 /// Returns `Ok(State)` if solution found, `Err(i32)` with the minimum
 /// f-value exceeding threshold.
 fn ida_star_depth_search(
-    ctx: &SolverContext,
+    ctx: &Context,
     stop_flag: &AtomicBool,
     node: &Node,
     path: &mut Vec<State>,
@@ -125,7 +122,7 @@ fn ida_star_depth_search(
 }
 
 /// Constructs the sequence of actions from a path of states.
-fn construct_actions(ctx: &SolverContext, path: &[State]) -> Actions {
+fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
     let mut actions = Actions::new();
     for (from_state, to_state) in path.iter().tuple_windows() {
         debug_assert_eq!(from_state.box_positions.len(), to_state.box_positions.len());

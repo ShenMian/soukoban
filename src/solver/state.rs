@@ -8,7 +8,7 @@ use nalgebra::Vector2;
 use crate::{
     Map, Tiles,
     path_finding::{compute_area_anchor, compute_reachable_area},
-    solver::{Strategy, context::SolverContext},
+    solver::{Strategy, context::Context},
 };
 
 #[derive(Clone, Eq, PartialEq, Debug)]
@@ -44,7 +44,7 @@ impl State {
     }
 
     /// Returns the heuristic value of the state.
-    pub fn heuristic(&self, ctx: &SolverContext) -> i32 {
+    pub fn heuristic(&self, ctx: &Context) -> i32 {
         self.box_positions
             .iter()
             .map(|box_position| ctx.lower_bounds()[box_position])
