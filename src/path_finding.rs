@@ -36,12 +36,12 @@ impl PartialOrd for Node {
 /// Finds a path from one position to another on the map.
 ///
 /// This function uses the A* algorithm to find the shortest path from the
-/// starting position to the target position, based on the provided `is_movable`
+/// starting position to the target position, based on the provided `is_walkable`
 /// function.
 pub fn find_path(
     from: Vector2<i32>,
     to: Vector2<i32>,
-    is_movable: impl Fn(Vector2<i32>) -> bool,
+    is_walkable: impl Fn(Vector2<i32>) -> bool,
 ) -> Option<Vec<Vector2<i32>>> {
     let mut open_set = BinaryHeap::new();
     let mut came_from = HashMap::new();
@@ -60,7 +60,7 @@ pub fn find_path(
 
         for direction in Direction::iter() {
             let new_position = node.position + &direction.into();
-            if !is_movable(new_position) {
+            if !is_walkable(new_position) {
                 continue;
             }
 
@@ -98,12 +98,10 @@ fn construct_path(
 /// Calculates the path for the player to move from their current position to a
 /// target position.
 ///
-/// This function finds a path using the A* algorithm from the player's current
-/// position to the target position, based on the provided `is_movable`
-/// function.
+/// This function finds a path using the A* algorithm from the player's current position to the target position, based on the provided `is_walkable` function.
 pub fn compute_player_move_directions(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
     let path = find_path(map.player_position(), to, |position| {
-        map.is_movable(position)
+        map.is_walkable(position)
     })?;
     // Converts the path of positions into a path of directions.
     #[expect(
@@ -161,18 +159,18 @@ pub fn compute_box_waypoints(
     let mut came_from = HashMap::new();
 
     let player_reachable_area =
-        compute_reachable_area(map.player_position(), |position| map.is_movable(position));
+        compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
     for push_direction in Direction::iter() {
         let state = DirectedPosition(initial_box_position, push_direction);
         // Check if the box can be pushed
         let new_box_position = state.forward();
-        if !map.is_movable(new_box_position) {
+        if !map.is_walkable(new_box_position) {
             continue;
         }
 
         // Check if the player can push the box
         let new_player_position = state.backward();
-        if !(map.is_movable(new_player_position)) {
+        if !(map.is_walkable(new_player_position)) {
             continue;
         }
         if !player_reachable_area.contains(&new_player_position) {
@@ -187,7 +185,7 @@ pub fn compute_box_waypoints(
             Strategy::PushOptimal | Strategy::Quick => 0,
             Strategy::MoveOptimal => {
                 find_path(map.player_position(), new_player_position, |position| {
-                    map.is_movable(position)
+                    map.is_walkable(position)
                 })
                 .unwrap()
                 .len() as i32
@@ -199,8 +197,8 @@ pub fn compute_box_waypoints(
     }
 
     // Treat other boxes as obstacles
-    let is_movable = |position| position == initial_box_position || map.is_movable(position);
-    let bcc = BccGraph::new(map.player_position(), is_movable);
+    let is_walkable = |position| position == initial_box_position || map.is_walkable(position);
+    let bcc = BccGraph::new(map.player_position(), is_walkable);
 
     while let Some(BoxNode { state, cost }) = queue.pop() {
         let (box_position, player_position) = (state.position(), state.backward());
@@ -208,13 +206,13 @@ pub fn compute_box_waypoints(
         for push_direction in Direction::iter() {
             // Check if the box can be pushed
             let new_box_position = box_position + &push_direction.into();
-            if !is_movable(new_box_position) {
+            if !is_walkable(new_box_position) {
                 continue;
             }
 
             // Check if the player can push the box
             let new_player_position = box_position - &push_direction.into();
-            if !is_movable(new_player_position) {
+            if !is_walkable(new_player_position) {
                 continue;
             }
             if !bcc.is_reachable(player_position, new_player_position, box_position) {
@@ -230,7 +228,7 @@ pub fn compute_box_waypoints(
                     Strategy::PushOptimal | Strategy::Quick => 1,
                     Strategy::MoveOptimal => {
                         find_path(player_position, new_player_position, |position| {
-                            (position == initial_box_position || map.is_movable(position))
+                            (position == initial_box_position || map.is_walkable(position))
                                 && position != box_position
                         })
                         .unwrap()
@@ -302,14 +300,14 @@ pub fn construct_player_path(
 /// Returns a set of positions of the boxes that can be pushed by the player.
 pub fn compute_pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
     let player_reachable_area =
-        compute_reachable_area(map.player_position(), |position| map.is_movable(position));
+        compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
     let mut pushable_boxes = HashSet::new();
     for box_position in map.box_positions() {
         // Check if the player can push the box from any direction
         for push_direction in Direction::iter() {
             let player_position = box_position - &push_direction.into();
             let new_box_position = box_position + &push_direction.into();
-            if map.is_movable(new_box_position) && player_reachable_area.contains(&player_position)
+            if map.is_walkable(new_box_position) && player_reachable_area.contains(&player_position)
             {
                 pushable_boxes.insert(*box_position);
                 break;
@@ -323,10 +321,10 @@ pub fn compute_pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
 ///
 /// This function performs a breadth-first search to determine all positions
 /// that can be reached from the starting position, based on the provided
-/// `is_movable` function.
+/// `is_walkable` function.
 pub fn compute_reachable_area(
     position: Vector2<i32>,
-    is_movable: impl Fn(Vector2<i32>) -> bool,
+    is_walkable: impl Fn(Vector2<i32>) -> bool,
 ) -> HashSet<Vector2<i32>> {
     let mut reachable_area = HashSet::new();
     let mut deque = VecDeque::new();
@@ -335,7 +333,7 @@ pub fn compute_reachable_area(
     while let Some(position) = deque.pop_front() {
         for direction in Direction::iter() {
             let neighbor = position + &direction.into();
-            if is_movable(neighbor) && reachable_area.insert(neighbor) {
+            if is_walkable(neighbor) && reachable_area.insert(neighbor) {
                 deque.push_back(neighbor);
             }
         }
