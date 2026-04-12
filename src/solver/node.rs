@@ -99,7 +99,7 @@ impl Node {
                 let mut new_player_position = *box_position;
                 while ctx
                     .tunnels()
-                    .contains(&DirectedPosition(new_box_position, push_direction))
+                    .contains(&DirectedPosition::new(new_box_position, push_direction))
                 {
                     if self
                         .state

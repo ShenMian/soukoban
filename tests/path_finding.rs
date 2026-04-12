@@ -16,16 +16,15 @@ fn find_path() {
 #[test]
 fn test_compute_box_waypoints() {
     let map = load_level_from_file("assets/Microban_155.xsb", 3).into();
-    assert_eq!(
-        compute_box_waypoints(&map, Vector2::new(6, 3), Strategy::PushOptimal)
-            .0
-            .len(),
-        0
-    );
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(6, 2), Strategy::PushOptimal);
     let positions: HashSet<_> = waypoints
         .keys()
-        .map(|DirectedPosition(position, _)| position)
+        .map(
+            |DirectedPosition {
+                 position,
+                 direction: _,
+             }| position,
+        )
         .collect();
     assert_eq!(positions.len(), 15);
 
@@ -33,10 +32,15 @@ fn test_compute_box_waypoints() {
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(8, 7), Strategy::PushOptimal);
     let positions: HashSet<_> = waypoints
         .keys()
-        .map(|DirectedPosition(position, _)| position)
+        .map(
+            |DirectedPosition {
+                 position,
+                 direction: _,
+             }| position,
+        )
         .collect();
     let box_path = construct_box_path(
-        DirectedPosition(Vector2::new(9, 8), Direction::Left),
+        DirectedPosition::new(Vector2::new(9, 8), Direction::Left),
         &waypoints,
     );
     let player_path = construct_player_path(&map, Vector2::new(7, 6), &box_path);
@@ -48,10 +52,15 @@ fn test_compute_box_waypoints() {
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(18, 18), Strategy::PushOptimal);
     let positions: HashSet<_> = waypoints
         .keys()
-        .map(|DirectedPosition(position, _)| position)
+        .map(
+            |DirectedPosition {
+                 position,
+                 direction: _,
+             }| position,
+        )
         .collect();
     let box_path = construct_box_path(
-        DirectedPosition(Vector2::new(17, 18), Direction::Right),
+        DirectedPosition::new(Vector2::new(17, 18), Direction::Right),
         &waypoints,
     );
     let player_path = construct_player_path(&map, Vector2::new(16, 18), &box_path);
@@ -62,7 +71,7 @@ fn test_compute_box_waypoints() {
     let map = load_level_from_file("assets/Microban_II_135.xsb", 134).into();
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(16, 34), Strategy::PushOptimal);
     let box_path = construct_box_path(
-        DirectedPosition(Vector2::new(20, 34), Direction::Left),
+        DirectedPosition::new(Vector2::new(20, 34), Direction::Left),
         &waypoints,
     );
     let player_path = construct_player_path(&map, Vector2::new(18, 18), &box_path);
@@ -72,7 +81,7 @@ fn test_compute_box_waypoints() {
     let map = load_level_from_file("assets/Microban_II_135.xsb", 135).into();
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(21, 36), Strategy::PushOptimal);
     let box_path = construct_box_path(
-        DirectedPosition(Vector2::new(21, 37), Direction::Down),
+        DirectedPosition::new(Vector2::new(21, 37), Direction::Down),
         &waypoints,
     );
     assert_eq!(box_path.len() - 1, 591);

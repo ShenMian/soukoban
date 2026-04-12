@@ -127,26 +127,29 @@ impl TryFrom<Vector2<i32>> for Direction {
 
 /// A directed position.
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
-pub struct DirectedPosition(pub Vector2<i32>, pub Direction);
+pub struct DirectedPosition {
+    /// The position.
+    pub position: Vector2<i32>,
+    /// The direction.
+    pub direction: Direction,
+}
 
 impl DirectedPosition {
-    /// Returns the position.
-    pub fn position(&self) -> Vector2<i32> {
-        self.0
-    }
-
-    /// Returns the direction.
-    pub fn direction(&self) -> Direction {
-        self.1
+    /// Creates a new `DirectedPosition`.
+    pub fn new(position: Vector2<i32>, direction: Direction) -> Self {
+        Self {
+            position,
+            direction,
+        }
     }
 
     /// Returns the position one step forward in the current direction.
     pub fn forward(&self) -> Vector2<i32> {
-        self.position() + &self.direction().into()
+        self.position + &self.direction.into()
     }
 
     /// Returns the position one step backward against the current direction.
     pub fn backward(&self) -> Vector2<i32> {
-        self.position() - &self.direction().into()
+        self.position - &self.direction.into()
     }
 }
