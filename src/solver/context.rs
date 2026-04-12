@@ -79,7 +79,7 @@ impl Context {
                 let new_player_position = new_box_position + &pull_direction.into();
 
                 if is_walkable(new_box_position) && is_walkable(new_player_position) {
-                    let state = DirectedPosition(new_box_position, pull_direction);
+                    let state = DirectedPosition::new(new_box_position, pull_direction);
                     costs.insert(state, 1);
                     queue.push_back((state, 1));
                     lower_bounds.insert(new_box_position, 1);
@@ -92,8 +92,8 @@ impl Context {
         }
 
         while let Some((state, cost)) = queue.pop_front() {
-            let box_position = state.position();
-            let player_position = state.forward();
+            let box_position = state.position;
+            let player_position = state.position + &state.direction.into();
 
             for pull_direction in Direction::iter() {
                 let new_box_position = box_position + &pull_direction.into();
@@ -107,7 +107,7 @@ impl Context {
                     continue;
                 }
 
-                let new_state = DirectedPosition(new_box_position, pull_direction);
+                let new_state = DirectedPosition::new(new_box_position, pull_direction);
                 let new_cost = cost + 1;
 
                 let current_cost = costs.entry(new_state).or_insert(i32::MAX);
@@ -173,7 +173,7 @@ impl Context {
                         && map[box_position + &up].intersects(Tiles::Floor)
                         && !map[box_position].intersects(Tiles::Goal)
                     {
-                        tunnels.insert(DirectedPosition(box_position, push_direction));
+                        tunnels.insert(DirectedPosition::new(box_position, push_direction));
                     }
                 }
             }

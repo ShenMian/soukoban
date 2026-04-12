@@ -137,15 +137,15 @@ pub fn compute_box_waypoints(
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
     for push_direction in Direction::iter() {
-        let state = DirectedPosition(initial_box_position, push_direction);
+        let state = DirectedPosition::new(initial_box_position, push_direction);
         // Check if the box can be pushed
-        let new_box_position = state.forward();
+        let new_box_position = state.position + &push_direction.into();
         if !map.is_walkable(new_box_position) {
             continue;
         }
 
         // Check if the player can push the box
-        let new_player_position = state.backward();
+        let new_player_position = state.position - &state.direction.into();
         if !(map.is_walkable(new_player_position)) {
             continue;
         }
@@ -184,7 +184,8 @@ pub fn compute_box_waypoints(
         priority: cost,
     }) = queue.pop()
     {
-        let (box_position, player_position) = (state.position(), state.backward());
+        let box_position = state.position;
+        let player_position = state.position - &state.direction.into();
 
         for push_direction in Direction::iter() {
             // Check if the box can be pushed
@@ -218,7 +219,7 @@ pub fn compute_box_waypoints(
                         .len() as i32
                     }
                 };
-            let new_state = DirectedPosition(new_box_position, push_direction);
+            let new_state = DirectedPosition::new(new_box_position, push_direction);
             let current_cost = costs.entry(new_state).or_insert(i32::MAX);
             if new_cost < *current_cost {
                 *current_cost = new_cost;
@@ -246,10 +247,10 @@ pub fn construct_box_path(
         if prev == current {
             break;
         }
-        path.push(current.position());
+        path.push(current.position);
         current = prev;
     }
-    path.push(current.position());
+    path.push(current.position);
     path.reverse();
     path
 }
