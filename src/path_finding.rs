@@ -36,8 +36,8 @@ impl<T: Eq> PartialOrd for Node<T> {
 /// Finds a path from one position to another on the map.
 ///
 /// This function uses the A* algorithm to find the shortest path from the
-/// starting position to the target position, based on the provided `is_walkable`
-/// function.
+/// starting position to the target position, based on the provided
+/// `is_walkable` function.
 pub fn find_path(
     from: Vector2<i32>,
     to: Vector2<i32>,
@@ -98,7 +98,9 @@ fn construct_path(
 /// Calculates the path for the player to move from their current position to a
 /// target position.
 ///
-/// This function finds a path using the A* algorithm from the player's current position to the target position, based on the provided `is_walkable` function.
+/// This function finds a path using the A* algorithm from the player's current
+/// position to the target position, based on the provided `is_walkable`
+/// function.
 pub fn compute_player_move_directions(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
     let path = find_path(map.player_position(), to, |position| {
         map.is_walkable(position)
