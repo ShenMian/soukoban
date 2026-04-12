@@ -144,7 +144,8 @@ impl Map {
     ///
     /// # Panics
     ///
-    /// Panics if there is no box at the `from` position or there is already a box at the `to` position.
+    /// Panics if there is no box at the `from` position or there is already a
+    /// box at the `to` position.
     pub fn set_box_position(&mut self, from: Vector2<i32>, to: Vector2<i32>) {
         self.remove_box_position(from);
         self.add_box_position(to);
