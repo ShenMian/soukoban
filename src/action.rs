@@ -46,7 +46,7 @@ impl Action {
         matches!(&self, Action::Move(_))
     }
 
-    /// Checks if the action is a push action.
+    /// Checks if the action is a shift action.
     ///
     /// # Examples
     ///
@@ -55,9 +55,9 @@ impl Action {
     /// use soukoban::direction::Direction;
     ///
     /// let action = Action::Push(Direction::Up);
-    /// assert!(action.is_push());
+    /// assert!(action.is_shift());
     /// ```
-    pub fn is_push(&self) -> bool {
+    pub fn is_shift(&self) -> bool {
         matches!(&self, Action::Push(_))
     }
 
@@ -69,10 +69,8 @@ impl Action {
     /// use soukoban::Action;
     /// use soukoban::direction::Direction;
     ///
-    /// assert_eq!(
-    ///     Action::Move(Direction::Up).rotate(),
-    ///     Action::Move(Direction::Right)
-    /// );
+    /// let action = Action::Move(Direction::Up);
+    /// assert_eq!(action.rotate(), Action::Move(Direction::Right));
     /// ```
     pub fn rotate(self) -> Action {
         self.map(Direction::rotate_cw)
@@ -86,10 +84,8 @@ impl Action {
     /// use soukoban::Action;
     /// use soukoban::direction::Direction;
     ///
-    /// assert_eq!(
-    ///     Action::Move(Direction::Left).flip_horizontal(),
-    ///     Action::Move(Direction::Right)
-    /// );
+    /// let action = Action::Move(Direction::Left);
+    /// assert_eq!(action.flip_horizontal(), Action::Move(Direction::Right));
     /// ```
     pub fn flip_horizontal(self) -> Action {
         self.map(Direction::flip_horizontal)
@@ -103,10 +99,8 @@ impl Action {
     /// use soukoban::Action;
     /// use soukoban::direction::Direction;
     ///
-    /// assert_eq!(
-    ///     Action::Move(Direction::Up).flip_vertical(),
-    ///     Action::Move(Direction::Down)
-    /// );
+    /// let action = Action::Move(Direction::Up);
+    /// assert_eq!(action.flip_vertical(), Action::Move(Direction::Down));
     /// ```
     pub fn flip_vertical(self) -> Action {
         self.map(Direction::flip_vertical)
@@ -148,7 +142,7 @@ impl From<Action> for char {
             Direction::Left => 'l',
             Direction::Right => 'r',
         };
-        if action.is_push() {
+        if action.is_shift() {
             char.to_ascii_uppercase()
         } else {
             char

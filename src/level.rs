@@ -110,7 +110,7 @@ impl Level {
     /// Undoes the last action.
     pub fn undo(&mut self) -> Result<(), ActionError> {
         if let Some(last_action) = self.actions.pop() {
-            if last_action.is_push() {
+            if last_action.is_shift() {
                 let box_position = self.map.player_position() + &last_action.direction().into();
                 let prev_box_position = self.map.player_position();
                 self.map.set_box_position(box_position, prev_box_position);

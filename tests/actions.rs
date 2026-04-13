@@ -59,7 +59,7 @@ fn flip_vertical() {
 fn secondary_values() {
     let empty_actions = Actions::new();
     assert_eq!(empty_actions.moves(), 0);
-    assert_eq!(empty_actions.pushes(), 0);
+    assert_eq!(empty_actions.shifts(), 0);
     let SecondaryValues {
         box_lines,
         box_changes,
@@ -80,7 +80,7 @@ fn secondary_values() {
     // #########
     let actions = Actions::from_str("ruuLLLulDrrrrddlUruLLLddllluurRDrdLuuurDD").unwrap();
     assert_eq!(actions.moves(), 41);
-    assert_eq!(actions.pushes(), 13);
+    assert_eq!(actions.shifts(), 13);
     let SecondaryValues {
         box_lines,
         box_changes,
@@ -100,7 +100,7 @@ fn secondary_values() {
     //     ####
     let actions = Actions::from_str("ullDLdRuurrdLLrrddlUruL").unwrap();
     assert_eq!(actions.moves(), 23);
-    assert_eq!(actions.pushes(), 7);
+    assert_eq!(actions.shifts(), 7);
     let SecondaryValues {
         box_lines,
         box_changes,
@@ -121,7 +121,7 @@ fn secondary_values() {
     // ########
     let actions = Actions::from_str("LulDuu3rdLrrddlUlldRd3luR").unwrap();
     assert_eq!(actions.moves(), 27);
-    assert_eq!(actions.pushes(), 6);
+    assert_eq!(actions.shifts(), 6);
     let SecondaryValues {
         box_lines,
         box_changes,
@@ -144,7 +144,7 @@ fn secondary_values() {
     )
     .unwrap();
     assert_eq!(actions.moves(), 107);
-    assert_eq!(actions.pushes(), 29);
+    assert_eq!(actions.shifts(), 29);
     let SecondaryValues {
         box_lines,
         box_changes,

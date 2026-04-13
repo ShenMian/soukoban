@@ -60,15 +60,15 @@ fn is_move() {
 }
 
 #[test]
-fn is_push() {
+fn is_shift() {
     use {Action::*, Direction::*};
 
-    assert!(Push(Up).is_push());
-    assert!(Push(Down).is_push());
-    assert!(Push(Left).is_push());
-    assert!(Push(Right).is_push());
-    assert!(!Move(Up).is_push());
-    assert!(!Move(Down).is_push());
-    assert!(!Move(Left).is_push());
-    assert!(!Move(Right).is_push());
+    assert!(Push(Up).is_shift());
+    assert!(Push(Down).is_shift());
+    assert!(Push(Left).is_shift());
+    assert!(Push(Right).is_shift());
+    assert!(!Move(Up).is_shift());
+    assert!(!Move(Down).is_shift());
+    assert!(!Move(Left).is_shift());
+    assert!(!Move(Right).is_shift());
 }

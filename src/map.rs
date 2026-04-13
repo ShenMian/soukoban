@@ -47,7 +47,7 @@ impl Map {
         for action in &*actions {
             instance[current_player_position] = Tiles::Floor;
             current_player_position += &action.direction().into();
-            if action.is_push() {
+            if action.is_shift() {
                 instance[current_player_position + &action.direction().into()] = Tiles::Floor;
                 // The player pushed the box when moving, which means there is a box at the
                 // player's current position
@@ -671,7 +671,7 @@ fn compute_dimensions_and_player_position(actions: &Actions) -> (Vector2<i32>, V
     let mut player_position = Vector2::zeros();
     for action in &**actions {
         player_position += &action.direction().into();
-        if action.is_push() {
+        if action.is_shift() {
             let box_position = player_position + &action.direction().into();
             min_position = min_position.zip_map(&box_position, std::cmp::min);
             max_position = max_position.zip_map(&box_position, std::cmp::max);

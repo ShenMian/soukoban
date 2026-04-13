@@ -32,14 +32,14 @@ impl Actions {
         Default::default()
     }
 
-    /// Returns the number of moves.
+    /// Returns the number of move actions.
     pub fn moves(&self) -> usize {
         self.len()
     }
 
-    /// Returns the number of pushes.
-    pub fn pushes(&self) -> usize {
-        self.iter().filter(|action| action.is_push()).count()
+    /// Returns the number of shift actions.
+    pub fn shifts(&self) -> usize {
+        self.iter().filter(|action| action.is_shift()).count()
     }
 
     /// Rotates all actions 90° clockwise.
@@ -80,11 +80,11 @@ impl Actions {
                 if action.direction() != prev_action.direction() {
                     player_lines += 1;
                 }
-                if action.is_push() {
+                if action.is_shift() {
                     if *action != prev_action {
                         box_lines += 1;
                     }
-                    if !prev_action.is_push() {
+                    if !prev_action.is_shift() {
                         pushing_sessions += 1;
                     }
                     if let Some(prev_box_position) = prev_box_position {
@@ -97,7 +97,7 @@ impl Actions {
                     prev_box_position = Some(player_position + &action.direction().into());
                 }
             } else {
-                if action.is_push() {
+                if action.is_shift() {
                     box_lines += 1;
                     pushing_sessions += 1;
                 }
