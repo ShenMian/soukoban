@@ -6,16 +6,13 @@ mod search;
 pub(crate) mod state;
 
 use std::{
-    collections::{HashMap, HashSet},
     sync::{
         Arc,
         atomic::{AtomicBool, Ordering},
     },
 };
 
-use nalgebra::Vector2;
-
-use crate::{Actions, Map, SearchError, direction::DirectedPosition};
+use crate::{Actions, Map, SearchError};
 
 use context::Context;
 
@@ -69,23 +66,8 @@ impl Solver {
         self.stop_flag.store(true, Ordering::Relaxed);
     }
 
-    /// Returns a reference to the map.
-    pub fn map(&self) -> &Map {
-        self.ctx.map()
-    }
-
-    /// Returns the strategy.
-    pub fn strategy(&self) -> Strategy {
-        self.ctx.strategy()
-    }
-
-    /// Returns a reference to the set of lower bounds.
-    pub fn lower_bounds(&self) -> &HashMap<Vector2<i32>, i32> {
-        self.ctx.lower_bounds()
-    }
-
-    /// Returns a reference to the set of tunnels.
-    pub fn tunnels(&self) -> &HashSet<DirectedPosition> {
-        self.ctx.tunnels()
+    /// Returns a reference to the context.
+    pub fn context(&self) -> &Context {
+        &self.ctx
     }
 }

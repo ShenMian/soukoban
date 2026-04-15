@@ -208,16 +208,16 @@ fn ida_star_search() {
 fn lower_bounds() {
     let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67);
     let solver = Solver::new(level.map().clone(), Strategy::Quick);
-    assert_eq!(solver.lower_bounds().len(), 8);
+    assert_eq!(solver.context().lower_bounds().len(), 8);
 
     let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 78);
     let solver = Solver::new(level.map().clone(), Strategy::Quick);
-    assert_eq!(solver.lower_bounds().len(), 8);
+    assert_eq!(solver.context().lower_bounds().len(), 8);
 }
 
 #[test]
 fn tunnels() {
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 2);
     let solver = Solver::new(level.map().clone(), Strategy::Quick);
-    assert_eq!(solver.tunnels().len(), 4);
+    assert_eq!(solver.context().tunnels().len(), 4);
 }
