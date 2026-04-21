@@ -5,11 +5,9 @@ mod node;
 mod search;
 pub(crate) mod state;
 
-use std::{
-    sync::{
-        Arc,
-        atomic::{AtomicBool, Ordering},
-    },
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
 };
 
 use crate::{Actions, Map, SearchError};
@@ -58,6 +56,12 @@ impl Solver {
     pub fn ida_star_search(&self) -> Result<Actions, SearchError> {
         self.stop_flag.store(false, Ordering::Relaxed);
         search::ida_star_search(&self.ctx, &self.stop_flag)
+    }
+
+    /// Searches for solution using the BFS algorithm.
+    pub fn bfs_search(&self) -> Result<Actions, SearchError> {
+        self.stop_flag.store(false, Ordering::Relaxed);
+        search::bfs_search(&self.ctx, &self.stop_flag)
     }
 
     /// Request to stop the ongoing search. This sets a shared flag checked by

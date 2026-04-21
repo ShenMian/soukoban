@@ -121,6 +121,44 @@ fn ida_star_depth_search(
     Err(min_threshold)
 }
 
+/// Searches for a solution using the BFS algorithm.
+pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
+    let mut queue = std::collections::VecDeque::new();
+    let mut came_from = HashMap::new();
+    let mut visited = HashSet::new();
+
+    let state: State = ctx.map().clone().into();
+    visited.insert(state.canonicalized_hash(ctx.strategy(), ctx.map()));
+
+    queue.push_back(Node::new(state, 0, 0, ctx));
+
+    while let Some(node) = queue.pop_front() {
+        if stop_flag.load(Ordering::Relaxed) {
+            return Err(SearchError::Interrupted);
+        }
+
+        if node.is_solved() {
+            return Ok(construct_actions(
+                ctx,
+                &construct_path(node.state, &came_from),
+            ));
+        }
+
+        for successor in node.successors(ctx) {
+            let hash = successor
+                .state
+                .canonicalized_hash(ctx.strategy(), ctx.map());
+
+            if visited.insert(hash) {
+                came_from.insert(successor.state.clone(), node.state.clone());
+                queue.push_back(successor);
+            }
+        }
+    }
+
+    Err(SearchError::NoSolution)
+}
+
 /// Constructs the sequence of actions from a path of states.
 fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
     let mut actions = Actions::new();
