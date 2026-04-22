@@ -76,6 +76,21 @@ impl Action {
         self.map(Direction::rotate_cw)
     }
 
+    /// Rotates the action's direction 90° counter-clockwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use soukoban::Action;
+    /// use soukoban::direction::Direction;
+    ///
+    /// let action = Action::Move(Direction::Up);
+    /// assert_eq!(action.rotate_ccw(), Action::Move(Direction::Left));
+    /// ```
+    pub fn rotate_ccw(self) -> Action {
+        self.map(Direction::rotate_ccw)
+    }
+
     /// Flips the action's direction horizontally.
     ///
     /// # Examples

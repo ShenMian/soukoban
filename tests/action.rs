@@ -31,7 +31,7 @@ fn to_char() {
 }
 
 #[test]
-fn rotate() {
+fn rotate_cw() {
     use {Action::*, Direction::*};
 
     assert_eq!(Move(Up).rotate_cw(), Move(Right));
@@ -46,6 +46,21 @@ fn rotate() {
 }
 
 #[test]
+fn rotate_ccw() {
+    use {Action::*, Direction::*};
+
+    assert_eq!(Move(Up).rotate_ccw(), Move(Left));
+    assert_eq!(Move(Right).rotate_ccw(), Move(Up));
+    assert_eq!(Move(Down).rotate_ccw(), Move(Right));
+    assert_eq!(Move(Left).rotate_ccw(), Move(Down));
+
+    assert_eq!(Push(Up).rotate_ccw(), Push(Left));
+    assert_eq!(Push(Right).rotate_ccw(), Push(Up));
+    assert_eq!(Push(Down).rotate_ccw(), Push(Right));
+    assert_eq!(Push(Left).rotate_ccw(), Push(Down));
+}
+
+#[test]
 fn is_move() {
     use {Action::*, Direction::*};
 
@@ -53,6 +68,7 @@ fn is_move() {
     assert!(Move(Down).is_move());
     assert!(Move(Left).is_move());
     assert!(Move(Right).is_move());
+
     assert!(!Push(Up).is_move());
     assert!(!Push(Down).is_move());
     assert!(!Push(Left).is_move());
@@ -67,6 +83,7 @@ fn is_shift() {
     assert!(Push(Down).is_shift());
     assert!(Push(Left).is_shift());
     assert!(Push(Right).is_shift());
+
     assert!(!Move(Up).is_shift());
     assert!(!Move(Down).is_shift());
     assert!(!Move(Left).is_shift());

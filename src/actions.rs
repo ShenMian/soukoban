@@ -49,6 +49,13 @@ impl Actions {
         }
     }
 
+    /// Rotates all actions 90° counter-clockwise.
+    pub fn rotate_ccw(&mut self) {
+        for action in &mut self.0 {
+            *action = action.rotate_ccw();
+        }
+    }
+
     /// Flips all actions horizontally.
     pub fn flip_horizontal(&mut self) {
         for action in &mut self.0 {
