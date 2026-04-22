@@ -28,6 +28,16 @@ pub enum Strategy {
     MoveOptimal,
 }
 
+/// The algorithm to use when searching for a solution.
+pub enum Algorithm {
+    /// A* search. Fast, extremely high memory footprint.
+    AStar,
+    /// IDA* search. Slower, extremely low memory footprint.
+    IDAStar,
+    /// Breadth-first search. Slow, extremely high memory footprint.
+    BFS,
+}
+
 /// A solver for the Sokoban problem.
 #[derive(Clone, Debug)]
 pub struct Solver {
@@ -46,22 +56,14 @@ impl Solver {
         }
     }
 
-    /// Searches for solution using the A* algorithm.
-    pub fn a_star_search(&self) -> Result<Actions, SearchError> {
+    /// Searches for solution using the specified algorithm.
+    pub fn search(&self, algorithm: Algorithm) -> Result<Actions, SearchError> {
         self.stop_flag.store(false, Ordering::Relaxed);
-        search::a_star_search(&self.ctx, &self.stop_flag)
-    }
-
-    /// Searches for solution using the IDA* algorithm.
-    pub fn ida_star_search(&self) -> Result<Actions, SearchError> {
-        self.stop_flag.store(false, Ordering::Relaxed);
-        search::ida_star_search(&self.ctx, &self.stop_flag)
-    }
-
-    /// Searches for solution using the BFS algorithm.
-    pub fn bfs_search(&self) -> Result<Actions, SearchError> {
-        self.stop_flag.store(false, Ordering::Relaxed);
-        search::bfs_search(&self.ctx, &self.stop_flag)
+        match algorithm {
+            Algorithm::AStar => search::a_star_search(&self.ctx, &self.stop_flag),
+            Algorithm::IDAStar => search::ida_star_search(&self.ctx, &self.stop_flag),
+            Algorithm::BFS => search::bfs_search(&self.ctx, &self.stop_flag),
+        }
     }
 
     /// Request to stop the ongoing search. This sets a shared flag checked by

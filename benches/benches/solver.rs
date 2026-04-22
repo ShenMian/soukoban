@@ -1,7 +1,7 @@
 use criterion::{BatchSize, Criterion, criterion_group};
 use soukoban::{
     Level,
-    solver::{Solver, Strategy},
+    solver::{Algorithm, Solver, Strategy},
 };
 
 use super::utils::*;
@@ -17,7 +17,7 @@ fn a_star_search(c: &mut Criterion) {
             |b| {
                 b.iter_batched_ref(
                     || Solver::new(level.map().clone(), strategy),
-                    |solver| solver.a_star_search().unwrap(),
+                    |solver| solver.search(Algorithm::AStar).unwrap(),
                     BatchSize::SmallInput,
                 )
             },
@@ -42,7 +42,7 @@ fn ida_star_search(c: &mut Criterion) {
             |b| {
                 b.iter_batched_ref(
                     || Solver::new(level.map().clone(), strategy),
-                    |solver| solver.ida_star_search().unwrap(),
+                    |solver| solver.search(Algorithm::IDAStar).unwrap(),
                     BatchSize::SmallInput,
                 )
             },

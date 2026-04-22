@@ -9,7 +9,7 @@ use utils::*;
 fn a_star_search() {
     fn search(mut level: Level, strategy: Strategy) -> Actions {
         let solver = Solver::new(level.map().clone(), strategy);
-        let solution = solver.a_star_search().unwrap();
+        let solution = solver.search(Algorithm::AStar).unwrap();
 
         let directions = solution.iter().map(|action| action.direction());
         level.execute_batch(directions).unwrap();
@@ -113,7 +113,7 @@ fn a_star_search() {
 fn ida_star_search() {
     fn search(mut level: Level, strategy: Strategy) -> Actions {
         let solver = Solver::new(level.map().clone(), strategy);
-        let solution = solver.ida_star_search().unwrap();
+        let solution = solver.search(Algorithm::IDAStar).unwrap();
 
         let directions = solution.iter().map(|action| action.direction());
         level.execute_batch(directions).unwrap();
