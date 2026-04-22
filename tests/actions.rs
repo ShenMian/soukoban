@@ -37,7 +37,7 @@ fn from_rle_str() {
 #[test]
 fn rotate() {
     let mut actions = Actions::from_str("lurdLURD").unwrap();
-    actions.rotate();
+    actions.rotate_cw();
     assert_eq!(actions.to_string(), "urdlURDL");
 }
 

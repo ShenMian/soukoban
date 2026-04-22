@@ -34,15 +34,15 @@ fn to_char() {
 fn rotate() {
     use {Action::*, Direction::*};
 
-    assert_eq!(Move(Up).rotate(), Move(Right));
-    assert_eq!(Move(Right).rotate(), Move(Down));
-    assert_eq!(Move(Down).rotate(), Move(Left));
-    assert_eq!(Move(Left).rotate(), Move(Up));
+    assert_eq!(Move(Up).rotate_cw(), Move(Right));
+    assert_eq!(Move(Right).rotate_cw(), Move(Down));
+    assert_eq!(Move(Down).rotate_cw(), Move(Left));
+    assert_eq!(Move(Left).rotate_cw(), Move(Up));
 
-    assert_eq!(Push(Up).rotate(), Push(Right));
-    assert_eq!(Push(Right).rotate(), Push(Down));
-    assert_eq!(Push(Down).rotate(), Push(Left));
-    assert_eq!(Push(Left).rotate(), Push(Up));
+    assert_eq!(Push(Up).rotate_cw(), Push(Right));
+    assert_eq!(Push(Right).rotate_cw(), Push(Down));
+    assert_eq!(Push(Down).rotate_cw(), Push(Left));
+    assert_eq!(Push(Left).rotate_cw(), Push(Up));
 }
 
 #[test]

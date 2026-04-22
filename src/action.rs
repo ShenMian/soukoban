@@ -70,9 +70,9 @@ impl Action {
     /// use soukoban::direction::Direction;
     ///
     /// let action = Action::Move(Direction::Up);
-    /// assert_eq!(action.rotate(), Action::Move(Direction::Right));
+    /// assert_eq!(action.rotate_cw(), Action::Move(Direction::Right));
     /// ```
-    pub fn rotate(self) -> Action {
+    pub fn rotate_cw(self) -> Action {
         self.map(Direction::rotate_cw)
     }
 

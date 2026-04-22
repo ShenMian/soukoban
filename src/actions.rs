@@ -43,9 +43,9 @@ impl Actions {
     }
 
     /// Rotates all actions 90° clockwise.
-    pub fn rotate(&mut self) {
+    pub fn rotate_cw(&mut self) {
         for action in &mut self.0 {
-            *action = action.rotate();
+            *action = action.rotate_cw();
         }
     }
 

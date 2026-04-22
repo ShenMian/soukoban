@@ -31,7 +31,7 @@ impl Direction {
     /// # use soukoban::direction::Direction;
     /// assert_eq!(Direction::Up.rotate_cw(), Direction::Right);
     ///
-    /// // Rotate the direction 90° counter clockwis.
+    /// // Rotate the direction 90° counter-clockwise.
     /// assert_eq!(-Direction::Right.rotate_cw(), Direction::Up);
     /// ```
     pub fn rotate_cw(self) -> Direction {

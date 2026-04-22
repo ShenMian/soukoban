@@ -146,10 +146,10 @@ impl Level {
     }
 
     /// Rotates the level 90° clockwise.
-    pub fn rotate(&mut self) {
-        self.map.rotate();
-        self.actions.rotate();
-        self.undone_actions.rotate();
+    pub fn rotate_cw(&mut self) {
+        self.map.rotate_cw();
+        self.actions.rotate_cw();
+        self.undone_actions.rotate_cw();
     }
 
     /// Flips the level horizontally.

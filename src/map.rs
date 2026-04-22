@@ -327,7 +327,7 @@ impl Map {
     }
 
     /// Rotates the map 90° clockwise.
-    pub fn rotate(&mut self) {
+    pub fn rotate_cw(&mut self) {
         let dimensions = self.dimensions;
         let rotate_position =
             |position: Vector2<i32>| Vector2::new(dimensions.y - 1 - position.y, position.x);
@@ -440,7 +440,7 @@ impl Map {
             if i == 4 {
                 self.flip_horizontal();
             }
-            self.rotate();
+            self.rotate_cw();
             self.canonicalize_player();
 
             let mut hasher = DefaultHasher::new();
