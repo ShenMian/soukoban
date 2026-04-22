@@ -44,3 +44,25 @@ fn flip_vertical() {
     assert_eq!(Right.flip_vertical(), Right);
     assert_eq!(Left.flip_vertical(), Left);
 }
+
+#[test]
+fn to_vector2() {
+    use Direction::*;
+    use nalgebra::Vector2;
+    assert_eq!(Vector2::<i32>::from(Up), -Vector2::y());
+    assert_eq!(Vector2::<i32>::from(Right), Vector2::x());
+    assert_eq!(Vector2::<i32>::from(Down), Vector2::y());
+    assert_eq!(Vector2::<i32>::from(Left), -Vector2::x());
+}
+
+#[test]
+fn try_from_vector2() {
+    use Direction::*;
+    use nalgebra::Vector2;
+    assert_eq!(Direction::try_from(-Vector2::<i32>::y()), Ok(Up));
+    assert_eq!(Direction::try_from(Vector2::<i32>::x()), Ok(Right));
+    assert_eq!(Direction::try_from(Vector2::<i32>::y()), Ok(Down));
+    assert_eq!(Direction::try_from(-Vector2::<i32>::x()), Ok(Left));
+    assert_eq!(Direction::try_from(Vector2::new(1, 1)), Err(()));
+    assert_eq!(Direction::try_from(Vector2::new(0, 0)), Err(()));
+}
