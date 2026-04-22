@@ -180,6 +180,31 @@ fn load_nth_from_reader() {
 }
 
 #[test]
+fn rotate_cw() {
+    let mut level = Level::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    level.rotate_cw();
+    assert_eq!(
+        level.to_string(),
+        indoc! {"
+            #####
+            #_$.#
+            #_###
+            #@#--
+            ###--
+        "}
+    );
+}
+
+#[test]
 fn rotate_ccw() {
     let mut level = Level::from_str(
         r#"
@@ -202,4 +227,74 @@ fn rotate_ccw() {
             #####
         "}
     );
+}
+
+#[test]
+fn flip_horizontal() {
+    let mut level = Level::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    level.flip_horizontal();
+    assert_eq!(
+        level.to_string(),
+        indoc! {"
+            --###
+            --#.#
+            ###$#
+            #@__#
+            #####
+        "}
+    );
+}
+
+#[test]
+fn flip_vertical() {
+    let mut level = Level::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    level.flip_vertical();
+    assert_eq!(
+        level.to_string(),
+        indoc! {"
+            #####
+            #__@#
+            #$###
+            #.#--
+            ###--
+        "}
+    );
+}
+
+#[test]
+fn player_reachable_area() {
+    let level = Level::from_str(indoc! {"
+        #####
+        #@* #
+        # ###
+        # #
+        ###
+    "})
+    .unwrap();
+    let reachable_area = level.player_reachable_area();
+    assert!(reachable_area.contains(&nalgebra::Vector2::new(1, 1)));
+    assert!(reachable_area.contains(&nalgebra::Vector2::new(1, 2)));
+    assert!(reachable_area.contains(&nalgebra::Vector2::new(1, 3)));
+    assert!(!reachable_area.contains(&nalgebra::Vector2::new(2, 1)));
+    assert!(!reachable_area.contains(&nalgebra::Vector2::new(3, 1)));
+    assert!(!reachable_area.contains(&nalgebra::Vector2::new(2, 3)));
+    assert!(!reachable_area.contains(&nalgebra::Vector2::new(3, 2)));
 }
