@@ -4,23 +4,25 @@
 [![Test status](https://img.shields.io/github/actions/workflow/status/ShenMian/soukoban/test.yml?label=test)](https://github.com/ShenMian/soukoban/actions/workflows/test.yml)
 [![Code coverage](https://img.shields.io/codecov/c/github/ShenMian/soukoban)](https://app.codecov.io/gh/ShenMian/soukoban)
 
-A library provides the implementation of algorithms and data structures related to [Sokoban].
+A library providing implementations of algorithms and data structures related to [Sokoban].
 
 ## Features
 
 - **Solver**
-  - **Search algorithms**: Supports A\*, IDA\* and GBFS search.
-  - **Strategies**: Supports optimal and suboptimal strategies.
+  - **Search algorithms**: Supports A\*, IDA\*, GBFS and BFS search.
+  - **Strategies**: Supports quick, push-optimal, and move-optimal strategies.
 - **Level**
   - **Zero-allocation lazy parsing**: Parses levels lazily from an in-memory string without memory allocations except for level creation.
   - **Lazy stream parsing**: Parses levels lazily from a stream.
   - **Map reconstruction**: Reconstructs the map from the solution.
   - **Canonicalization**: Removes elements from the map that are not relevant to the solution.
   - **RLE support**: Enables loading of levels encoded in Run-Length Encoding (RLE) format.
-- **Solution**
+  - **Symmetry transformations**: Supports rotating and flipping levels.
+- **Actions**
   - **Reversal move handling**: Automatically interprets reversal moves as undo actions.
   - **Metrics calculation**: Computes metrics such as `box_lines`, `box_changes`, `pushing_sessions`, and `player_lines`.
-- **Pathfinding**: Finds the optimal player path to push a box to a position.
+  - **Symmetry transformations**: Supports rotating and flipping action sequences mapping.
+- **Pathfinding**: Finds paths for box/player with support for different strategies.
 - **Deadlock detection**: Detects static deadlocks and freeze deadlocks.
 
 ## License
