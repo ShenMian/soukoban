@@ -178,3 +178,28 @@ fn load_nth_from_reader() {
         load_level_from_file("assets/Microban_II_135.xsb", 132)
     );
 }
+
+#[test]
+fn rotate_ccw() {
+    let mut level = Level::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    level.rotate_ccw();
+    assert_eq!(
+        level.to_string(),
+        indoc! {"
+            --###
+            --#@#
+            ###_#
+            #.$_#
+            #####
+        "}
+    );
+}

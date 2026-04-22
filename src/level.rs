@@ -152,6 +152,13 @@ impl Level {
         self.undone_actions.rotate_cw();
     }
 
+    /// Rotates the level 90° counter-clockwise.
+    pub fn rotate_ccw(&mut self) {
+        self.map.rotate_ccw();
+        self.actions.rotate_ccw();
+        self.undone_actions.rotate_ccw();
+    }
+
     /// Flips the level horizontally.
     pub fn flip_horizontal(&mut self) {
         self.map.flip_horizontal();
