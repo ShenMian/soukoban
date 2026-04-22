@@ -35,7 +35,7 @@ pub enum Algorithm {
     /// IDA* search. Slower, extremely low memory footprint.
     IDAStar,
     /// Breadth-first search. Slow, extremely high memory footprint.
-    BFS,
+    Bfs,
 }
 
 /// A solver for the Sokoban problem.
@@ -62,7 +62,7 @@ impl Solver {
         match algorithm {
             Algorithm::AStar => search::a_star_search(&self.ctx, &self.stop_flag),
             Algorithm::IDAStar => search::ida_star_search(&self.ctx, &self.stop_flag),
-            Algorithm::BFS => search::bfs_search(&self.ctx, &self.stop_flag),
+            Algorithm::Bfs => search::bfs_search(&self.ctx, &self.stop_flag),
         }
     }
 
