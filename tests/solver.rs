@@ -98,15 +98,14 @@ fn a_star_search() {
         .shifts()
     );
 
-    // FIXME: The following levels are incorrectly identified as unsolvable by
-    // the solver, but they are actually solvable. search(
-    //     load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67),
-    //     Strategy::Quick,
-    // );
-    // search(
-    //     load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 78),
-    //     Strategy::Quick,
-    // );
+    search(
+        load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67),
+        Strategy::Quick,
+    );
+    search(
+        load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 78),
+        Strategy::Quick,
+    );
 }
 
 #[test]
@@ -202,6 +201,66 @@ fn ida_star_search() {
     //     .unwrap()
     //     .pushes()
     // );
+}
+
+#[test]
+fn bfs_search() {
+    fn search(mut level: Level, strategy: Strategy) -> Actions {
+        let solver = Solver::new(level.map().clone(), strategy);
+        let solution = solver.search(Algorithm::Bfs).unwrap();
+
+        let directions = solution.iter().map(|action| action.direction());
+        level.execute_batch(directions).unwrap();
+        assert!(level.is_solved());
+
+        solution
+    }
+
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 1),
+        Strategy::Quick,
+    );
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 2),
+        Strategy::Quick,
+    );
+    search(
+        load_level_from_file("assets/BoxWorld_100.xsb", 3),
+        Strategy::Quick,
+    );
+
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::PushOptimal,
+        )
+        .shifts(),
+        Actions::from_str("DuLLrUUdrR").unwrap().shifts()
+    );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 2),
+            Strategy::PushOptimal,
+        )
+        .shifts(),
+        Actions::from_str(
+            "rr4DrddlluRdrUl5ulldRur4D3RdrUUd3lddlluRdrUl4ulldRur3D3RdrU3lddlluRdrUlu3R"
+        )
+        .unwrap()
+        .shifts()
+    );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 3),
+            Strategy::PushOptimal,
+        )
+        .shifts(),
+        Actions::from_str(
+            "rRRddrruULuu4l3D3u4rdd3L3ruu4ldDldRu6ruLd5luu4rDrd4LDu3ruu4ldDldRu3rddrUru4L3ruu4ldD"
+        )
+        .unwrap()
+        .shifts()
+    );
 }
 
 #[test]
