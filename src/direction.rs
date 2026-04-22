@@ -142,14 +142,4 @@ impl DirectedPosition {
             direction,
         }
     }
-
-    /// Returns the position one step forward in the current direction.
-    pub fn forward(&self) -> Vector2<i32> {
-        self.position + &self.direction.into()
-    }
-
-    /// Returns the position one step backward against the current direction.
-    pub fn backward(&self) -> Vector2<i32> {
-        self.position - &self.direction.into()
-    }
 }
