@@ -247,6 +247,106 @@ fn shrink_to_fit() {
 }
 
 #[test]
+fn rotate_cw() {
+    let mut map = Map::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    map.rotate_cw();
+    assert_eq!(
+        map.to_string(),
+        indoc! {"
+            #####
+            #_$.#
+            #_###
+            #@#--
+            ###--
+        "}
+    );
+}
+
+#[test]
+fn rotate_ccw() {
+    let mut map = Map::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    map.rotate_ccw();
+    assert_eq!(
+        map.to_string(),
+        indoc! {"
+            --###
+            --#@#
+            ###_#
+            #.$_#
+            #####
+        "}
+    );
+}
+
+#[test]
+fn flip_horizontal() {
+    let mut map = Map::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    map.flip_horizontal();
+    assert_eq!(
+        map.to_string(),
+        indoc! {"
+            --###
+            --#.#
+            ###$#
+            #@__#
+            #####
+        "}
+    );
+}
+
+#[test]
+fn flip_vertical() {
+    let mut map = Map::from_str(
+        r#"
+        ###
+        #.#
+        #$###
+        #  @#
+        #####
+    "#,
+    )
+    .unwrap();
+    map.flip_vertical();
+    assert_eq!(
+        map.to_string(),
+        indoc! {"
+            #####
+            #__@#
+            #$###
+            #.#--
+            ###--
+        "}
+    );
+}
+
+#[test]
 fn display() {
     let map = load_level_from_file("assets/Holland_81.xsb", 9)
         .map()

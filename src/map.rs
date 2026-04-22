@@ -334,6 +334,14 @@ impl Map {
         self.transform(rotate_position, self.dimensions.yx());
     }
 
+    /// Rotates the map 90° counter-clockwise.
+    pub fn rotate_ccw(&mut self) {
+        let dimensions = self.dimensions;
+        let rotate_position =
+            |position: Vector2<i32>| Vector2::new(position.y, dimensions.x - 1 - position.x);
+        self.transform(rotate_position, self.dimensions.yx());
+    }
+
     /// Flips the map horizontally.
     pub fn flip_horizontal(&mut self) {
         let dimensions = self.dimensions;
