@@ -90,7 +90,7 @@ fn lower_bounds(c: &mut Criterion) {
 
 fn tunnels(c: &mut Criterion) {
     let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
-    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    let solver = Solver::new(level.into(), Strategy::Quick);
     solver.context().lower_bounds();
     c.bench_function("Solver::tunnels", |b| {
         b.iter_batched_ref(

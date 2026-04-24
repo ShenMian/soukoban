@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use soukoban::{Actions, Level, solver::*};
+use soukoban::{Actions, Level, SearchError, solver::*};
 
 mod utils;
 use utils::*;
@@ -264,19 +264,36 @@ fn bfs_search() {
 }
 
 #[test]
+fn request_stop() {
+    let level = load_level_from_file("assets/Grigr2001_100.xsb", 1);
+    let solver = Solver::new(level.into(), Strategy::Quick);
+
+    let handler = std::thread::spawn({
+        let solver = solver.clone();
+        move || solver.search(Algorithm::AStar)
+    });
+
+    std::thread::sleep(std::time::Duration::from_secs(1));
+    solver.request_stop();
+
+    let result = handler.join().unwrap();
+    assert_eq!(result, Err(SearchError::Interrupted));
+}
+
+#[test]
 fn lower_bounds() {
     let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67);
-    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    let solver = Solver::new(level.into(), Strategy::Quick);
     assert_eq!(solver.context().lower_bounds().len(), 8);
 
     let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 78);
-    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    let solver = Solver::new(level.into(), Strategy::Quick);
     assert_eq!(solver.context().lower_bounds().len(), 8);
 }
 
 #[test]
 fn tunnels() {
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 2);
-    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    let solver = Solver::new(level.into(), Strategy::Quick);
     assert_eq!(solver.context().tunnels().len(), 4);
 }

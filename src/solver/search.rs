@@ -7,7 +7,10 @@ use std::{
 
 use itertools::Itertools;
 
-use crate::{Action, Actions, SearchError, Tiles, direction::Direction, path_finding::find_path, solver::Strategy};
+use crate::{
+    Action, Actions, SearchError, Tiles, direction::Direction, path_finding::find_path,
+    solver::Strategy,
+};
 
 use super::{context::Context, node::Node, state::State};
 
@@ -123,7 +126,10 @@ fn ida_star_depth_search(
 
 /// Searches for a solution using the BFS algorithm.
 pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
-    assert!(ctx.strategy() != Strategy::MoveOptimal, "BFS does not support MoveOptimal strategy");
+    assert!(
+        ctx.strategy() != Strategy::MoveOptimal,
+        "BFS does not support MoveOptimal strategy"
+    );
 
     let mut queue = std::collections::VecDeque::new();
     let mut came_from = HashMap::new();
