@@ -167,6 +167,6 @@ impl From<Action> for char {
 
 impl fmt::Display for Action {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", Into::<char>::into(*self))
+        write!(f, "{}", char::from(*self))
     }
 }

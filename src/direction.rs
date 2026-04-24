@@ -19,7 +19,7 @@ pub enum Direction {
 
 impl Direction {
     /// Returns an iterator over all directions.
-    pub fn iter() -> std::array::IntoIter<Direction, 4> {
+    pub fn iter() -> impl Iterator<Item = Direction> {
         [Self::Up, Self::Right, Self::Down, Self::Left].into_iter()
     }
 
