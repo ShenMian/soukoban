@@ -100,14 +100,14 @@ impl Node {
                 while ctx
                     .tunnels()
                     .contains(&DirectedPosition::new(new_box_position, push_direction))
-                {
-                    if self
+                    && !self
                         .state
                         .box_positions
                         .contains(&(new_box_position + &push_direction.into()))
-                    {
-                        break;
-                    }
+                    && ctx
+                        .lower_bounds()
+                        .contains_key(&(new_box_position + &push_direction.into()))
+                {
                     new_player_position = new_box_position;
                     new_box_position += &push_direction.into();
                     new_pushes += 1;
