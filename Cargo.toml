@@ -20,11 +20,11 @@ harness = false
 bench = false
 
 [dependencies]
-bitflags = "2.10"
+bitflags = "2"
 itertools = "0.14"
 nalgebra = "0.34"
-thiserror = "2.0"
+thiserror = "2"
 
 [dev-dependencies]
-indoc = "2.0"
+indoc = "2"
 criterion = { version = "0.8", features = ["html_reports"] }
