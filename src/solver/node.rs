@@ -23,7 +23,7 @@ impl Node {
     /// Creates a new `Node`.
     pub fn new(state: State, pushes: i32, moves: i32, ctx: &Context) -> Self {
         Self {
-            heuristic: state.heuristic(ctx),
+            heuristic: state.lower_bound(ctx),
             state,
             pushes,
             moves,
@@ -75,7 +75,7 @@ impl Node {
                 let mut new_box_position = box_position + &push_direction.into();
                 if ctx.map()[new_box_position].intersects(Tiles::Wall)
                     || self.state.box_positions.contains(&new_box_position)
-                    || !ctx.lower_bounds().contains_key(&new_box_position)
+                    || !ctx.min_costs().contains_key(&new_box_position)
                 {
                     continue;
                 }
@@ -105,7 +105,7 @@ impl Node {
                         .box_positions
                         .contains(&(new_box_position + &push_direction.into()))
                     && ctx
-                        .lower_bounds()
+                        .min_costs()
                         .contains_key(&(new_box_position + &push_direction.into()))
                 {
                     new_player_position = new_box_position;

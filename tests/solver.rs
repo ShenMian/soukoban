@@ -281,14 +281,14 @@ fn request_stop() {
 }
 
 #[test]
-fn lower_bounds() {
+fn min_costs() {
     let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67);
     let solver = Solver::new(level.into(), Strategy::Quick);
-    assert_eq!(solver.context().lower_bounds().len(), 8);
+    assert_eq!(solver.context().min_costs().len(), 8);
 
     let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 78);
     let solver = Solver::new(level.into(), Strategy::Quick);
-    assert_eq!(solver.context().lower_bounds().len(), 8);
+    assert_eq!(solver.context().min_costs().len(), 8);
 }
 
 #[test]

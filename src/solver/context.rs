@@ -24,8 +24,8 @@ pub struct Context {
     map: Map,
     /// The search strategy to use.
     strategy: Strategy,
-    /// Lower bounds for a single box to the nearest goal.
-    lower_bounds: HashMap<Vector2<i32>, i32>,
+    /// Minimum cost to push a box from a position to the nearest goal.
+    min_costs: HashMap<Vector2<i32>, i32>,
     /// Set of tunnel positions and directions.
     tunnels: HashSet<DirectedPosition>,
 }
@@ -35,7 +35,7 @@ impl Context {
     /// tunnels.
     pub fn new(map: Map, strategy: Strategy) -> Self {
         Self {
-            lower_bounds: Self::compute_minimum_push(&map),
+            min_costs: Self::compute_minimum_push(&map),
             tunnels: Self::compute_tunnels(&map),
             map,
             strategy,
@@ -52,9 +52,9 @@ impl Context {
         self.strategy
     }
 
-    /// Returns a reference to the set of lower bounds.
-    pub fn lower_bounds(&self) -> &HashMap<Vector2<i32>, i32> {
-        &self.lower_bounds
+    /// Returns a reference to the set of minimum costs.
+    pub fn min_costs(&self) -> &HashMap<Vector2<i32>, i32> {
+        &self.min_costs
     }
 
     /// Returns a reference to the set of tunnels.
@@ -65,7 +65,7 @@ impl Context {
     /// Computes and returns the minimum number of pushes to push the box to
     /// the nearest goal.
     fn compute_minimum_push(map: &Map) -> HashMap<Vector2<i32>, i32> {
-        let mut lower_bounds = HashMap::new();
+        let mut min_costs = HashMap::new();
         let mut costs = HashMap::new();
         let mut queue = VecDeque::new();
 
@@ -82,13 +82,13 @@ impl Context {
                     let state = DirectedPosition::new(new_box_position, pull_direction);
                     costs.insert(state, 1);
                     queue.push_back((state, 1));
-                    lower_bounds.insert(new_box_position, 1);
+                    min_costs.insert(new_box_position, 1);
                 }
             }
         }
 
         for goal in map.goal_positions() {
-            lower_bounds.insert(*goal, 0);
+            min_costs.insert(*goal, 0);
         }
 
         while let Some((state, cost)) = queue.pop_front() {
@@ -115,7 +115,7 @@ impl Context {
                     *current_cost = new_cost;
                     queue.push_back((new_state, new_cost));
 
-                    let current_min = lower_bounds.entry(new_box_position).or_insert(i32::MAX);
+                    let current_min = min_costs.entry(new_box_position).or_insert(i32::MAX);
                     if new_cost < *current_min {
                         *current_min = new_cost;
                     }
@@ -123,7 +123,7 @@ impl Context {
             }
         }
 
-        lower_bounds
+        min_costs
     }
 
     /// Computes and returns the set of tunnels.

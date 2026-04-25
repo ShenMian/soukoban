@@ -18,6 +18,21 @@ pub struct State {
 }
 
 impl State {
+    /// Computes the lower bound on the minimum remaining cost to reach a final
+    /// state.
+    ///
+    /// It sums, over all boxes, the minimum cost needed to bring that box to
+    /// its nearest goal (ignoring other boxes).
+    ///
+    /// A value of 0 means every box is already on a goal, i.e. the state is a
+    /// final state.
+    pub fn lower_bound(&self, ctx: &Context) -> i32 {
+        self.box_positions
+            .iter()
+            .map(|box_position| ctx.min_costs()[box_position])
+            .sum()
+    }
+
     /// Computes the hash of the canonicalized state.
     pub fn canonicalized_hash(&self, strategy: Strategy, map: &Map) -> u64 {
         let mut hasher = DefaultHasher::new();
@@ -41,14 +56,6 @@ impl State {
             !(map[position].intersects(Tiles::Wall) || self.box_positions.contains(&position))
         });
         self.player_position = compute_area_anchor(&player_reachable_area).unwrap();
-    }
-
-    /// Returns the heuristic value of the state.
-    pub fn heuristic(&self, ctx: &Context) -> i32 {
-        self.box_positions
-            .iter()
-            .map(|box_position| ctx.lower_bounds()[box_position])
-            .sum()
     }
 }
 

@@ -56,16 +56,16 @@ fn ida_star_search(c: &mut Criterion) {
     bench_search(level, Strategy::Quick);
 }
 
-fn lower_bounds(c: &mut Criterion) {
+fn min_costs(c: &mut Criterion) {
     let level = load_level_from_file("assets/Aymeric_Du_Peloux_282.xsb", 67);
     let solver = Solver::new(level.map().clone(), Strategy::Quick);
     c.bench_function(
-        &format!("Solver::lower_bounds '{}'", level.metadata()["title"]),
+        &format!("Solver::min_costs '{}'", level.metadata()["title"]),
         |b| {
             b.iter_batched_ref(
                 || solver.clone(),
                 |solver| {
-                    solver.context().lower_bounds();
+                    solver.context().min_costs();
                 },
                 BatchSize::SmallInput,
             )
@@ -75,12 +75,12 @@ fn lower_bounds(c: &mut Criterion) {
     let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
     let solver = Solver::new(level.map().clone(), Strategy::Quick);
     c.bench_function(
-        &format!("Solver::lower_bounds '{}'", level.metadata()["title"]),
+        &format!("Solver::min_costs '{}'", level.metadata()["title"]),
         |b| {
             b.iter_batched_ref(
                 || solver.clone(),
                 |solver| {
-                    solver.context().lower_bounds();
+                    solver.context().min_costs();
                 },
                 BatchSize::SmallInput,
             )
@@ -91,7 +91,7 @@ fn lower_bounds(c: &mut Criterion) {
 fn tunnels(c: &mut Criterion) {
     let level = load_level_from_file("assets/Benchmark_3.xsb", 1);
     let solver = Solver::new(level.into(), Strategy::Quick);
-    solver.context().lower_bounds();
+    solver.context().min_costs();
     c.bench_function("Solver::tunnels", |b| {
         b.iter_batched_ref(
             || solver.clone(),
@@ -103,10 +103,4 @@ fn tunnels(c: &mut Criterion) {
     });
 }
 
-criterion_group!(
-    benches,
-    a_star_search,
-    ida_star_search,
-    lower_bounds,
-    tunnels
-);
+criterion_group!(benches, a_star_search, ida_star_search, min_costs, tunnels);
