@@ -32,12 +32,12 @@ impl State {
     }
 
     /// Computes the hash of the canonicalized state.
-    pub fn canonicalized_hash(&self, strategy: Strategy, map: &Map) -> u64 {
+    pub fn canonicalized_hash(&self, ctx: &Context) -> u64 {
         let mut hasher = FxHasher::default();
-        match strategy {
+        match ctx.strategy() {
             Strategy::Quick | Strategy::PushOptimal => {
                 let mut canonicalized_state = self.clone();
-                canonicalized_state.canonicalize_player(map);
+                canonicalized_state.canonicalize_player(ctx.map());
                 canonicalized_state.hash(&mut hasher);
                 hasher.finish()
             }

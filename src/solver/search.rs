@@ -21,7 +21,7 @@ pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, S
     let mut came_from = FxHashMap::default();
 
     let state: State = ctx.map().clone().into();
-    costs.insert(state.canonicalized_hash(ctx.strategy(), ctx.map()), 0);
+    costs.insert(state.canonicalized_hash(ctx), 0);
     queue.push(Node::new(state, 0, 0, ctx));
 
     while let Some(node) = queue.pop() {
@@ -37,9 +37,7 @@ pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, S
         }
 
         for successor in node.successors(ctx) {
-            let hash = successor
-                .state
-                .canonicalized_hash(ctx.strategy(), ctx.map());
+            let hash = successor.state.canonicalized_hash(ctx);
             let current_cost = costs.entry(hash).or_insert(i32::MAX);
             if successor.cost() < *current_cost {
                 *current_cost = successor.cost();
@@ -58,7 +56,7 @@ pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions,
 
     let mut path = vec![state];
     let mut visited = FxHashSet::default();
-    visited.insert(node.state.canonicalized_hash(ctx.strategy(), ctx.map()));
+    visited.insert(node.state.canonicalized_hash(ctx));
     let mut threshold = node.heuristic();
     loop {
         match ida_star_depth_search(ctx, stop_flag, &node, &mut path, &mut visited, threshold) {
@@ -103,9 +101,7 @@ fn ida_star_depth_search(
 
     let mut min_threshold = i32::MAX;
     for successor in node.successors(ctx) {
-        let hash = successor
-            .state
-            .canonicalized_hash(ctx.strategy(), ctx.map());
+        let hash = successor.state.canonicalized_hash(ctx);
 
         // Skips if this state is already in the current search path
         if visited.contains(&hash) {
@@ -139,7 +135,7 @@ pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, Sear
     let mut visited = FxHashSet::default();
 
     let state: State = ctx.map().clone().into();
-    visited.insert(state.canonicalized_hash(ctx.strategy(), ctx.map()));
+    visited.insert(state.canonicalized_hash(ctx));
 
     queue.push_back(Node::new(state, 0, 0, ctx));
 
@@ -156,10 +152,7 @@ pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, Sear
         }
 
         for successor in node.successors(ctx) {
-            let hash = successor
-                .state
-                .canonicalized_hash(ctx.strategy(), ctx.map());
-
+            let hash = successor.state.canonicalized_hash(ctx);
             if visited.insert(hash) {
                 came_from.insert(successor.state.clone(), node.state.clone());
                 queue.push_back(successor);
