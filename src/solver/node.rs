@@ -96,7 +96,6 @@ impl Node {
                 let mut new_pushes = self.pushes + 1;
 
                 // Skips pushes in tunnels
-                let mut new_player_position = *box_position;
                 while ctx
                     .tunnels()
                     .contains(&DirectedPosition::new(new_box_position, push_direction))
@@ -106,11 +105,11 @@ impl Node {
                         .contains(&(new_box_position + &push_direction.into()))
                     && !ctx.is_dead_position(new_box_position + &push_direction.into())
                 {
-                    new_player_position = new_box_position;
                     new_box_position += &push_direction.into();
                     new_pushes += 1;
                     new_moves += 1;
                 }
+                let new_player_position = new_box_position - &push_direction.into();
 
                 let mut new_box_positions = self.state.box_positions.clone();
                 new_box_positions.remove(box_position);
