@@ -476,10 +476,10 @@ fn is_xsb_string(str: &str) -> bool {
         || (str.chars().all(is_xsb_symbol_with_rle) && str.chars().any(is_xsb_symbol))
 }
 
-fn is_xsb_symbol(char: char) -> bool {
+const fn is_xsb_symbol(char: char) -> bool {
     matches!(char, ' ' | '-' | '_' | '#' | '$' | '.' | '@' | '*' | '+')
 }
 
-fn is_xsb_symbol_with_rle(char: char) -> bool {
+const fn is_xsb_symbol_with_rle(char: char) -> bool {
     is_xsb_symbol(char) || char::is_ascii_digit(&char) || char == '|'
 }

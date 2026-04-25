@@ -25,9 +25,9 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.direction(), Direction::Up);
     /// ```
-    pub fn direction(&self) -> Direction {
+    pub const fn direction(&self) -> Direction {
         match *self {
-            Action::Move(direction) | Action::Push(direction) => direction,
+            Self::Move(direction) | Self::Push(direction) => direction,
         }
     }
 
@@ -42,8 +42,8 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert!(action.is_move());
     /// ```
-    pub fn is_move(&self) -> bool {
-        matches!(&self, Action::Move(_))
+    pub const fn is_move(&self) -> bool {
+        matches!(&self, Self::Move(_))
     }
 
     /// Checks if the action is a shift action.
@@ -57,8 +57,8 @@ impl Action {
     /// let action = Action::Push(Direction::Up);
     /// assert!(action.is_shift());
     /// ```
-    pub fn is_shift(&self) -> bool {
-        matches!(&self, Action::Push(_))
+    pub const fn is_shift(&self) -> bool {
+        matches!(&self, Self::Push(_))
     }
 
     /// Rotates the action's direction 90° clockwise.
@@ -72,7 +72,7 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.rotate_cw(), Action::Move(Direction::Right));
     /// ```
-    pub fn rotate_cw(self) -> Action {
+    pub fn rotate_cw(self) -> Self {
         self.map(Direction::rotate_cw)
     }
 
@@ -87,7 +87,7 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.rotate_ccw(), Action::Move(Direction::Left));
     /// ```
-    pub fn rotate_ccw(self) -> Action {
+    pub fn rotate_ccw(self) -> Self {
         self.map(Direction::rotate_ccw)
     }
 
@@ -102,7 +102,7 @@ impl Action {
     /// let action = Action::Move(Direction::Left);
     /// assert_eq!(action.flip_horizontal(), Action::Move(Direction::Right));
     /// ```
-    pub fn flip_horizontal(self) -> Action {
+    pub fn flip_horizontal(self) -> Self {
         self.map(Direction::flip_horizontal)
     }
 
@@ -117,15 +117,15 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.flip_vertical(), Action::Move(Direction::Down));
     /// ```
-    pub fn flip_vertical(self) -> Action {
+    pub fn flip_vertical(self) -> Self {
         self.map(Direction::flip_vertical)
     }
 
     /// Applies a transformation function to the `Direction`.
-    fn map(self, f: impl Fn(Direction) -> Direction) -> Action {
+    fn map(self, f: impl Fn(Direction) -> Direction) -> Self {
         match self {
-            Action::Move(direction) => Action::Move(f(direction)),
-            Action::Push(direction) => Action::Push(f(direction)),
+            Self::Move(direction) => Self::Move(f(direction)),
+            Self::Push(direction) => Self::Push(f(direction)),
         }
     }
 }
@@ -142,9 +142,9 @@ impl TryFrom<char> for Action {
             _ => return Err(ParseActionError::InvalidCharacter(char)),
         };
         if char.is_ascii_uppercase() {
-            Ok(Action::Push(direction))
+            Ok(Self::Push(direction))
         } else {
-            Ok(Action::Move(direction))
+            Ok(Self::Move(direction))
         }
     }
 }

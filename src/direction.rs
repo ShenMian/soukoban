@@ -19,7 +19,7 @@ pub enum Direction {
 
 impl Direction {
     /// Returns an iterator over all directions.
-    pub fn iter() -> impl Iterator<Item = Direction> {
+    pub fn iter() -> impl Iterator<Item = Self> {
         [Self::Up, Self::Right, Self::Down, Self::Left].into_iter()
     }
 
@@ -34,7 +34,7 @@ impl Direction {
     /// // Rotate the direction 90° counter-clockwise.
     /// assert_eq!(-Direction::Right.rotate_cw(), Direction::Up);
     /// ```
-    pub fn rotate_cw(self) -> Direction {
+    pub const fn rotate_cw(self) -> Self {
         match self {
             Self::Up => Self::Right,
             Self::Right => Self::Down,
@@ -51,7 +51,7 @@ impl Direction {
     /// # use soukoban::direction::Direction;
     /// assert_eq!(Direction::Up.rotate_ccw(), Direction::Left);
     /// ```
-    pub fn rotate_ccw(self) -> Direction {
+    pub fn rotate_ccw(self) -> Self {
         -self.rotate_cw()
     }
 
@@ -64,7 +64,7 @@ impl Direction {
     /// assert_eq!(Direction::Left.flip_horizontal(), Direction::Right);
     /// assert_eq!(Direction::Up.flip_horizontal(), Direction::Up);
     /// ```
-    pub fn flip_horizontal(self) -> Direction {
+    pub const fn flip_horizontal(self) -> Self {
         match self {
             Self::Left => Self::Right,
             Self::Right => Self::Left,
@@ -81,7 +81,7 @@ impl Direction {
     /// assert_eq!(Direction::Up.flip_vertical(), Direction::Down);
     /// assert_eq!(Direction::Left.flip_vertical(), Direction::Left);
     /// ```
-    pub fn flip_vertical(self) -> Direction {
+    pub const fn flip_vertical(self) -> Self {
         match self {
             Self::Up => Self::Down,
             Self::Down => Self::Up,
@@ -102,10 +102,10 @@ impl From<Direction> for Vector2<i32> {
     fn from(direction: Direction) -> Self {
         use Direction as E;
         match direction {
-            E::Up => -Vector2::y(),
-            E::Right => Vector2::x(),
-            E::Down => Vector2::y(),
-            E::Left => -Vector2::x(),
+            E::Up => -Self::y(),
+            E::Right => Self::x(),
+            E::Down => Self::y(),
+            E::Left => -Self::x(),
         }
     }
 }
@@ -136,7 +136,7 @@ pub struct DirectedPosition {
 
 impl DirectedPosition {
     /// Creates a new `DirectedPosition`.
-    pub fn new(position: Vector2<i32>, direction: Direction) -> Self {
+    pub const fn new(position: Vector2<i32>, direction: Direction) -> Self {
         Self {
             position,
             direction,

@@ -127,9 +127,9 @@ impl FromStr for Actions {
     /// Creates a new `Actions` with LURD format string.
     fn from_str(lurd: &str) -> Result<Self, Self::Err> {
         if lurd.contains(char::is_numeric) {
-            return Actions::from_str(&rle_decode(lurd)?);
+            return Self::from_str(&rle_decode(lurd)?);
         }
-        let mut instance = Actions::default();
+        let mut instance = Self::default();
         for char in lurd.chars() {
             instance.push(Action::try_from(char)?);
         }

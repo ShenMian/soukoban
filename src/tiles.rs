@@ -24,22 +24,22 @@ bitflags! {
 impl fmt::Display for Tiles {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut tiles = *self;
-        if tiles == Tiles::Floor {
+        if tiles == Self::Floor {
             write!(f, "_")?;
             return Ok(());
         }
-        tiles.remove(Tiles::Floor);
-        if tiles == Tiles::Box | Tiles::Goal {
+        tiles.remove(Self::Floor);
+        if tiles == Self::Box | Self::Goal {
             write!(f, "*")?;
-        } else if tiles == Tiles::Player | Tiles::Goal {
+        } else if tiles == Self::Player | Self::Goal {
             write!(f, "+")?;
-        } else if tiles == Tiles::Box {
+        } else if tiles == Self::Box {
             write!(f, "$")?;
-        } else if tiles == Tiles::Goal {
+        } else if tiles == Self::Goal {
             write!(f, ".")?;
-        } else if tiles == Tiles::Player {
+        } else if tiles == Self::Player {
             write!(f, "@")?;
-        } else if tiles == Tiles::Wall {
+        } else if tiles == Self::Wall {
             write!(f, "#")?;
         } else if tiles.is_empty() {
             write!(f, "-")?;

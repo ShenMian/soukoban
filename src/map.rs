@@ -41,7 +41,7 @@ impl Map {
     pub fn from_actions(actions: Actions) -> Result<Self, ParseMapError> {
         let (dimensions, player_position) = compute_dimensions_and_player_position(&actions);
 
-        let mut instance = Map::with_dimensions(dimensions);
+        let mut instance = Self::with_dimensions(dimensions);
 
         let mut initial_box_positions = FxHashSet::default();
         let mut current_box_positions = FxHashSet::default();
@@ -240,7 +240,7 @@ impl Map {
             "dimensions must be non-negative"
         );
 
-        let mut clamped_map = Map::with_dimensions(dimensions);
+        let mut clamped_map = Self::with_dimensions(dimensions);
         for y in 0..dimensions.y {
             for x in 0..dimensions.x {
                 let position = Vector2::new(x, y);
@@ -476,7 +476,7 @@ impl Map {
         operation: impl Fn(Vector2<i32>) -> Vector2<i32> + Copy,
         new_dimensions: Vector2<i32>,
     ) {
-        let mut transformed_map = Map::with_dimensions(new_dimensions);
+        let mut transformed_map = Self::with_dimensions(new_dimensions);
         for x in 0..self.dimensions.x {
             for y in 0..self.dimensions.y {
                 let position = Vector2::new(x, y);
@@ -567,7 +567,7 @@ impl FromStr for Map {
         }
         dimensions.x -= indent;
 
-        let mut instance = Map::with_dimensions(dimensions);
+        let mut instance = Self::with_dimensions(dimensions);
 
         // Parse map data
         let mut player_position = None;

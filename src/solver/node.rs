@@ -51,7 +51,7 @@ impl Node {
     }
 
     /// Returns the successors of the node.
-    pub fn successors(&self, ctx: &Context) -> Vec<Node> {
+    pub fn successors(&self, ctx: &Context) -> Vec<Self> {
         let mut successors = Vec::new();
         let player_reachable_area =
             compute_reachable_area(self.state.player_position, |position| {
@@ -117,7 +117,7 @@ impl Node {
                     continue;
                 }
 
-                successors.push(Node::new(
+                successors.push(Self::new(
                     State {
                         player_position: new_player_position,
                         box_positions: new_box_positions,

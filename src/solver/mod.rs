@@ -29,6 +29,7 @@ pub enum Strategy {
 }
 
 /// The algorithm to use when searching for a solution.
+#[derive(Clone, Copy, Eq, PartialEq, Debug)]
 pub enum Algorithm {
     /// A* search. Fast, extremely high memory footprint.
     AStar,

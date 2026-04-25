@@ -200,7 +200,7 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Vector2<i32>> {
 pub fn compute_useless_boxes(map: &Map) -> FxHashSet<Vector2<i32>> {
     map.box_positions()
         .iter()
-        .cloned()
+        .copied()
         .filter(|&position| {
             is_freeze_deadlock(
                 map,

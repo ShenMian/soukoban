@@ -28,12 +28,14 @@ pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, S
         if stop_flag.load(Ordering::Relaxed) {
             return Err(SearchError::Interrupted);
         }
+
         if node.is_solved() {
             return Ok(construct_actions(
                 ctx,
                 &construct_path(node.state, &came_from),
             ));
         }
+
         for successor in node.successors(ctx) {
             let hash = successor
                 .state
@@ -217,7 +219,7 @@ fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
     actions
 }
 
-/// Reconstructs the path from goal to start by following the came_from map.
+/// Reconstructs the path from goal to start by following the `came_from` map.
 fn construct_path(state: State, came_from: &FxHashMap<State, State>) -> Vec<State> {
     let mut path = vec![state];
     while let Some(prev_state) = came_from.get(path.last().unwrap()) {
