@@ -2,7 +2,7 @@
 
 use std::ops::Neg;
 
-use nalgebra::Vector2;
+use crate::Vector2;
 
 /// A direction.
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]

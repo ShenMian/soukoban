@@ -2,10 +2,8 @@
 
 use std::{collections::BTreeMap, fmt, io::BufRead, str::FromStr};
 
-use nalgebra::Vector2;
-
 use crate::{
-    FxHashSet,
+    FxHashSet, Vector2,
     action::Action,
     actions::Actions,
     direction::Direction,

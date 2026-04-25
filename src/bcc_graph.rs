@@ -1,6 +1,4 @@
-use nalgebra::Vector2;
-
-use crate::{FxHashMap, FxHashSet, direction::Direction};
+use crate::{FxHashMap, FxHashSet, Vector2, direction::Direction};
 
 /// A biconnected component graph.
 pub struct BccGraph {

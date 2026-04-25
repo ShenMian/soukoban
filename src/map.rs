@@ -8,11 +8,10 @@ use std::{
     str::FromStr,
 };
 
-use nalgebra::Vector2;
 use rustc_hash::{FxBuildHasher, FxHasher};
 
 use crate::{
-    FxHashMap, FxHashSet, actions::Actions, deadlock::*, direction::Direction,
+    FxHashMap, FxHashSet, Vector2, actions::Actions, deadlock::*, direction::Direction,
     error::ParseMapError, level::Level, path_finding::*, run_length::rle_decode,
     solver::state::State, tiles::Tiles,
 };

@@ -1,6 +1,5 @@
 use criterion::{BatchSize, Criterion, criterion_group};
-use nalgebra::Vector2;
-use soukoban::{FxHashSet, deadlock};
+use soukoban::{FxHashSet, Vector2, deadlock};
 
 use super::utils::*;
 

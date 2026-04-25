@@ -1,8 +1,7 @@
 use std::str::FromStr;
 
 use indoc::indoc;
-use nalgebra::Vector2;
-use soukoban::{Actions, Map, ParseMapError, tiles::Tiles};
+use soukoban::{Actions, Map, ParseMapError, Vector2, tiles::Tiles};
 
 mod utils;
 use utils::*;

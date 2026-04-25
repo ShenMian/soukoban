@@ -1,5 +1,4 @@
-use nalgebra::Vector2;
-use soukoban::{FxHashSet, direction::*, path_finding::*, solver::Strategy};
+use soukoban::{FxHashSet, Vector2, direction::*, path_finding::*, solver::Strategy};
 
 mod utils;
 use utils::*;

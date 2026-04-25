@@ -1,7 +1,6 @@
 #![allow(clippy::op_ref)]
 
-use nalgebra::Vector2;
-use soukoban::{FxHashSet, Map, deadlock};
+use soukoban::{FxHashSet, Map, Vector2, deadlock};
 
 mod utils;
 use utils::*;

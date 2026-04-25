@@ -23,4 +23,5 @@ pub use level::*;
 pub use map::*;
 pub use tiles::*;
 
+pub use nalgebra::Vector2;
 pub use rustc_hash::{FxHashMap, FxHashSet};

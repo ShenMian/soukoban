@@ -1,4 +1,4 @@
-use soukoban::direction::*;
+use soukoban::{Vector2, direction::*};
 
 #[test]
 fn rotate_cw() {
@@ -48,7 +48,6 @@ fn flip_vertical() {
 #[test]
 fn to_vector2() {
     use Direction::*;
-    use nalgebra::Vector2;
     assert_eq!(Vector2::<i32>::from(Up), -Vector2::y());
     assert_eq!(Vector2::<i32>::from(Right), Vector2::x());
     assert_eq!(Vector2::<i32>::from(Down), Vector2::y());
@@ -58,7 +57,6 @@ fn to_vector2() {
 #[test]
 fn try_from_vector2() {
     use Direction::*;
-    use nalgebra::Vector2;
     assert_eq!(Direction::try_from(-Vector2::<i32>::y()), Ok(Up));
     assert_eq!(Direction::try_from(Vector2::<i32>::x()), Ok(Right));
     assert_eq!(Direction::try_from(Vector2::<i32>::y()), Ok(Down));

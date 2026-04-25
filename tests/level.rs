@@ -1,8 +1,7 @@
 use std::{fs, str::FromStr};
 
 use indoc::indoc;
-use nalgebra::Vector2;
-use soukoban::{FxHashSet, Level, ParseLevelError, ParseMapError};
+use soukoban::{FxHashSet, Level, ParseLevelError, ParseMapError, Vector2};
 
 mod utils;
 use utils::*;

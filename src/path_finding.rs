@@ -5,10 +5,8 @@ use std::{
     collections::{BinaryHeap, VecDeque},
 };
 
-use nalgebra::Vector2;
-
 use crate::{
-    FxHashMap, FxHashSet, Tiles,
+    FxHashMap, FxHashSet, Tiles, Vector2,
     bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
     map::Map,

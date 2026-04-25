@@ -2,10 +2,8 @@
 
 use std::collections::VecDeque;
 
-use nalgebra::Vector2;
-
 use crate::{
-    FxHashMap, FxHashSet, Map, Tiles,
+    FxHashMap, FxHashSet, Map, Tiles, Vector2,
     bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
 };

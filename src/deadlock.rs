@@ -2,9 +2,7 @@
 
 use std::collections::VecDeque;
 
-use nalgebra::Vector2;
-
-use crate::{FxHashSet, direction::Direction, map::Map, tiles::Tiles};
+use crate::{FxHashSet, Vector2, direction::Direction, map::Map, tiles::Tiles};
 
 /// Checks if the given box position is a static deadlock.
 ///

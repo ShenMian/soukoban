@@ -1,6 +1,5 @@
 use criterion::{Criterion, criterion_group};
-use nalgebra::Vector2;
-use soukoban::{direction::Direction, path_finding, solver::Strategy};
+use soukoban::{Vector2, direction::Direction, path_finding, solver::Strategy};
 
 use super::utils::*;
 

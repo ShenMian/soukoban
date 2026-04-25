@@ -1,10 +1,9 @@
 use std::hash::{Hash, Hasher};
 
-use nalgebra::Vector2;
 use rustc_hash::FxHasher;
 
 use crate::{
-    FxHashSet, Map, Tiles,
+    FxHashSet, Map, Tiles, Vector2,
     path_finding::{compute_area_anchor, compute_reachable_area},
     solver::{Strategy, context::Context},
 };
