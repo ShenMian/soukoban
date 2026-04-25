@@ -1,15 +1,15 @@
 //! Search algorithm implementations.
 
 use std::{
-    collections::{BinaryHeap, HashMap, HashSet},
+    collections::BinaryHeap,
     sync::atomic::{AtomicBool, Ordering},
 };
 
 use itertools::Itertools;
 
 use crate::{
-    Action, Actions, SearchError, Tiles, direction::Direction, path_finding::find_path,
-    solver::Strategy,
+    Action, Actions, FxHashMap, FxHashSet, SearchError, Tiles, direction::Direction,
+    path_finding::find_path, solver::Strategy,
 };
 
 use super::{context::Context, node::Node, state::State};
@@ -17,8 +17,8 @@ use super::{context::Context, node::Node, state::State};
 /// Searches for a solution using the A* algorithm.
 pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
     let mut queue = BinaryHeap::new();
-    let mut costs = HashMap::new();
-    let mut came_from = HashMap::new();
+    let mut costs = FxHashMap::default();
+    let mut came_from = FxHashMap::default();
 
     let state: State = ctx.map().clone().into();
     costs.insert(state.canonicalized_hash(ctx.strategy(), ctx.map()), 0);
@@ -55,7 +55,7 @@ pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions,
     let node = Node::new(state.clone(), 0, 0, ctx);
 
     let mut path = vec![state];
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     visited.insert(node.state.canonicalized_hash(ctx.strategy(), ctx.map()));
     let mut threshold = node.heuristic();
     loop {
@@ -83,7 +83,7 @@ fn ida_star_depth_search(
     stop_flag: &AtomicBool,
     node: &Node,
     path: &mut Vec<State>,
-    visited: &mut HashSet<u64>,
+    visited: &mut FxHashSet<u64>,
     threshold: i32,
 ) -> Result<State, i32> {
     if stop_flag.load(Ordering::Relaxed) {
@@ -133,8 +133,8 @@ pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, Sear
     );
 
     let mut queue = std::collections::VecDeque::new();
-    let mut came_from = HashMap::new();
-    let mut visited = HashSet::new();
+    let mut came_from = FxHashMap::default();
+    let mut visited = FxHashSet::default();
 
     let state: State = ctx.map().clone().into();
     visited.insert(state.canonicalized_hash(ctx.strategy(), ctx.map()));
@@ -218,7 +218,7 @@ fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
 }
 
 /// Reconstructs the path from goal to start by following the came_from map.
-fn construct_path(state: State, came_from: &HashMap<State, State>) -> Vec<State> {
+fn construct_path(state: State, came_from: &FxHashMap<State, State>) -> Vec<State> {
     let mut path = vec![state];
     while let Some(prev_state) = came_from.get(path.last().unwrap()) {
         path.push(prev_state.clone());

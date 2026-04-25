@@ -1,7 +1,5 @@
-use std::collections::HashSet;
-
 use nalgebra::Vector2;
-use soukoban::{direction::*, path_finding::*, solver::Strategy};
+use soukoban::{FxHashSet, direction::*, path_finding::*, solver::Strategy};
 
 mod utils;
 use utils::*;
@@ -17,7 +15,7 @@ fn find_path() {
 fn test_compute_box_waypoints() {
     let map = load_level_from_file("assets/Microban_155.xsb", 3).into();
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(6, 2), Strategy::PushOptimal);
-    let positions: HashSet<_> = waypoints
+    let positions: FxHashSet<_> = waypoints
         .keys()
         .map(
             |DirectedPosition {
@@ -30,7 +28,7 @@ fn test_compute_box_waypoints() {
 
     let map = load_level_from_file("assets/Microban_II_135.xsb", 132).into();
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(8, 7), Strategy::PushOptimal);
-    let positions: HashSet<_> = waypoints
+    let positions: FxHashSet<_> = waypoints
         .keys()
         .map(
             |DirectedPosition {
@@ -50,7 +48,7 @@ fn test_compute_box_waypoints() {
 
     let map = load_level_from_file("assets/Microban_II_135.xsb", 133).into();
     let (waypoints, _) = compute_box_waypoints(&map, Vector2::new(18, 18), Strategy::PushOptimal);
-    let positions: HashSet<_> = waypoints
+    let positions: FxHashSet<_> = waypoints
         .keys()
         .map(
             |DirectedPosition {
@@ -94,6 +92,6 @@ fn test_pushable_boxes() {
     let map = load_level_from_file("assets/Microban_155.xsb", 3).into();
     assert_eq!(
         compute_pushable_boxes(&map),
-        HashSet::from([Vector2::new(6, 2)])
+        FxHashSet::from_iter([Vector2::new(6, 2)])
     );
 }

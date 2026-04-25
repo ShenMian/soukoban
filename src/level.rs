@@ -1,15 +1,11 @@
 //! A level.
 
-use std::{
-    collections::{BTreeMap, HashSet},
-    fmt,
-    io::BufRead,
-    str::FromStr,
-};
+use std::{collections::BTreeMap, fmt, io::BufRead, str::FromStr};
 
 use nalgebra::Vector2;
 
 use crate::{
+    FxHashSet,
     action::Action,
     actions::Actions,
     direction::Direction,
@@ -174,7 +170,7 @@ impl Level {
     }
 
     /// Returns the reachable area for the player.
-    pub fn player_reachable_area(&self) -> HashSet<Vector2<i32>> {
+    pub fn player_reachable_area(&self) -> FxHashSet<Vector2<i32>> {
         compute_reachable_area(self.map.player_position(), |position| {
             self.map.is_walkable(position)
         })

@@ -2,13 +2,13 @@
 
 use std::{
     cmp::Ordering,
-    collections::{BinaryHeap, HashMap, HashSet, VecDeque},
+    collections::{BinaryHeap, VecDeque},
 };
 
 use nalgebra::Vector2;
 
 use crate::{
-    Tiles,
+    FxHashMap, FxHashSet, Tiles,
     bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
     map::Map,
@@ -44,8 +44,8 @@ pub fn find_path(
     is_walkable: impl Fn(Vector2<i32>) -> bool,
 ) -> Option<Vec<Vector2<i32>>> {
     let mut open_set = BinaryHeap::new();
-    let mut came_from = HashMap::new();
-    let mut cost = HashMap::new();
+    let mut came_from = FxHashMap::default();
+    let mut cost = FxHashMap::default();
 
     cost.insert(from, 0);
     open_set.push(Node {
@@ -82,7 +82,7 @@ pub fn find_path(
 fn construct_path(
     from: Vector2<i32>,
     to: Vector2<i32>,
-    came_from: HashMap<Vector2<i32>, Vector2<i32>>,
+    came_from: FxHashMap<Vector2<i32>, Vector2<i32>>,
 ) -> Vec<Vector2<i32>> {
     let mut path = Vec::new();
     let mut current = to;
@@ -124,8 +124,8 @@ pub fn compute_box_waypoints(
     initial_box_position: Vector2<i32>,
     strategy: Strategy,
 ) -> (
-    HashMap<DirectedPosition, DirectedPosition>,
-    HashMap<DirectedPosition, i32>,
+    FxHashMap<DirectedPosition, DirectedPosition>,
+    FxHashMap<DirectedPosition, i32>,
 ) {
     debug_assert!(
         map.box_positions().contains(&initial_box_position),
@@ -133,8 +133,8 @@ pub fn compute_box_waypoints(
     );
 
     let mut queue = BinaryHeap::new();
-    let mut costs = HashMap::new();
-    let mut came_from = HashMap::new();
+    let mut costs = FxHashMap::default();
+    let mut came_from = FxHashMap::default();
 
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
@@ -240,7 +240,7 @@ pub fn compute_box_waypoints(
 /// Constructs a path for the box to move to a target position.
 pub fn construct_box_path(
     to: DirectedPosition,
-    waypoints: &HashMap<DirectedPosition, DirectedPosition>,
+    waypoints: &FxHashMap<DirectedPosition, DirectedPosition>,
 ) -> Vec<Vector2<i32>> {
     let mut path = Vec::new();
     let mut current = to;
@@ -287,10 +287,10 @@ pub fn construct_player_path(
 }
 
 /// Returns a set of positions of the boxes that can be pushed by the player.
-pub fn compute_pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
+pub fn compute_pushable_boxes(map: &Map) -> FxHashSet<Vector2<i32>> {
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
-    let mut pushable_boxes = HashSet::new();
+    let mut pushable_boxes = FxHashSet::default();
     for box_position in map.box_positions() {
         // Check if the player can push the box from any direction
         for push_direction in Direction::iter() {
@@ -314,8 +314,8 @@ pub fn compute_pushable_boxes(map: &Map) -> HashSet<Vector2<i32>> {
 pub fn compute_reachable_area(
     position: Vector2<i32>,
     is_walkable: impl Fn(Vector2<i32>) -> bool,
-) -> HashSet<Vector2<i32>> {
-    let mut reachable_area = HashSet::new();
+) -> FxHashSet<Vector2<i32>> {
+    let mut reachable_area = FxHashSet::default();
     let mut deque = VecDeque::new();
     reachable_area.insert(position);
     deque.push_back(position);
@@ -331,7 +331,7 @@ pub fn compute_reachable_area(
 }
 
 /// Computes the anchor point (top-left) for a given positions.
-pub fn compute_area_anchor(area: &HashSet<Vector2<i32>>) -> Option<Vector2<i32>> {
+pub fn compute_area_anchor(area: &FxHashSet<Vector2<i32>>) -> Option<Vector2<i32>> {
     area.iter()
         .min_by(|a, b| (a.y, a.x).cmp(&(b.y, b.x)))
         .copied()

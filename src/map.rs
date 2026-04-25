@@ -1,18 +1,20 @@
 //! A grid-based map.
 
 use std::{
-    collections::{HashMap, HashSet, VecDeque},
+    collections::VecDeque,
     fmt,
-    hash::{DefaultHasher, Hash, Hasher},
+    hash::{Hash, Hasher},
     ops::{Index, IndexMut},
     str::FromStr,
 };
 
 use nalgebra::Vector2;
+use rustc_hash::{FxBuildHasher, FxHasher};
 
 use crate::{
-    actions::Actions, deadlock::*, direction::Direction, error::ParseMapError, level::Level,
-    path_finding::*, run_length::rle_decode, solver::state::State, tiles::Tiles,
+    FxHashMap, FxHashSet, actions::Actions, deadlock::*, direction::Direction,
+    error::ParseMapError, level::Level, path_finding::*, run_length::rle_decode,
+    solver::state::State, tiles::Tiles,
 };
 
 /// A grid-based map.
@@ -27,8 +29,8 @@ pub struct Map {
     dimensions: Vector2<i32>,
 
     player_position: Vector2<i32>,
-    box_positions: HashSet<Vector2<i32>>,
-    goal_positions: HashSet<Vector2<i32>>,
+    box_positions: FxHashSet<Vector2<i32>>,
+    goal_positions: FxHashSet<Vector2<i32>>,
 }
 
 impl Map {
@@ -41,8 +43,8 @@ impl Map {
 
         let mut instance = Map::with_dimensions(dimensions);
 
-        let mut initial_box_positions = HashSet::new();
-        let mut current_box_positions = HashSet::new();
+        let mut initial_box_positions = FxHashSet::default();
+        let mut current_box_positions = FxHashSet::default();
         let mut current_player_position = player_position;
         for action in &*actions {
             instance[current_player_position] = Tiles::Floor;
@@ -108,8 +110,8 @@ impl Map {
             data: vec![Tiles::empty(); (dimensions.x * dimensions.y) as usize],
             dimensions,
             player_position: Vector2::zeros(),
-            box_positions: HashSet::new(),
-            goal_positions: HashSet::new(),
+            box_positions: FxHashSet::default(),
+            goal_positions: FxHashSet::default(),
         }
     }
 
@@ -131,12 +133,12 @@ impl Map {
     }
 
     /// Returns a reference to the positions of the boxes.
-    pub fn box_positions(&self) -> &HashSet<Vector2<i32>> {
+    pub fn box_positions(&self) -> &FxHashSet<Vector2<i32>> {
         &self.box_positions
     }
 
     /// Returns a reference to the positions of the goals.
-    pub fn goal_positions(&self) -> &HashSet<Vector2<i32>> {
+    pub fn goal_positions(&self) -> &FxHashSet<Vector2<i32>> {
         &self.goal_positions
     }
 
@@ -442,7 +444,7 @@ impl Map {
 
     /// Canonicalizes the transformation of the map.
     fn canonicalize_transform(&mut self) {
-        let mut transformed_maps = HashMap::with_capacity(8);
+        let mut transformed_maps = FxHashMap::with_capacity_and_hasher(8, FxBuildHasher);
         let mut min_hash = u64::MAX;
         for i in 0..8 {
             if i == 4 {
@@ -451,7 +453,7 @@ impl Map {
             self.rotate_cw();
             self.canonicalize_player();
 
-            let mut hasher = DefaultHasher::new();
+            let mut hasher = FxHasher::default();
             self.hash(&mut hasher);
             let hash = hasher.finish();
 

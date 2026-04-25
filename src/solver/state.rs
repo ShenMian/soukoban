@@ -1,12 +1,10 @@
-use std::{
-    collections::HashSet,
-    hash::{DefaultHasher, Hash, Hasher},
-};
+use std::hash::{Hash, Hasher};
 
 use nalgebra::Vector2;
+use rustc_hash::FxHasher;
 
 use crate::{
-    Map, Tiles,
+    FxHashSet, Map, Tiles,
     path_finding::{compute_area_anchor, compute_reachable_area},
     solver::{Strategy, context::Context},
 };
@@ -14,7 +12,7 @@ use crate::{
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct State {
     pub player_position: Vector2<i32>,
-    pub box_positions: HashSet<Vector2<i32>>,
+    pub box_positions: FxHashSet<Vector2<i32>>,
 }
 
 impl State {
@@ -35,7 +33,7 @@ impl State {
 
     /// Computes the hash of the canonicalized state.
     pub fn canonicalized_hash(&self, strategy: Strategy, map: &Map) -> u64 {
-        let mut hasher = DefaultHasher::new();
+        let mut hasher = FxHasher::default();
         match strategy {
             Strategy::Quick | Strategy::PushOptimal => {
                 let mut canonicalized_state = self.clone();

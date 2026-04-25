@@ -22,3 +22,5 @@ pub use error::*;
 pub use level::*;
 pub use map::*;
 pub use tiles::*;
+
+pub use rustc_hash::{FxHashMap, FxHashSet};

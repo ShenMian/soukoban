@@ -1,7 +1,7 @@
-use std::{cmp::Ordering, collections::HashSet};
+use std::cmp::Ordering;
 
 use crate::{
-    Tiles,
+    FxHashSet, Tiles,
     deadlock::is_freeze_deadlock,
     direction::{DirectedPosition, Direction},
     path_finding::{compute_reachable_area, find_path},
@@ -111,7 +111,7 @@ impl Node {
                         ctx.map(),
                         new_box_position,
                         &new_box_positions,
-                        &mut HashSet::new(),
+                        &mut FxHashSet::default(),
                     )
                 {
                     continue;

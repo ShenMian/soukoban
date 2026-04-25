@@ -1,10 +1,10 @@
 //! Utilities for deadlocks detection.
 
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
 
 use nalgebra::Vector2;
 
-use crate::{direction::Direction, map::Map, tiles::Tiles};
+use crate::{FxHashSet, direction::Direction, map::Map, tiles::Tiles};
 
 /// Checks if the given box position is a static deadlock.
 ///
@@ -13,8 +13,8 @@ use crate::{direction::Direction, map::Map, tiles::Tiles};
 pub fn is_static_deadlock(
     map: &Map,
     box_position: Vector2<i32>,
-    box_positions: &HashSet<Vector2<i32>>,
-    visited: &mut HashSet<Vector2<i32>>,
+    box_positions: &FxHashSet<Vector2<i32>>,
+    visited: &mut FxHashSet<Vector2<i32>>,
 ) -> bool {
     debug_assert!(box_positions.contains(&box_position));
 
@@ -54,8 +54,8 @@ pub fn is_static_deadlock(
 pub fn is_freeze_deadlock(
     map: &Map,
     box_position: Vector2<i32>,
-    box_positions: &HashSet<Vector2<i32>>,
-    visited: &mut HashSet<Vector2<i32>>,
+    box_positions: &FxHashSet<Vector2<i32>>,
+    visited: &mut FxHashSet<Vector2<i32>>,
 ) -> bool {
     debug_assert!(box_positions.contains(&box_position));
 
@@ -100,8 +100,8 @@ pub fn is_freeze_deadlock(
 /// This function returns an **incomplete** set of dead positions independent
 /// of the player's position. Any box pushed to a point in the set will cause a
 /// deadlock, regardless of the player's position.
-pub fn compute_static_deadlocks(map: &Map) -> HashSet<Vector2<i32>> {
-    let mut dead_positions = HashSet::new();
+pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Vector2<i32>> {
+    let mut dead_positions = FxHashSet::default();
     for x in 1..map.dimensions().x - 1 {
         for y in 1..map.dimensions().y - 1 {
             let position = Vector2::new(x, y);
@@ -132,7 +132,7 @@ pub fn compute_static_deadlocks(map: &Map) -> HashSet<Vector2<i32>> {
                 dead_positions.insert(position);
 
                 // Detects grooves based on current position
-                let mut potential_dead_positions = HashSet::new();
+                let mut potential_dead_positions = FxHashSet::default();
                 let mut next_position = position - &(directions[0]).into();
                 while map[next_position + &directions[1].into()].intersects(Tiles::Wall) {
                     if map[next_position].intersects(Tiles::Goal) {
@@ -152,8 +152,8 @@ pub fn compute_static_deadlocks(map: &Map) -> HashSet<Vector2<i32>> {
 }
 
 /// Computes the positions of the useless floors.
-pub fn compute_useless_floors(mut map: Map) -> HashSet<Vector2<i32>> {
-    let mut useless_floors = HashSet::new();
+pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Vector2<i32>> {
+    let mut useless_floors = FxHashSet::default();
 
     // Add all floors to `unchecked_floors`
     let mut unchecked_floors = VecDeque::new();
@@ -197,12 +197,17 @@ pub fn compute_useless_floors(mut map: Map) -> HashSet<Vector2<i32>> {
 }
 
 /// Computes the positions of the useless boxes.
-pub fn compute_useless_boxes(map: &Map) -> HashSet<Vector2<i32>> {
+pub fn compute_useless_boxes(map: &Map) -> FxHashSet<Vector2<i32>> {
     map.box_positions()
         .iter()
         .cloned()
         .filter(|&position| {
-            is_freeze_deadlock(map, position, map.box_positions(), &mut HashSet::new())
+            is_freeze_deadlock(
+                map,
+                position,
+                map.box_positions(),
+                &mut FxHashSet::default(),
+            )
         })
         .collect()
 }

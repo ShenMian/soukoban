@@ -1,11 +1,11 @@
 //! Pre-computed data and configuration for search algorithms.
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::VecDeque;
 
 use nalgebra::Vector2;
 
 use crate::{
-    Map, Tiles,
+    FxHashMap, FxHashSet, Map, Tiles,
     bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
 };
@@ -25,9 +25,9 @@ pub struct Context {
     /// The search strategy to use.
     strategy: Strategy,
     /// Minimum cost to push a box from a position to the nearest goal.
-    min_costs: HashMap<Vector2<i32>, i32>,
+    min_costs: FxHashMap<Vector2<i32>, i32>,
     /// Set of tunnel positions and directions.
-    tunnels: HashSet<DirectedPosition>,
+    tunnels: FxHashSet<DirectedPosition>,
 }
 
 impl Context {
@@ -53,12 +53,12 @@ impl Context {
     }
 
     /// Returns a reference to the set of minimum costs.
-    pub fn min_costs(&self) -> &HashMap<Vector2<i32>, i32> {
+    pub fn min_costs(&self) -> &FxHashMap<Vector2<i32>, i32> {
         &self.min_costs
     }
 
     /// Returns a reference to the set of tunnels.
-    pub fn tunnels(&self) -> &HashSet<DirectedPosition> {
+    pub fn tunnels(&self) -> &FxHashSet<DirectedPosition> {
         &self.tunnels
     }
 
@@ -72,9 +72,9 @@ impl Context {
 
     /// Computes and returns the minimum number of pushes to push the box to
     /// the nearest goal.
-    fn compute_minimum_push(map: &Map) -> HashMap<Vector2<i32>, i32> {
-        let mut min_costs = HashMap::new();
-        let mut costs = HashMap::new();
+    fn compute_minimum_push(map: &Map) -> FxHashMap<Vector2<i32>, i32> {
+        let mut min_costs = FxHashMap::default();
+        let mut costs = FxHashMap::default();
         let mut queue = VecDeque::new();
 
         // Ignore other boxes
@@ -139,10 +139,10 @@ impl Context {
     /// Tunnel is a common type of no influence push.
     /// Since tunnels are only determined by the map terrain, they can be
     /// pre-calculated.
-    fn compute_tunnels(map: &Map) -> HashSet<DirectedPosition> {
+    fn compute_tunnels(map: &Map) -> FxHashSet<DirectedPosition> {
         use itertools::Itertools;
 
-        let mut tunnels = HashSet::new();
+        let mut tunnels = FxHashSet::default();
         for x in 1..map.dimensions().x - 1 {
             for y in 1..map.dimensions().y - 1 {
                 let box_position = Vector2::new(x, y);

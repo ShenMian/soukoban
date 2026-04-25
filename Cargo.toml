@@ -23,6 +23,7 @@ bench = false
 bitflags = "2"
 itertools = "0.14"
 nalgebra = "0.34"
+rustc-hash = "2"
 thiserror = "2"
 
 [dev-dependencies]

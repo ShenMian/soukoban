@@ -1,8 +1,6 @@
-use std::collections::HashSet;
-
 use criterion::{BatchSize, Criterion, criterion_group};
 use nalgebra::Vector2;
-use soukoban::deadlock;
+use soukoban::{FxHashSet, deadlock};
 
 use super::utils::*;
 
@@ -22,7 +20,7 @@ fn is_freeze_deadlock(c: &mut Criterion) {
                     &map,
                     Vector2::new(3, 1),
                     map.box_positions(),
-                    &mut HashSet::new(),
+                    &mut FxHashSet::default(),
                 )
             },
             BatchSize::SmallInput,

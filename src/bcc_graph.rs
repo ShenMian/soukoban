@@ -1,24 +1,22 @@
-use std::collections::{HashMap, HashSet};
-
 use nalgebra::Vector2;
 
-use crate::direction::Direction;
+use crate::{FxHashMap, FxHashSet, direction::Direction};
 
 /// A biconnected component graph.
 pub struct BccGraph {
     /// Maps an undirected edge to its block ID.
-    edge_blocks: HashMap<[Vector2<i32>; 2], usize>,
+    edge_blocks: FxHashMap<[Vector2<i32>; 2], usize>,
     /// The set of cut vertices (articulation points) in the graph.
-    cut_vertices: HashSet<Vector2<i32>>,
+    cut_vertices: FxHashSet<Vector2<i32>>,
 }
 
 impl BccGraph {
     /// Creates a new `BccGraph`.
     pub fn new(start: Vector2<i32>, is_walkable: impl Fn(Vector2<i32>) -> bool) -> Self {
-        let mut edge_blocks = HashMap::new();
-        let mut cut_vertices = HashSet::new();
-        let mut depth = HashMap::new();
-        let mut low = HashMap::new();
+        let mut edge_blocks = FxHashMap::default();
+        let mut cut_vertices = FxHashSet::default();
+        let mut depth = FxHashMap::default();
+        let mut low = FxHashMap::default();
         let mut edge_stack = Vec::new();
         let mut block_count = 0;
         let mut time = 0;
