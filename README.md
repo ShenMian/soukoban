@@ -9,7 +9,7 @@ A library providing implementations of algorithms and data structures related to
 ## Features
 
 - **Solver**
-  - **Search algorithms**: Supports A\*, IDA\*, GBFS and BFS search.
+  - **Search algorithms**: Supports [A\*], [IDA\*], [GBFS] and [BFS] search.
   - **Strategies**: Supports quick, push-optimal, and move-optimal strategies.
 - **Level**
   - **Zero-allocation lazy parsing**: Parses levels lazily from an in-memory string without memory allocations except for level creation.
@@ -38,3 +38,7 @@ The level files in the `assets` directory are licensed solely under
 their respective licenses, available in the `LICENSE` file in the directory.
 
 [sokoban]: https://en.wikipedia.org/wiki/Sokoban
+[A\*]: https://en.wikipedia.org/wiki/A*_search_algorithm
+[IDA\*]: https://en.wikipedia.org/wiki/Iterative_deepening_A*
+[GBFS]: https://en.wikipedia.org/wiki/Best-first_search
+[BFS]: https://en.wikipedia.org/wiki/Breadth-first_search
