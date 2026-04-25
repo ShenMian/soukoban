@@ -1,7 +1,8 @@
 use std::{fs, str::FromStr};
 
 use indoc::indoc;
-use soukoban::{Level, ParseLevelError, ParseMapError};
+use nalgebra::Vector2;
+use soukoban::{FxHashSet, Level, ParseLevelError, ParseMapError};
 
 mod utils;
 use utils::*;
@@ -289,12 +290,16 @@ fn player_reachable_area() {
         ###
     "})
     .unwrap();
-    let reachable_area = level.player_reachable_area();
-    assert!(reachable_area.contains(&nalgebra::Vector2::new(1, 1)));
-    assert!(reachable_area.contains(&nalgebra::Vector2::new(1, 2)));
-    assert!(reachable_area.contains(&nalgebra::Vector2::new(1, 3)));
-    assert!(!reachable_area.contains(&nalgebra::Vector2::new(2, 1)));
-    assert!(!reachable_area.contains(&nalgebra::Vector2::new(3, 1)));
-    assert!(!reachable_area.contains(&nalgebra::Vector2::new(2, 3)));
-    assert!(!reachable_area.contains(&nalgebra::Vector2::new(3, 2)));
+    let actual = level.player_reachable_area();
+    let expected =
+        FxHashSet::from_iter([Vector2::new(1, 1), Vector2::new(1, 2), Vector2::new(1, 3)]);
+    assert!(actual == expected);
+
+    let unreachable_area = FxHashSet::from_iter([
+        Vector2::new(2, 1),
+        Vector2::new(3, 1),
+        Vector2::new(2, 3),
+        Vector2::new(3, 2),
+    ]);
+    assert!(actual.is_disjoint(&unreachable_area));
 }
