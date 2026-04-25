@@ -1,7 +1,7 @@
 use crate::{FxHashMap, FxHashSet, Vector2, direction::Direction};
 
 /// A biconnected component graph.
-pub struct BccGraph {
+pub(crate) struct BccGraph {
     /// Maps an undirected edge to its block ID.
     edge_blocks: FxHashMap<[Vector2<i32>; 2], usize>,
     /// The set of cut vertices (articulation points) in the graph.
@@ -10,7 +10,7 @@ pub struct BccGraph {
 
 impl BccGraph {
     /// Creates a new `BccGraph`.
-    pub fn new(start: Vector2<i32>, is_walkable: impl Fn(Vector2<i32>) -> bool) -> Self {
+    pub(crate) fn new(start: Vector2<i32>, is_walkable: impl Fn(Vector2<i32>) -> bool) -> Self {
         let mut edge_blocks = FxHashMap::default();
         let mut cut_vertices = FxHashSet::default();
         let mut depth = FxHashMap::default();
@@ -111,7 +111,7 @@ impl BccGraph {
     ///
     /// Panics if `from` and `to` are not adjacent to the `obstacle`, or are
     /// outside the movable area.
-    pub fn is_reachable(
+    pub(crate) fn is_reachable(
         &self,
         from: Vector2<i32>,
         to: Vector2<i32>,

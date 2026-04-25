@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use soukoban::{Actions, ParseActionError, ParseActionsError, SecondaryValues};
+use soukoban::prelude::*;
 
 #[test]
 fn from_str() {

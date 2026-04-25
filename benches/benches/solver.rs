@@ -1,8 +1,5 @@
 use criterion::{BatchSize, Criterion, criterion_group};
-use soukoban::{
-    Level,
-    solver::{Algorithm, Solver, Strategy},
-};
+use soukoban::{prelude::*, solver::*};
 
 use super::utils::*;
 

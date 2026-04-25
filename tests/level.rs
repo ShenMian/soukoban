@@ -1,7 +1,7 @@
 use std::{fs, str::FromStr};
 
 use indoc::indoc;
-use soukoban::{FxHashSet, Level, ParseLevelError, ParseMapError, Vector2};
+use soukoban::prelude::*;
 
 mod utils;
 use utils::*;

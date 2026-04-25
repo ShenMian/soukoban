@@ -1,7 +1,7 @@
 use std::fs;
 
 use criterion::{Criterion, criterion_group};
-use soukoban::Level;
+use soukoban::prelude::*;
 
 fn load_from_str(c: &mut Criterion) {
     c.bench_function("Level::load_from_str", |b| {

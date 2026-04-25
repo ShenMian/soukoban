@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use indoc::indoc;
-use soukoban::{Actions, Map, ParseMapError, Vector2, tiles::Tiles};
+use soukoban::prelude::*;
 
 mod utils;
 use utils::*;

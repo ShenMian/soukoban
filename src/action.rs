@@ -19,8 +19,7 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
+    /// use soukoban::prelude::*;
     ///
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.direction(), Direction::Up);
@@ -36,8 +35,7 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
+    /// use soukoban::prelude::*;
     ///
     /// let action = Action::Move(Direction::Up);
     /// assert!(action.is_move());
@@ -51,8 +49,7 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
+    /// use soukoban::prelude::*;
     ///
     /// let action = Action::Push(Direction::Up);
     /// assert!(action.is_shift());
@@ -66,8 +63,7 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
+    /// use soukoban::prelude::*;
     ///
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.rotate_cw(), Action::Move(Direction::Right));
@@ -81,8 +77,7 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
+    /// use soukoban::prelude::*;
     ///
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.rotate_ccw(), Action::Move(Direction::Left));
@@ -96,8 +91,7 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
+    /// use soukoban::prelude::*;
     ///
     /// let action = Action::Move(Direction::Left);
     /// assert_eq!(action.flip_horizontal(), Action::Move(Direction::Right));
@@ -111,8 +105,7 @@ impl Action {
     /// # Examples
     ///
     /// ```
-    /// use soukoban::Action;
-    /// use soukoban::direction::Direction;
+    /// use soukoban::prelude::*;
     ///
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.flip_vertical(), Action::Move(Direction::Down));

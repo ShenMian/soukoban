@@ -1,6 +1,6 @@
 #![allow(clippy::op_ref)]
 
-use soukoban::{FxHashSet, Map, Vector2, deadlock};
+use soukoban::{deadlock, prelude::*};
 
 mod utils;
 use utils::*;

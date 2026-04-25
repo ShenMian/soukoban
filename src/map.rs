@@ -11,9 +11,9 @@ use std::{
 use rustc_hash::{FxBuildHasher, FxHasher};
 
 use crate::{
-    FxHashMap, FxHashSet, Vector2, actions::Actions, deadlock::*, direction::Direction,
-    error::ParseMapError, level::Level, path_finding::*, run_length::rle_decode,
-    solver::state::State, tiles::Tiles,
+    Actions, FxHashMap, FxHashSet, Level, Vector2, deadlock::*, direction::Direction,
+    error::ParseMapError, path_finding::*, run_length::rle_decode, solver::state::State,
+    tiles::Tiles,
 };
 
 /// A grid-based map.

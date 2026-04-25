@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use soukoban::{Actions, Level, SearchError, solver::*};
+use soukoban::{prelude::*, solver::*};
 
 mod utils;
 use utils::*;

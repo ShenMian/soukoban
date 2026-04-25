@@ -1,4 +1,4 @@
-use soukoban::{Action, direction::Direction};
+use soukoban::prelude::*;
 
 #[test]
 fn from_char() {

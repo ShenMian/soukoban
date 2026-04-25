@@ -28,7 +28,7 @@ impl Direction {
     /// # Examples
     ///
     /// ```
-    /// # use soukoban::direction::Direction;
+    /// # use soukoban::prelude::*;
     /// assert_eq!(Direction::Up.rotate_cw(), Direction::Right);
     ///
     /// // Rotate the direction 90° counter-clockwise.
@@ -48,7 +48,7 @@ impl Direction {
     /// # Examples
     ///
     /// ```
-    /// # use soukoban::direction::Direction;
+    /// # use soukoban::prelude::*;
     /// assert_eq!(Direction::Up.rotate_ccw(), Direction::Left);
     /// ```
     pub fn rotate_ccw(self) -> Self {
@@ -60,7 +60,7 @@ impl Direction {
     /// # Examples
     ///
     /// ```
-    /// # use soukoban::direction::Direction;
+    /// # use soukoban::prelude::*;
     /// assert_eq!(Direction::Left.flip_horizontal(), Direction::Right);
     /// assert_eq!(Direction::Up.flip_horizontal(), Direction::Up);
     /// ```
@@ -77,7 +77,7 @@ impl Direction {
     /// # Examples
     ///
     /// ```
-    /// # use soukoban::direction::Direction;
+    /// # use soukoban::prelude::*;
     /// assert_eq!(Direction::Up.flip_vertical(), Direction::Down);
     /// assert_eq!(Direction::Left.flip_vertical(), Direction::Left);
     /// ```

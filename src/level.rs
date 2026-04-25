@@ -3,9 +3,7 @@
 use std::{collections::BTreeMap, fmt, io::BufRead, str::FromStr};
 
 use crate::{
-    FxHashSet, Vector2,
-    action::Action,
-    actions::Actions,
+    Action, Actions, FxHashSet, Vector2,
     direction::Direction,
     error::{ActionError, ParseLevelError, ParseMapError},
     map::Map,

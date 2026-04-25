@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufReader, path::Path};
 
-use soukoban::Level;
+use soukoban::prelude::*;
 
 pub fn load_level_from_file<P: AsRef<Path>>(path: P, id: usize) -> Level {
     debug_assert!(id >= 1);

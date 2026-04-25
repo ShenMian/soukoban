@@ -6,7 +6,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{Vector2, action::Action, error::ParseActionsError, run_length::rle_decode};
+use crate::{Action, Vector2, error::ParseActionsError, run_length::rle_decode};
 
 /// Secondary statistics for a sequence of actions.
 pub struct SecondaryValues {
