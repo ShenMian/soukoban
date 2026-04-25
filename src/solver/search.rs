@@ -124,11 +124,15 @@ fn ida_star_depth_search(
 }
 
 /// Searches for a solution using the BFS algorithm.
+///
+/// Since state transitions may have non-uniform costs, BFS cannot guarantee any
+/// optimal solution.
+///
+/// # Panics
+///
+/// Panics if the context's strategy is not [`Strategy::Quick`].
 pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
-    assert!(
-        ctx.strategy() != Strategy::MoveOptimal,
-        "BFS does not support MoveOptimal strategy"
-    );
+    assert!(ctx.strategy() == Strategy::Quick);
 
     let mut queue = std::collections::VecDeque::new();
     let mut came_from = FxHashMap::default();
