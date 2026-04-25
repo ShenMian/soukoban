@@ -10,8 +10,9 @@ fn a_star_search(c: &mut Criterion) {
     let mut bench_search = |level: Level, strategy: Strategy| {
         c.bench_function(
             &format!(
-                "Solver::a_star_search '{}' using '{:?}'",
+                "Solver::search '{}' ({:?}, {:?})",
                 level.metadata()["title"],
+                Algorithm::AStar,
                 strategy
             ),
             |b| {
@@ -35,8 +36,9 @@ fn ida_star_search(c: &mut Criterion) {
     let mut bench_search = |level: Level, strategy: Strategy| {
         c.bench_function(
             &format!(
-                "Solver::ida_star_search '{}' using '{:?}'",
+                "Solver::search '{}' ({:?}, {:?})",
                 level.metadata()["title"],
+                Algorithm::IDAStar,
                 strategy
             ),
             |b| {
