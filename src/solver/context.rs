@@ -62,6 +62,14 @@ impl Context {
         &self.tunnels
     }
 
+    /// Returns `true` if `position` is a dead position.
+    ///
+    /// Pushing a box onto a dead position inevitably leads to an unsolvable
+    /// state.
+    pub fn is_dead_position(&self, position: Vector2<i32>) -> bool {
+        !self.min_costs.contains_key(&position)
+    }
+
     /// Computes and returns the minimum number of pushes to push the box to
     /// the nearest goal.
     fn compute_minimum_push(map: &Map) -> HashMap<Vector2<i32>, i32> {

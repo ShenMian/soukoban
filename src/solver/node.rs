@@ -75,7 +75,7 @@ impl Node {
                 let mut new_box_position = box_position + &push_direction.into();
                 if ctx.map()[new_box_position].intersects(Tiles::Wall)
                     || self.state.box_positions.contains(&new_box_position)
-                    || !ctx.min_costs().contains_key(&new_box_position)
+                    || ctx.is_dead_position(new_box_position)
                 {
                     continue;
                 }
@@ -104,9 +104,7 @@ impl Node {
                         .state
                         .box_positions
                         .contains(&(new_box_position + &push_direction.into()))
-                    && ctx
-                        .min_costs()
-                        .contains_key(&(new_box_position + &push_direction.into()))
+                    && !ctx.is_dead_position(new_box_position + &push_direction.into())
                 {
                     new_player_position = new_box_position;
                     new_box_position += &push_direction.into();
