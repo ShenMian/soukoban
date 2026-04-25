@@ -25,6 +25,36 @@ A library providing implementations of algorithms and data structures related to
 - **Pathfinding**: Finds paths for box/player with support for different strategies.
 - **Deadlock detection**: Detects static deadlocks and freeze deadlocks.
 
+## Example
+
+```rust
+use std::str::FromStr as _;
+use soukoban::{prelude::*, solver::*};
+
+fn main() {
+    // Create a sequence of actions from a LURD string
+    let actions = Actions::from_str("R").unwrap();
+
+    // Reconstruct the map from the actions
+    let map = Map::from_actions(actions.clone()).unwrap();
+
+    // Print the reconstructed map
+    //
+    // #####
+    // #@$.#
+    // #####
+    println!("{map}");
+
+    // Search for a solution using A* algorithm
+    let solution = Solver::new(map, Strategy::Quick)
+        .search(Algorithm::AStar)
+        .unwrap();
+
+    // Verify the solution matches the original actions
+    assert_eq!(solution, actions);
+}
+```
+
 ## License
 
 Licensed under either of
