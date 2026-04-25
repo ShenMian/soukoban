@@ -31,11 +31,6 @@ impl Node {
         }
     }
 
-    /// Returns true if the state is solved.
-    pub fn is_solved(&self) -> bool {
-        self.heuristic == 0
-    }
-
     /// Returns the actual cost from the start node to this node (g-value).
     pub fn cost(&self) -> i32 {
         match self.strategy {
@@ -45,19 +40,14 @@ impl Node {
         }
     }
 
-    /// Returns the heuristic estimated cost from this node to the goal
-    /// (h-value).
-    pub fn estimated_cost(&self) -> i32 {
+    /// Returns the estimated cost from this node to the goal (h-value).
+    pub fn heuristic(&self) -> i32 {
         self.heuristic
     }
 
-    /// Returns the estimated total cost from start to goal through this node
-    /// (f-value).
-    ///
-    /// This is the sum of the actual cost and the heuristic cost: f(n) = g(n) +
-    /// h(n).
-    pub fn estimated_total_cost(&self) -> i32 {
-        self.cost() + self.estimated_cost()
+    /// Returns true if the state is solved.
+    pub fn is_solved(&self) -> bool {
+        self.heuristic == 0
     }
 
     /// Returns the successors of the node.

@@ -57,7 +57,7 @@ pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions,
     let mut path = vec![state];
     let mut visited = HashSet::new();
     visited.insert(node.state.canonicalized_hash(ctx.strategy(), ctx.map()));
-    let mut threshold = node.estimated_cost();
+    let mut threshold = node.heuristic();
     loop {
         match ida_star_depth_search(ctx, stop_flag, &node, &mut path, &mut visited, threshold) {
             Ok(_state) => return Ok(construct_actions(ctx, &path)),
@@ -90,8 +90,9 @@ fn ida_star_depth_search(
         return Err(i32::MIN);
     }
 
-    if node.estimated_total_cost() > threshold {
-        return Err(node.estimated_total_cost());
+    let estimated_cost = node.cost() + node.heuristic();
+    if estimated_cost > threshold {
+        return Err(estimated_cost);
     }
 
     if node.is_solved() {
