@@ -132,7 +132,7 @@ impl Level {
         }
     }
 
-    /// Returns true if the level is solved.
+    /// Returns `true` if the level is solved.
     pub fn is_solved(&self) -> bool {
         self.map.box_positions() == self.map.goal_positions()
     }

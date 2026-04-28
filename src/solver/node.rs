@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use crate::{
-    FxHashSet, Tiles,
+    FxHashSet, Tiles, Vector2,
     deadlock::is_freeze_deadlock,
     direction::{DirectedPosition, Direction},
     path_finding::{compute_reachable_area, find_path},
@@ -45,7 +45,7 @@ impl Node {
         self.heuristic
     }
 
-    /// Returns true if the state is solved.
+    /// Returns `true` if the state is solved.
     pub fn is_solved(&self) -> bool {
         self.heuristic == 0
     }
@@ -106,14 +106,7 @@ impl Node {
                 new_box_positions.insert(new_box_position);
 
                 // Skips freeze deadlocks
-                if !ctx.map()[new_box_position].intersects(Tiles::Goal)
-                    && is_freeze_deadlock(
-                        ctx.map(),
-                        new_box_position,
-                        &new_box_positions,
-                        &mut FxHashSet::default(),
-                    )
-                {
+                if Self::is_deadlock(ctx, new_box_position, &new_box_positions) {
                     continue;
                 }
 
@@ -129,6 +122,22 @@ impl Node {
             }
         }
         successors
+    }
+
+    /// Returns `true` if the new box position is a deadlock.
+    fn is_deadlock(
+        ctx: &Context,
+        new_box_position: Vector2<i32>,
+        new_box_positions: &FxHashSet<Vector2<i32>>,
+    ) -> bool {
+        !ctx.map()[new_box_position].intersects(Tiles::Goal)
+            && (ctx.is_dead_position(new_box_position)
+                || is_freeze_deadlock(
+                    ctx.map(),
+                    new_box_position,
+                    new_box_positions,
+                    &mut FxHashSet::default(),
+                ))
     }
 
     /// Returns the priority tuple.
