@@ -62,7 +62,7 @@ impl Node {
         for box_position in &self.state.box_positions {
             for push_direction in Direction::iter() {
                 // Check if the box can be pushed
-                let mut new_box_position = box_position + &push_direction.into();
+                let new_box_position = box_position + &push_direction.into();
                 if ctx.map()[new_box_position].intersects(Tiles::Wall)
                     || self.state.box_positions.contains(&new_box_position)
                     || ctx.is_dead_position(new_box_position)
@@ -76,30 +76,23 @@ impl Node {
                     continue;
                 }
 
-                let mut new_moves = self.moves
+                let new_moves = self.moves
                     + find_path(self.state.player_position, push_position, |position| {
                         !ctx.map()[position].intersects(Tiles::Wall)
                             && !self.state.box_positions.contains(&position)
                     })
                     .unwrap()
                     .len() as i32;
-                let mut new_pushes = self.pushes + 1;
+                let new_pushes = self.pushes + 1;
 
-                // Skips pushes in tunnels
-                while ctx
-                    .tunnels()
-                    .contains(&DirectedPosition::new(new_box_position, push_direction))
-                    && !self
-                        .state
-                        .box_positions
-                        .contains(&(new_box_position + &push_direction.into()))
-                    && !ctx.is_dead_position(new_box_position + &push_direction.into())
-                {
-                    new_box_position += &push_direction.into();
-                    new_pushes += 1;
-                    new_moves += 1;
-                }
-                let new_player_position = new_box_position - &push_direction.into();
+                // Slides the box through a tunnel
+                let (new_box_position, pushes) = Self::slide_through_tunnel(
+                    ctx,
+                    &self.state.box_positions,
+                    new_box_position,
+                    push_direction,
+                );
+                let (new_pushes, new_moves) = (new_pushes + pushes, new_moves + pushes);
 
                 let mut new_box_positions = self.state.box_positions.clone();
                 new_box_positions.remove(box_position);
@@ -110,6 +103,7 @@ impl Node {
                     continue;
                 }
 
+                let new_player_position = new_box_position - &push_direction.into();
                 successors.push(Self::new(
                     State {
                         player_position: new_player_position,
@@ -124,15 +118,38 @@ impl Node {
         successors
     }
 
+    /// Slides the box through a tunnel.
+    ///
+    /// Returns the final box position and the number of additional pushes that
+    /// occurred inside the tunnel.
+    fn slide_through_tunnel(
+        ctx: &Context,
+        box_positions: &FxHashSet<Vector2<i32>>,
+        mut box_position: Vector2<i32>,
+        push_direction: Direction,
+    ) -> (Vector2<i32>, i32) {
+        let mut pushes = 0;
+        while ctx
+            .tunnels()
+            .contains(&DirectedPosition::new(box_position, push_direction))
+            && !box_positions.contains(&(box_position + &push_direction.into()))
+            && !ctx.is_dead_position(box_position + &push_direction.into())
+        {
+            box_position += &push_direction.into();
+            pushes += 1;
+        }
+        (box_position, pushes)
+    }
+
     /// Returns `true` if the new box position is a deadlock.
     fn is_deadlock(
         ctx: &Context,
-        new_box_position: Vector2<i32>,
-        new_box_positions: &FxHashSet<Vector2<i32>>,
+        box_position: Vector2<i32>,
+        box_positions: &FxHashSet<Vector2<i32>>,
     ) -> bool {
-        !ctx.map()[new_box_position].intersects(Tiles::Goal)
-            && (ctx.is_dead_position(new_box_position)
-                || is_freeze_deadlock(ctx.map(), new_box_position, new_box_positions))
+        !ctx.map()[box_position].intersects(Tiles::Goal)
+            && (ctx.is_dead_position(box_position)
+                || is_freeze_deadlock(ctx.map(), box_position, box_positions))
     }
 
     /// Returns the priority tuple.
