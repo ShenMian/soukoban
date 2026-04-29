@@ -1,5 +1,3 @@
-#![allow(clippy::op_ref)]
-
 use soukoban::{deadlock, prelude::*};
 
 mod utils;
@@ -13,7 +11,6 @@ fn is_freeze_deadlock() {
         &map,
         Vector2::new(3, 1),
         map.box_positions(),
-        &mut FxHashSet::default(),
     ));
 
     let mut map: Map = load_level_from_file("assets/Deadlock_3.xsb", 3).into();
@@ -22,7 +19,6 @@ fn is_freeze_deadlock() {
         &map,
         Vector2::new(4, 2),
         map.box_positions(),
-        &mut FxHashSet::default(),
     ));
 }
 

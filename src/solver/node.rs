@@ -132,12 +132,7 @@ impl Node {
     ) -> bool {
         !ctx.map()[new_box_position].intersects(Tiles::Goal)
             && (ctx.is_dead_position(new_box_position)
-                || is_freeze_deadlock(
-                    ctx.map(),
-                    new_box_position,
-                    new_box_positions,
-                    &mut FxHashSet::default(),
-                ))
+                || is_freeze_deadlock(ctx.map(), new_box_position, new_box_positions))
     }
 
     /// Returns the priority tuple.

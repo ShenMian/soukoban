@@ -12,10 +12,17 @@ pub fn is_static_deadlock(
     map: &Map,
     box_position: Vector2<i32>,
     box_positions: &FxHashSet<Vector2<i32>>,
-    visited: &mut FxHashSet<Vector2<i32>>,
 ) -> bool {
     debug_assert!(box_positions.contains(&box_position));
+    is_static_deadlock_inner(map, box_position, box_positions, &mut FxHashSet::default())
+}
 
+fn is_static_deadlock_inner(
+    map: &Map,
+    box_position: Vector2<i32>,
+    box_positions: &FxHashSet<Vector2<i32>>,
+    visited: &mut FxHashSet<Vector2<i32>>,
+) -> bool {
     if !visited.insert(box_position) {
         return true;
     }
@@ -38,7 +45,7 @@ pub fn is_static_deadlock(
                 continue;
             }
             if box_positions.contains(neighbor)
-                && is_static_deadlock(map, *neighbor, box_positions, visited)
+                && is_static_deadlock_inner(map, *neighbor, box_positions, visited)
             {
                 continue;
             }
@@ -53,10 +60,17 @@ pub fn is_freeze_deadlock(
     map: &Map,
     box_position: Vector2<i32>,
     box_positions: &FxHashSet<Vector2<i32>>,
-    visited: &mut FxHashSet<Vector2<i32>>,
 ) -> bool {
     debug_assert!(box_positions.contains(&box_position));
+    is_freeze_deadlock_inner(map, box_position, box_positions, &mut FxHashSet::default())
+}
 
+fn is_freeze_deadlock_inner(
+    map: &Map,
+    box_position: Vector2<i32>,
+    box_positions: &FxHashSet<Vector2<i32>>,
+    visited: &mut FxHashSet<Vector2<i32>>,
+) -> bool {
     if !visited.insert(box_position) {
         return true;
     }
@@ -81,9 +95,9 @@ pub fn is_freeze_deadlock(
 
         // Check if any immovable boxes on the axis.
         if (box_positions.contains(&neighbors[0])
-            && is_freeze_deadlock(map, neighbors[0], box_positions, visited))
+            && is_freeze_deadlock_inner(map, neighbors[0], box_positions, visited))
             || (box_positions.contains(&neighbors[1])
-                && is_freeze_deadlock(map, neighbors[1], box_positions, visited))
+                && is_freeze_deadlock_inner(map, neighbors[1], box_positions, visited))
         {
             continue;
         }
@@ -199,13 +213,6 @@ pub fn compute_useless_boxes(map: &Map) -> FxHashSet<Vector2<i32>> {
     map.box_positions()
         .iter()
         .copied()
-        .filter(|&position| {
-            is_freeze_deadlock(
-                map,
-                position,
-                map.box_positions(),
-                &mut FxHashSet::default(),
-            )
-        })
+        .filter(|&position| is_freeze_deadlock(map, position, map.box_positions()))
         .collect()
 }

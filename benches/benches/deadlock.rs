@@ -1,5 +1,5 @@
 use criterion::{BatchSize, Criterion, criterion_group};
-use soukoban::{FxHashSet, Vector2, deadlock};
+use soukoban::{Vector2, deadlock};
 
 use super::utils::*;
 
@@ -14,14 +14,7 @@ fn is_freeze_deadlock(c: &mut Criterion) {
                 map.set_box_position(Vector2::new(3, 2), Vector2::new(3, 1));
                 map
             },
-            |map| {
-                deadlock::is_freeze_deadlock(
-                    &map,
-                    Vector2::new(3, 1),
-                    map.box_positions(),
-                    &mut FxHashSet::default(),
-                )
-            },
+            |map| deadlock::is_freeze_deadlock(&map, Vector2::new(3, 1), map.box_positions()),
             BatchSize::SmallInput,
         )
     });
