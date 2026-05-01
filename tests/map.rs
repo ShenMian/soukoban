@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::str::FromStr as _;
 
 use indoc::indoc;
 use soukoban::prelude::*;
