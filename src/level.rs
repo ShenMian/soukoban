@@ -3,11 +3,12 @@
 use std::{collections::BTreeMap, fmt, io::BufRead, str::FromStr};
 
 use crate::{
-    Action, Actions, FxHashSet, Vector2,
+    Action, Actions, FxHashSet,
     direction::Direction,
     error::{ActionError, ParseLevelError, ParseMapError},
     map::Map,
     path_finding::compute_reachable_area,
+    point::Point,
     tiles::Tiles,
 };
 
@@ -166,7 +167,7 @@ impl Level {
     }
 
     /// Returns the reachable area for the player.
-    pub fn player_reachable_area(&self) -> FxHashSet<Vector2<i32>> {
+    pub fn player_reachable_area(&self) -> FxHashSet<Point> {
         compute_reachable_area(self.map.player_position(), |position| {
             self.map.is_walkable(position)
         })

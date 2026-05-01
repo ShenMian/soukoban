@@ -6,7 +6,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{Action, Vector2, error::ParseActionsError, run_length::rle_decode};
+use crate::{Action, error::ParseActionsError, point::Point, run_length::rle_decode};
 
 /// Secondary statistics for a sequence of actions.
 pub struct SecondaryValues {
@@ -75,7 +75,7 @@ impl Actions {
         let mut pushing_sessions = 0;
         let mut player_lines = 0;
 
-        let mut player_position = Vector2::zeros();
+        let mut player_position = Point::ZERO;
         // Previous pushed box position
         let mut prev_box_position = None;
         let mut prev_action: Option<Action> = None;

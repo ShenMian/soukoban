@@ -2,7 +2,7 @@
 
 use std::collections::VecDeque;
 
-use crate::{FxHashSet, Vector2, direction::Direction, map::Map, tiles::Tiles};
+use crate::{FxHashSet, direction::Direction, map::Map, point::Point, tiles::Tiles};
 
 /// Checks if the given box position is a static deadlock.
 ///
@@ -10,8 +10,8 @@ use crate::{FxHashSet, Vector2, direction::Direction, map::Map, tiles::Tiles};
 /// compute multiple static deadlock positions.
 pub fn is_static_deadlock(
     map: &Map,
-    box_position: Vector2<i32>,
-    box_positions: &FxHashSet<Vector2<i32>>,
+    box_position: Point,
+    box_positions: &FxHashSet<Point>,
 ) -> bool {
     debug_assert!(box_positions.contains(&box_position));
     is_static_deadlock_inner(map, box_position, box_positions, &mut FxHashSet::default())
@@ -19,9 +19,9 @@ pub fn is_static_deadlock(
 
 fn is_static_deadlock_inner(
     map: &Map,
-    box_position: Vector2<i32>,
-    box_positions: &FxHashSet<Vector2<i32>>,
-    visited: &mut FxHashSet<Vector2<i32>>,
+    box_position: Point,
+    box_positions: &FxHashSet<Point>,
+    visited: &mut FxHashSet<Point>,
 ) -> bool {
     if !visited.insert(box_position) {
         return true;
@@ -58,8 +58,8 @@ fn is_static_deadlock_inner(
 /// Checks if the given box position is a freeze deadlock.
 pub fn is_freeze_deadlock(
     map: &Map,
-    box_position: Vector2<i32>,
-    box_positions: &FxHashSet<Vector2<i32>>,
+    box_position: Point,
+    box_positions: &FxHashSet<Point>,
 ) -> bool {
     debug_assert!(box_positions.contains(&box_position));
     is_freeze_deadlock_inner(map, box_position, box_positions, &mut FxHashSet::default())
@@ -67,9 +67,9 @@ pub fn is_freeze_deadlock(
 
 fn is_freeze_deadlock_inner(
     map: &Map,
-    box_position: Vector2<i32>,
-    box_positions: &FxHashSet<Vector2<i32>>,
-    visited: &mut FxHashSet<Vector2<i32>>,
+    box_position: Point,
+    box_positions: &FxHashSet<Point>,
+    visited: &mut FxHashSet<Point>,
 ) -> bool {
     if !visited.insert(box_position) {
         return true;
@@ -112,11 +112,11 @@ fn is_freeze_deadlock_inner(
 /// This function returns an **incomplete** set of dead positions independent
 /// of the player's position. Any box pushed to a point in the set will cause a
 /// deadlock, regardless of the player's position.
-pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Vector2<i32>> {
+pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
     let mut dead_positions = FxHashSet::default();
     for x in 1..map.dimensions().x - 1 {
         for y in 1..map.dimensions().y - 1 {
-            let position = Vector2::new(x, y);
+            let position = Point::new(x, y);
             // Check if current position may be a new corner
             if !map[position].intersects(Tiles::Floor) || map[position].intersects(Tiles::Goal) {
                 continue;
@@ -164,14 +164,14 @@ pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Vector2<i32>> {
 }
 
 /// Computes the positions of the useless floors.
-pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Vector2<i32>> {
+pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
     let mut useless_floors = FxHashSet::default();
 
     // Add all floors to `unchecked_floors`
     let mut unchecked_floors = VecDeque::new();
     for y in 1..map.dimensions().y - 1 {
         for x in 1..map.dimensions().x - 1 {
-            let position = Vector2::new(x, y);
+            let position = Point::new(x, y);
             if map[position] == Tiles::Floor {
                 unchecked_floors.push_back(position);
             }
@@ -209,7 +209,7 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Vector2<i32>> {
 }
 
 /// Computes the positions of the useless boxes.
-pub fn compute_useless_boxes(map: &Map) -> FxHashSet<Vector2<i32>> {
+pub fn compute_useless_boxes(map: &Map) -> FxHashSet<Point> {
     map.box_positions()
         .iter()
         .copied()

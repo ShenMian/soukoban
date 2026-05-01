@@ -290,15 +290,14 @@ fn player_reachable_area() {
     "})
     .unwrap();
     let actual = level.player_reachable_area();
-    let expected =
-        FxHashSet::from_iter([Vector2::new(1, 1), Vector2::new(1, 2), Vector2::new(1, 3)]);
+    let expected = FxHashSet::from_iter([Point::new(1, 1), Point::new(1, 2), Point::new(1, 3)]);
     assert!(actual == expected);
 
     let unreachable_area = FxHashSet::from_iter([
-        Vector2::new(2, 1),
-        Vector2::new(3, 1),
-        Vector2::new(2, 3),
-        Vector2::new(3, 2),
+        Point::new(2, 1),
+        Point::new(3, 1),
+        Point::new(2, 3),
+        Point::new(3, 2),
     ]);
     assert!(actual.is_disjoint(&unreachable_area));
 }

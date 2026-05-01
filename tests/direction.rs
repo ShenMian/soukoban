@@ -1,4 +1,4 @@
-use soukoban::{Vector2, direction::*};
+use soukoban::prelude::*;
 
 #[test]
 fn rotate_cw() {
@@ -48,19 +48,19 @@ fn flip_vertical() {
 #[test]
 fn to_vector2() {
     use Direction::*;
-    assert_eq!(Vector2::<i32>::from(Up), -Vector2::y());
-    assert_eq!(Vector2::<i32>::from(Right), Vector2::x());
-    assert_eq!(Vector2::<i32>::from(Down), Vector2::y());
-    assert_eq!(Vector2::<i32>::from(Left), -Vector2::x());
+    assert_eq!(Point::from(Up), Point::UP);
+    assert_eq!(Point::from(Right), Point::RIGHT);
+    assert_eq!(Point::from(Down), Point::DOWN);
+    assert_eq!(Point::from(Left), Point::LEFT);
 }
 
 #[test]
 fn try_from_vector2() {
     use Direction::*;
-    assert_eq!(Direction::try_from(-Vector2::<i32>::y()), Ok(Up));
-    assert_eq!(Direction::try_from(Vector2::<i32>::x()), Ok(Right));
-    assert_eq!(Direction::try_from(Vector2::<i32>::y()), Ok(Down));
-    assert_eq!(Direction::try_from(-Vector2::<i32>::x()), Ok(Left));
-    assert_eq!(Direction::try_from(Vector2::new(1, 1)), Err(()));
-    assert_eq!(Direction::try_from(Vector2::new(0, 0)), Err(()));
+    assert_eq!(Direction::try_from(Point::UP), Ok(Up));
+    assert_eq!(Direction::try_from(Point::RIGHT), Ok(Right));
+    assert_eq!(Direction::try_from(Point::DOWN), Ok(Down));
+    assert_eq!(Direction::try_from(Point::LEFT), Ok(Left));
+    assert_eq!(Direction::try_from(Point::new(1, 1)), Err(()));
+    assert_eq!(Direction::try_from(Point::new(0, 0)), Err(()));
 }

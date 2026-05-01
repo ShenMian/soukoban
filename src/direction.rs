@@ -2,7 +2,7 @@
 
 use std::ops::Neg;
 
-use crate::Vector2;
+use crate::point::Point;
 
 /// A direction.
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
@@ -98,28 +98,28 @@ impl Neg for Direction {
     }
 }
 
-impl From<Direction> for Vector2<i32> {
+impl From<Direction> for Point {
     fn from(direction: Direction) -> Self {
         use Direction as E;
         match direction {
-            E::Up => -Self::y(),
-            E::Right => Self::x(),
-            E::Down => Self::y(),
-            E::Left => -Self::x(),
+            E::Up => Self::UP,
+            E::Right => Self::RIGHT,
+            E::Down => Self::DOWN,
+            E::Left => Self::LEFT,
         }
     }
 }
 
-impl TryFrom<Vector2<i32>> for Direction {
+impl TryFrom<Point> for Direction {
     type Error = ();
 
-    fn try_from(vector: Vector2<i32>) -> Result<Self, Self::Error> {
+    fn try_from(position: Point) -> Result<Self, Self::Error> {
         use Direction::*;
-        match vector {
-            v if v == -Vector2::<i32>::y() => Ok(Up),
-            v if v == Vector2::<i32>::x() => Ok(Right),
-            v if v == Vector2::<i32>::y() => Ok(Down),
-            v if v == -Vector2::<i32>::x() => Ok(Left),
+        match position {
+            v if v == Point::UP => Ok(Up),
+            v if v == Point::RIGHT => Ok(Right),
+            v if v == Point::DOWN => Ok(Down),
+            v if v == Point::LEFT => Ok(Left),
             _ => Err(()),
         }
     }
@@ -129,14 +129,14 @@ impl TryFrom<Vector2<i32>> for Direction {
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub struct DirectedPosition {
     /// The position.
-    pub position: Vector2<i32>,
+    pub position: Point,
     /// The direction.
     pub direction: Direction,
 }
 
 impl DirectedPosition {
     /// Creates a new `DirectedPosition`.
-    pub const fn new(position: Vector2<i32>, direction: Direction) -> Self {
+    pub const fn new(position: Point, direction: Direction) -> Self {
         Self {
             position,
             direction,

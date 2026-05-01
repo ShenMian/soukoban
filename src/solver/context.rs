@@ -3,9 +3,10 @@
 use std::collections::VecDeque;
 
 use crate::{
-    FxHashMap, FxHashSet, Map, Tiles, Vector2,
+    FxHashMap, FxHashSet, Map, Tiles,
     bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
+    point::Point,
 };
 
 use super::Strategy;
@@ -23,7 +24,7 @@ pub struct Context {
     /// The search strategy to use.
     strategy: Strategy,
     /// Minimum cost to push a box from a position to the nearest goal.
-    min_costs: FxHashMap<Vector2<i32>, i32>,
+    min_costs: FxHashMap<Point, i32>,
     /// Set of tunnel positions and directions.
     tunnels: FxHashSet<DirectedPosition>,
 }
@@ -51,7 +52,7 @@ impl Context {
     }
 
     /// Returns a reference to the set of minimum costs.
-    pub fn min_costs(&self) -> &FxHashMap<Vector2<i32>, i32> {
+    pub fn min_costs(&self) -> &FxHashMap<Point, i32> {
         &self.min_costs
     }
 
@@ -64,13 +65,13 @@ impl Context {
     ///
     /// Pushing a box onto a dead position inevitably leads to an unsolvable
     /// state.
-    pub fn is_dead_position(&self, position: Vector2<i32>) -> bool {
+    pub fn is_dead_position(&self, position: Point) -> bool {
         !self.min_costs.contains_key(&position)
     }
 
     /// Computes and returns the minimum number of pushes to push the box to
     /// the nearest goal.
-    fn compute_minimum_push(map: &Map) -> FxHashMap<Vector2<i32>, i32> {
+    fn compute_minimum_push(map: &Map) -> FxHashMap<Point, i32> {
         let mut min_costs = FxHashMap::default();
         let mut costs = FxHashMap::default();
         let mut queue = VecDeque::new();
@@ -143,7 +144,7 @@ impl Context {
         let mut tunnels = FxHashSet::default();
         for x in 1..map.dimensions().x - 1 {
             for y in 1..map.dimensions().y - 1 {
-                let box_position = Vector2::new(x, y);
+                let box_position = Point::new(x, y);
                 if !map[box_position].intersects(Tiles::Floor) {
                     continue;
                 }

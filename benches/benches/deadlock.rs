@@ -1,5 +1,5 @@
 use criterion::{BatchSize, Criterion, criterion_group};
-use soukoban::{Vector2, deadlock};
+use soukoban::{deadlock, prelude::*};
 
 use super::utils::*;
 
@@ -11,10 +11,10 @@ fn is_freeze_deadlock(c: &mut Criterion) {
         b.iter_batched(
             || {
                 let mut map = map.clone();
-                map.set_box_position(Vector2::new(3, 2), Vector2::new(3, 1));
+                map.set_box_position(Point::new(3, 2), Point::new(3, 1));
                 map
             },
-            |map| deadlock::is_freeze_deadlock(&map, Vector2::new(3, 1), map.box_positions()),
+            |map| deadlock::is_freeze_deadlock(&map, Point::new(3, 1), map.box_positions()),
             BatchSize::SmallInput,
         )
     });

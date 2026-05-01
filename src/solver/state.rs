@@ -3,15 +3,16 @@ use std::hash::{Hash, Hasher};
 use rustc_hash::FxHasher;
 
 use crate::{
-    FxHashSet, Map, Tiles, Vector2,
+    FxHashSet, Map, Tiles,
     path_finding::{compute_area_anchor, compute_reachable_area},
+    point::Point,
     solver::{Strategy, context::Context},
 };
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct State {
-    pub player_position: Vector2<i32>,
-    pub box_positions: FxHashSet<Vector2<i32>>,
+    pub player_position: Point,
+    pub box_positions: FxHashSet<Point>,
 }
 
 impl State {

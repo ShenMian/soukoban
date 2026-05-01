@@ -6,18 +6,18 @@ use utils::*;
 #[test]
 fn is_freeze_deadlock() {
     let mut map: Map = load_level_from_file("assets/Deadlock_3.xsb", 2).into();
-    map.set_box_position(Vector2::new(3, 2), Vector2::new(3, 1));
+    map.set_box_position(Point::new(3, 2), Point::new(3, 1));
     assert!(deadlock::is_freeze_deadlock(
         &map,
-        Vector2::new(3, 1),
+        Point::new(3, 1),
         map.box_positions(),
     ));
 
     let mut map: Map = load_level_from_file("assets/Deadlock_3.xsb", 3).into();
-    map.set_box_position(Vector2::new(5, 2), Vector2::new(4, 2));
+    map.set_box_position(Point::new(5, 2), Point::new(4, 2));
     assert!(deadlock::is_freeze_deadlock(
         &map,
-        Vector2::new(4, 2),
+        Point::new(4, 2),
         map.box_positions(),
     ));
 }

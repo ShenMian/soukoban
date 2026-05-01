@@ -10,6 +10,7 @@ pub mod error;
 pub mod level;
 pub mod map;
 pub mod path_finding;
+pub mod point;
 pub mod solver;
 pub mod tiles;
 
@@ -23,7 +24,6 @@ use level::*;
 use map::*;
 use tiles::*;
 
-pub use nalgebra::Vector2;
 pub use rustc_hash::{FxHashMap, FxHashSet};
 
 /// Convenience re-export of common structs and functions.
@@ -34,6 +34,7 @@ pub mod prelude {
     pub use crate::error::*;
     pub use crate::level::*;
     pub use crate::map::*;
+    pub use crate::point::*;
     pub use crate::tiles::*;
-    pub use crate::{FxHashMap, FxHashSet, Vector2};
+    pub use crate::{FxHashMap, FxHashSet};
 }

@@ -1,5 +1,5 @@
 use criterion::{Criterion, criterion_group};
-use soukoban::{Vector2, direction::Direction, path_finding, solver::Strategy};
+use soukoban::{path_finding, prelude::*, solver::Strategy};
 
 use super::utils::*;
 
@@ -8,11 +8,7 @@ fn compute_box_waypoints(c: &mut Criterion) {
         b.iter_batched_ref(
             || load_level_from_file("assets/Benchmark_3.xsb", 1),
             |level| {
-                path_finding::compute_box_waypoints(
-                    level.map(),
-                    Vector2::new(6, 4),
-                    Strategy::Quick,
-                )
+                path_finding::compute_box_waypoints(level.map(), Point::new(6, 4), Strategy::Quick)
             },
             criterion::BatchSize::SmallInput,
         )
@@ -28,11 +24,7 @@ fn compute_box_waypoints(c: &mut Criterion) {
                 level
             },
             |level| {
-                path_finding::compute_box_waypoints(
-                    level.map(),
-                    Vector2::new(4, 44),
-                    Strategy::Quick,
-                )
+                path_finding::compute_box_waypoints(level.map(), Point::new(4, 44), Strategy::Quick)
             },
             criterion::BatchSize::SmallInput,
         )

@@ -6,10 +6,11 @@ use std::{
 };
 
 use crate::{
-    FxHashMap, FxHashSet, Tiles, Vector2,
+    FxHashMap, FxHashSet, Tiles,
     bcc_graph::BccGraph,
     direction::{DirectedPosition, Direction},
     map::Map,
+    point::Point,
     solver::Strategy,
 };
 
@@ -37,10 +38,10 @@ impl<T: Eq> PartialOrd for Node<T> {
 /// starting position to the target position, based on the provided
 /// `is_walkable` function.
 pub fn find_path(
-    from: Vector2<i32>,
-    to: Vector2<i32>,
-    is_walkable: impl Fn(Vector2<i32>) -> bool,
-) -> Option<Vec<Vector2<i32>>> {
+    from: Point,
+    to: Point,
+    is_walkable: impl Fn(Point) -> bool,
+) -> Option<Vec<Point>> {
     let mut open_set = BinaryHeap::new();
     let mut came_from = FxHashMap::default();
     let mut cost = FxHashMap::default();
@@ -77,11 +78,7 @@ pub fn find_path(
     None
 }
 
-fn construct_path(
-    from: Vector2<i32>,
-    to: Vector2<i32>,
-    came_from: FxHashMap<Vector2<i32>, Vector2<i32>>,
-) -> Vec<Vector2<i32>> {
+fn construct_path(from: Point, to: Point, came_from: FxHashMap<Point, Point>) -> Vec<Point> {
     let mut path = Vec::new();
     let mut current = to;
     while current != from {
@@ -99,7 +96,7 @@ fn construct_path(
 /// This function finds a path using the A* algorithm from the player's current
 /// position to the target position, based on the provided `is_walkable`
 /// function.
-pub fn compute_player_move_directions(map: &Map, to: Vector2<i32>) -> Option<Vec<Direction>> {
+pub fn compute_player_move_directions(map: &Map, to: Point) -> Option<Vec<Direction>> {
     let path = find_path(map.player_position(), to, |position| {
         map.is_walkable(position)
     })?;
@@ -119,7 +116,7 @@ pub fn compute_player_move_directions(map: &Map, to: Vector2<i32>) -> Option<Vec
 /// reachable positions.
 pub fn compute_box_waypoints(
     map: &Map,
-    initial_box_position: Vector2<i32>,
+    initial_box_position: Point,
     strategy: Strategy,
 ) -> (
     FxHashMap<DirectedPosition, DirectedPosition>,
@@ -239,7 +236,7 @@ pub fn compute_box_waypoints(
 pub fn construct_box_path(
     to: DirectedPosition,
     waypoints: &FxHashMap<DirectedPosition, DirectedPosition>,
-) -> Vec<Vector2<i32>> {
+) -> Vec<Point> {
     let mut path = Vec::new();
     let mut current = to;
     debug_assert!(waypoints.contains_key(&current));
@@ -262,9 +259,9 @@ pub fn construct_box_path(
 /// Panics if parameters are invalid.
 pub fn construct_player_path(
     map: &Map,
-    mut player_position: Vector2<i32>,
-    box_path: &[Vector2<i32>],
-) -> Vec<Vector2<i32>> {
+    mut player_position: Point,
+    box_path: &[Point],
+) -> Vec<Point> {
     let mut path = Vec::new();
     let initial_box_position = *box_path.first().unwrap();
     for box_positions in box_path.windows(2) {
@@ -285,7 +282,7 @@ pub fn construct_player_path(
 }
 
 /// Returns a set of positions of the boxes that can be pushed by the player.
-pub fn compute_pushable_boxes(map: &Map) -> FxHashSet<Vector2<i32>> {
+pub fn compute_pushable_boxes(map: &Map) -> FxHashSet<Point> {
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
     let mut pushable_boxes = FxHashSet::default();
@@ -310,9 +307,9 @@ pub fn compute_pushable_boxes(map: &Map) -> FxHashSet<Vector2<i32>> {
 /// that can be reached from the starting position, based on the provided
 /// `is_walkable` function.
 pub fn compute_reachable_area(
-    position: Vector2<i32>,
-    is_walkable: impl Fn(Vector2<i32>) -> bool,
-) -> FxHashSet<Vector2<i32>> {
+    position: Point,
+    is_walkable: impl Fn(Point) -> bool,
+) -> FxHashSet<Point> {
     let mut reachable_area = FxHashSet::default();
     let mut deque = VecDeque::new();
     reachable_area.insert(position);
@@ -329,13 +326,13 @@ pub fn compute_reachable_area(
 }
 
 /// Computes the anchor point (top-left) for a given positions.
-pub fn compute_area_anchor(area: &FxHashSet<Vector2<i32>>) -> Option<Vector2<i32>> {
+pub fn compute_area_anchor(area: &FxHashSet<Point>) -> Option<Point> {
     area.iter()
         .min_by(|a, b| (a.y, a.x).cmp(&(b.y, b.x)))
         .copied()
 }
 
 /// Calculates the Manhattan distance between two 2D vectors.
-fn manhattan_distance(a: Vector2<i32>, b: Vector2<i32>) -> i32 {
+fn manhattan_distance(a: Point, b: Point) -> i32 {
     (a - b).abs().sum()
 }

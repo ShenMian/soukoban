@@ -186,7 +186,7 @@ fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
 
         // Determine the direction of the push
         let delta = box_to_position - box_from_position;
-        let push_direction = Direction::try_from((delta).map(i32::signum)).unwrap();
+        let push_direction = Direction::try_from(delta.map(i32::signum)).unwrap();
 
         // Find the path for the player to reach the box position before pushing it
         actions.extend(

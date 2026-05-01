@@ -1,10 +1,11 @@
 use std::cmp::Ordering;
 
 use crate::{
-    FxHashSet, Tiles, Vector2,
+    FxHashSet, Tiles,
     deadlock::is_freeze_deadlock,
     direction::{DirectedPosition, Direction},
     path_finding::{compute_reachable_area, find_path},
+    point::Point,
 };
 
 use super::{Strategy, context::Context, state::State};
@@ -124,10 +125,10 @@ impl Node {
     /// occurred inside the tunnel.
     fn slide_through_tunnel(
         ctx: &Context,
-        box_positions: &FxHashSet<Vector2<i32>>,
-        mut box_position: Vector2<i32>,
+        box_positions: &FxHashSet<Point>,
+        mut box_position: Point,
         push_direction: Direction,
-    ) -> (Vector2<i32>, i32) {
+    ) -> (Point, i32) {
         let mut pushes = 0;
         while ctx
             .tunnels()
@@ -142,11 +143,7 @@ impl Node {
     }
 
     /// Returns `true` if the new box position is a deadlock.
-    fn is_deadlock(
-        ctx: &Context,
-        box_position: Vector2<i32>,
-        box_positions: &FxHashSet<Vector2<i32>>,
-    ) -> bool {
+    fn is_deadlock(ctx: &Context, box_position: Point, box_positions: &FxHashSet<Point>) -> bool {
         !ctx.map()[box_position].intersects(Tiles::Goal)
             && (ctx.is_dead_position(box_position)
                 || is_freeze_deadlock(ctx.map(), box_position, box_positions))
