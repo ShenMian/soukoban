@@ -125,14 +125,15 @@ fn ida_star_depth_search(
 
 /// Searches for a solution using the BFS algorithm.
 ///
-/// Since state transitions may have non-uniform costs, BFS cannot guarantee any
-/// optimal solution.
+/// While the tunnel pruning optimization introduces non-uniform costs between
+/// adjacent nodes, it still guarantees push-optimality, yet fails to guarantee
+/// move-optimality.
 ///
 /// # Panics
 ///
-/// Panics if the context's strategy is not [`Strategy::Quick`].
+/// Panics if the context's strategy is [`Strategy::MoveOptimal`].
 pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
-    assert!(ctx.strategy() == Strategy::Quick);
+    assert!(ctx.strategy() != Strategy::MoveOptimal);
 
     let mut queue = std::collections::VecDeque::new();
     let mut came_from = FxHashMap::default();
