@@ -180,26 +180,26 @@ fn ida_star_search() {
     // assert_eq!(
     //     search(
     //         load_level_from_file("assets/BoxWorld_100.xsb", 3),
-    //         Strategy::OptimalPush,
+    //         Strategy::PushOptimal,
     //     )
-    //     .pushes(),
+    //     .shifts(),
     //     Actions::from_str(
     //         "rRRddrruULuu4l3D3u4rdd3L3ruu4ldDldRu6ruLd5luu4rDrd4LDu3ruu4ldDldRu3rddrUru4L3ruu4ldD"
     //     )
     //     .unwrap()
-    //     .pushes()
+    //     .shifts()
     // );
     // assert_eq!(
     //     search(
     //         load_level_from_file("assets/BoxWorld_100.xsb", 3),
-    //         Strategy::OptimalMove,
+    //         Strategy::MoveOptimal,
     //     )
-    //     .pushes(),
+    //     .moves(),
     //     Actions::from_str(
     //         "rRRddrruULuu4l3D3u4rdd3L3ruu4ldDldRu6ruLd5luu4rDrd4LDu3ruu4ldDldRu3rddrUru4L3ruu4ldD"
     //     )
     //     .unwrap()
-    //     .pushes()
+    //     .moves()
     // );
 }
 
