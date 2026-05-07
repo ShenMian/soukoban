@@ -41,15 +41,6 @@ fn a_star_search() {
     );
     assert_eq!(
         search(
-            load_level_from_file("assets/BoxWorld_100.xsb", 1),
-            Strategy::MoveOptimal,
-        )
-        .moves(),
-        Actions::from_str("DuLLrUUdrR").unwrap().moves()
-    );
-
-    assert_eq!(
-        search(
             load_level_from_file("assets/BoxWorld_100.xsb", 2),
             Strategy::PushOptimal,
         )
@@ -59,6 +50,27 @@ fn a_star_search() {
         )
         .unwrap()
         .shifts()
+    );
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 3),
+            Strategy::PushOptimal,
+        )
+        .shifts(),
+        Actions::from_str(
+            "rRRddrruULuu4l3D3u4rdd3L3ruu4ldDldRu6ruLd5luu4rDrd4LDu3ruu4ldDldRu3rddrUru4L3ruu4ldD"
+        )
+        .unwrap()
+        .shifts()
+    );
+
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::MoveOptimal,
+        )
+        .moves(),
+        Actions::from_str("DuLLrUUdrR").unwrap().moves()
     );
     assert_eq!(
         search(
@@ -71,19 +83,6 @@ fn a_star_search() {
         )
         .unwrap()
         .moves()
-    );
-
-    assert_eq!(
-        search(
-            load_level_from_file("assets/BoxWorld_100.xsb", 3),
-            Strategy::PushOptimal,
-        )
-        .shifts(),
-        Actions::from_str(
-            "rRRddrruULuu4l3D3u4rdd3L3ruu4ldDldRu6ruLd5luu4rDrd4LDu3ruu4ldDldRu3rddrUru4L3ruu4ldD"
-        )
-        .unwrap()
-        .shifts()
     );
     assert_eq!(
         search(
@@ -144,15 +143,6 @@ fn ida_star_search() {
     );
     assert_eq!(
         search(
-            load_level_from_file("assets/BoxWorld_100.xsb", 1),
-            Strategy::MoveOptimal,
-        )
-        .moves(),
-        Actions::from_str("DuLLrUUdrR").unwrap().moves()
-    );
-
-    assert_eq!(
-        search(
             load_level_from_file("assets/BoxWorld_100.xsb", 2),
             Strategy::PushOptimal,
         )
@@ -162,6 +152,15 @@ fn ida_star_search() {
         )
         .unwrap()
         .shifts()
+    );
+
+    assert_eq!(
+        search(
+            load_level_from_file("assets/BoxWorld_100.xsb", 1),
+            Strategy::MoveOptimal,
+        )
+        .moves(),
+        Actions::from_str("DuLLrUUdrR").unwrap().moves()
     );
     assert_eq!(
         search(
