@@ -1,6 +1,9 @@
 //! Utilities for deadlocks detection.
 
-use std::collections::VecDeque;
+use std::{
+    collections::{HashSet, VecDeque},
+    hash::BuildHasher,
+};
 
 use crate::{FxHashSet, direction::Direction, map::Map, point::Point, tiles::Tiles};
 
@@ -8,21 +11,32 @@ use crate::{FxHashSet, direction::Direction, map::Map, point::Point, tiles::Tile
 ///
 /// Consider using [`compute_static_deadlocks`] if you need to efficiently
 /// compute multiple static deadlock positions.
-pub fn is_static_deadlock(
+pub fn is_static_deadlock<S>(
     map: &Map,
     box_position: Point,
-    box_positions: &FxHashSet<Point>,
-) -> bool {
+    box_positions: &HashSet<Point, S>,
+) -> bool
+where
+    S: BuildHasher + Default,
+{
     debug_assert!(box_positions.contains(&box_position));
-    is_static_deadlock_inner(map, box_position, box_positions, &mut FxHashSet::default())
+    is_static_deadlock_inner(
+        map,
+        box_position,
+        box_positions,
+        &mut HashSet::<Point, S>::default(),
+    )
 }
 
-fn is_static_deadlock_inner(
+fn is_static_deadlock_inner<S>(
     map: &Map,
     box_position: Point,
-    box_positions: &FxHashSet<Point>,
-    visited: &mut FxHashSet<Point>,
-) -> bool {
+    box_positions: &HashSet<Point, S>,
+    visited: &mut HashSet<Point, S>,
+) -> bool
+where
+    S: BuildHasher,
+{
     if !visited.insert(box_position) {
         return true;
     }
@@ -56,21 +70,32 @@ fn is_static_deadlock_inner(
 }
 
 /// Checks if the given box position is a freeze deadlock.
-pub fn is_freeze_deadlock(
+pub fn is_freeze_deadlock<S>(
     map: &Map,
     box_position: Point,
-    box_positions: &FxHashSet<Point>,
-) -> bool {
+    box_positions: &HashSet<Point, S>,
+) -> bool
+where
+    S: BuildHasher + Default,
+{
     debug_assert!(box_positions.contains(&box_position));
-    is_freeze_deadlock_inner(map, box_position, box_positions, &mut FxHashSet::default())
+    is_freeze_deadlock_inner(
+        map,
+        box_position,
+        box_positions,
+        &mut HashSet::<Point, S>::default(),
+    )
 }
 
-fn is_freeze_deadlock_inner(
+fn is_freeze_deadlock_inner<S>(
     map: &Map,
     box_position: Point,
-    box_positions: &FxHashSet<Point>,
-    visited: &mut FxHashSet<Point>,
-) -> bool {
+    box_positions: &HashSet<Point, S>,
+    visited: &mut HashSet<Point, S>,
+) -> bool
+where
+    S: BuildHasher,
+{
     if !visited.insert(box_position) {
         return true;
     }
