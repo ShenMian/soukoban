@@ -416,9 +416,8 @@ impl<B: BufRead> Iterator for Group<B> {
                 Ok(0) => {
                     if buf.is_empty() {
                         return None;
-                    } else {
-                        return Some(Ok(buf));
                     }
+                    return Some(Ok(buf));
                 }
                 Ok(_n) => {
                     let trimmed_line = line.trim();
@@ -427,10 +426,9 @@ impl<B: BufRead> Iterator for Group<B> {
                         if trimmed_line.is_empty() {
                             if has_map_data {
                                 return Some(Ok(buf));
-                            } else {
-                                buf.clear();
-                                continue;
                             }
+                            buf.clear();
+                            continue;
                         }
                         if let Some(comment) = trimmed_line.to_lowercase().strip_prefix("comment:")
                         {

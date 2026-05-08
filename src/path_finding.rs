@@ -54,7 +54,7 @@ pub fn find_path(
 
     while let Some(node) = open_set.pop() {
         if node.state == to {
-            return Some(construct_path(from, to, came_from));
+            return Some(construct_path(from, to, &came_from));
         }
 
         for direction in Direction::iter() {
@@ -78,7 +78,7 @@ pub fn find_path(
     None
 }
 
-fn construct_path(from: Point, to: Point, came_from: FxHashMap<Point, Point>) -> Vec<Point> {
+fn construct_path(from: Point, to: Point, came_from: &FxHashMap<Point, Point>) -> Vec<Point> {
     let mut path = Vec::new();
     let mut current = to;
     while current != from {

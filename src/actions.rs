@@ -27,7 +27,7 @@ pub struct Actions(pub Vec<Action>);
 impl Actions {
     /// Creates an empty actions.
     pub fn new() -> Self {
-        Default::default()
+        Self::default()
     }
 
     /// Returns the number of move actions.

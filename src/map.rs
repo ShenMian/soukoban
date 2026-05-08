@@ -11,8 +11,9 @@ use std::{
 use rustc_hash::{FxBuildHasher, FxHasher};
 
 use crate::{
-    Actions, FxHashMap, FxHashSet, Level, deadlock::*, direction::Direction, error::ParseMapError,
-    path_finding::*, point::Point, run_length::rle_decode, solver::state::State, tiles::Tiles,
+    Actions, FxHashMap, FxHashSet, Level, action::Action, deadlock::*, direction::Direction,
+    error::ParseMapError, path_finding::*, point::Point, run_length::rle_decode,
+    solver::state::State, tiles::Tiles,
 };
 
 /// A grid-based map.
@@ -87,7 +88,7 @@ impl Map {
 
         // Verify the solution
         let mut level = Level::from_map(instance.clone());
-        let directions = actions.iter().map(|action| action.direction());
+        let directions = actions.iter().map(Action::direction);
         level
             .execute_batch(directions)
             .map_err(|_| ParseMapError::InvalidActions)?;
@@ -545,7 +546,7 @@ impl FromStr for Map {
         debug_assert!(!xsb.trim().is_empty(), "string is empty");
 
         // Calculate map dimensions and indentation
-        let mut indent = i32::MAX;
+        let mut indent = usize::MAX;
         let mut dimensions = Point::ZERO;
         let mut buf = String::with_capacity(xsb.len());
         for line in xsb.split(['\n', '|']) {
@@ -559,10 +560,10 @@ impl FromStr for Map {
             }
             dimensions.x = dimensions.x.max(line.len() as i32);
             dimensions.y += 1;
-            indent = indent.min(line.chars().take_while(char::is_ascii_whitespace).count() as i32);
+            indent = indent.min(line.chars().take_while(char::is_ascii_whitespace).count());
             buf += &(line + "\n");
         }
-        dimensions.x -= indent;
+        dimensions.x -= indent as i32;
 
         let mut instance = Self::with_dimensions(dimensions);
 
@@ -570,7 +571,7 @@ impl FromStr for Map {
         let mut player_position = None;
         for (y, line) in buf.lines().enumerate() {
             // Trim map indentation
-            let line = &line[indent as usize..];
+            let line = &line[indent..];
             for (x, char) in line.chars().enumerate() {
                 let position = Point::new(x as i32, y as i32);
                 instance[position] = match char {
