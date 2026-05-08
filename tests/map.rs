@@ -8,58 +8,59 @@ use utils::*;
 
 #[test]
 fn from_str() {
-    let no_player_map = r#"
+    const NO_PLAYER_MAP: &str = r"
         #####
         # $.#
         #####
-    "#;
-    let no_box_or_goal_map = r#"
+    ";
+    const NO_BOX_OR_GOAL_MAP: &str = r"
         ###
         #@#
         ###
-    "#;
-    let more_than_one_player_map_1 = r#"
+    ";
+    const MORE_THAN_ONE_PLAYER_MAP_1: &str = r"
         ######
         #@@$.#
         ######
-    "#;
-    let more_than_one_player_map_2 = r#"
+    ";
+    const MORE_THAN_ONE_PLAYER_MAP_2: &str = r"
         ######
         #@$.+#
         ######
-    "#;
-    let mismatch_between_boxs_and_goals_map = r#"
+    ";
+    const MISMATCH_BETWEEN_BOXS_AND_GOALS_MAP: &str = r"
         ######
         #@$$.#
         ######
-    "#;
-    let invalid_character_map = r#"
+    ";
+    const INVALID_CHARACTER_MAP: &str = r"
         ######
         #@!$.#
         ######
-    "#;
+    ";
+
     assert_eq!(
-        Map::from_str(no_player_map).unwrap_err(),
+        Map::from_str(NO_PLAYER_MAP).unwrap_err(),
         ParseMapError::MissingPlayer
     );
     assert_eq!(
-        Map::from_str(no_box_or_goal_map).unwrap_err(),
+        Map::from_str(NO_BOX_OR_GOAL_MAP).unwrap_err(),
         ParseMapError::MissingBoxOrGoal
     );
     assert_eq!(
-        Map::from_str(more_than_one_player_map_1).unwrap_err(),
+        Map::from_str(MORE_THAN_ONE_PLAYER_MAP_1).unwrap_err(),
         ParseMapError::MultiplePlayers
     );
     assert_eq!(
-        Map::from_str(more_than_one_player_map_2).unwrap_err(),
+        Map::from_str(MORE_THAN_ONE_PLAYER_MAP_2).unwrap_err(),
         ParseMapError::MultiplePlayers
     );
     assert_eq!(
-        Map::from_str(mismatch_between_boxs_and_goals_map).unwrap_err(),
+        Map::from_str(MISMATCH_BETWEEN_BOXS_AND_GOALS_MAP).unwrap_err(),
         ParseMapError::BoxGoalMismatch
     );
     assert_eq!(
-        Map::from_str(invalid_character_map).unwrap_err(),
+        Map::from_str(INVALID_CHARACTER_MAP).unwrap_err(),
         ParseMapError::InvalidCharacter('!')
     );
 }
@@ -92,7 +93,7 @@ fn from_actions() {
     assert_eq!(
         Map::from_actions(actions).unwrap(),
         Map::from_str(
-            r#"
+            r"
             -----####-
             ######  #-
             # $  $  #-
@@ -101,7 +102,7 @@ fn from_actions() {
             ##$# *   #
             -#   #####
             -#####----
-        "#
+        "
         )
         .unwrap()
     );
@@ -126,7 +127,7 @@ fn get() {
 fn canonicalize() {
     // Steaming Hot
     let mut actual = Map::from_str(
-        r#"
+        r"
          #      #
          #   #  #
           # #  #
@@ -144,11 +145,11 @@ fn canonicalize() {
         #$$$$$$$ #  #
         #        ####
         ##########
-    "#,
+    ",
     )
     .unwrap();
     let expected = Map::from_str(
-        r#"
+        r"
         ##########
         #@_______#
         #_$$$$$$$#
@@ -158,7 +159,7 @@ fn canonicalize() {
         #$$$$$$$_#
         #........#
         ##########
-    "#,
+    ",
     )
     .unwrap();
     actual.canonicalize();
@@ -169,7 +170,7 @@ fn canonicalize() {
         .map()
         .clone();
     let expected = Map::from_str(
-        r#"
+        r"
         --####----
         --#@_##---
         --#___#---
@@ -181,7 +182,7 @@ fn canonicalize() {
         ###$_$####
         --#___#---
         --#####---
-    "#,
+    ",
     )
     .unwrap();
     actual.canonicalize();
@@ -191,7 +192,7 @@ fn canonicalize() {
         .map()
         .clone();
     let expected = Map::from_str(
-        r#"
+        r"
         ----#####--------
         --###___##-------
         ###___*._####----
@@ -209,7 +210,7 @@ fn canonicalize() {
         -###***##--------
         ---#___#---------
         ---#####---------
-    "#,
+    ",
     )
     .unwrap();
     actual.canonicalize();
@@ -219,7 +220,7 @@ fn canonicalize() {
 #[test]
 fn shrink_to_fit() {
     let mut oversize_map = Map::from_str(
-        r#"
+        r"
         ---------------
         ---------------
         ----####-------
@@ -231,7 +232,7 @@ fn shrink_to_fit() {
         ---------------
         ---------------
         ---------------
-    "#,
+    ",
     )
     .unwrap();
     let expected = load_level_from_file("assets/Microban_155.xsb", 3)
@@ -248,13 +249,13 @@ fn shrink_to_fit() {
 #[test]
 fn rotate_cw() {
     let mut map = Map::from_str(
-        r#"
+        r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
+    ",
     )
     .unwrap();
     map.rotate_cw();
@@ -273,13 +274,13 @@ fn rotate_cw() {
 #[test]
 fn rotate_ccw() {
     let mut map = Map::from_str(
-        r#"
+        r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
+    ",
     )
     .unwrap();
     map.rotate_ccw();
@@ -298,13 +299,13 @@ fn rotate_ccw() {
 #[test]
 fn flip_horizontal() {
     let mut map = Map::from_str(
-        r#"
+        r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
+    ",
     )
     .unwrap();
     map.flip_horizontal();
@@ -323,13 +324,13 @@ fn flip_horizontal() {
 #[test]
 fn flip_vertical() {
     let mut map = Map::from_str(
-        r#"
+        r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
+    ",
     )
     .unwrap();
     map.flip_vertical();

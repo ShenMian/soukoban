@@ -8,42 +8,40 @@ use utils::*;
 
 #[test]
 fn from_str() {
-    const SIMPLEST: &str = r#"
+    const SIMPLEST: &str = r"
         #####
         #@$.#
         #####
-    "#;
-    assert!(Level::from_str(SIMPLEST).is_ok());
-
-    const DUPLICATE_METADATA_LEVEL: &str = r#"
+    ";
+    const DUPLICATE_METADATA_LEVEL: &str = r"
         #####
         #@$.#
         #####
         unknown: 1
         unknown: 2
-    "#;
-    assert_eq!(
-        Level::from_str(DUPLICATE_METADATA_LEVEL).unwrap_err(),
-        ParseLevelError::DuplicateMetadata("unknown".to_string())
-    );
-
-    const UNTERMINATED_BLOCK_COMMENT_LEVEL: &str = r#"
+    ";
+    const UNTERMINATED_BLOCK_COMMENT_LEVEL: &str = r"
         #####
         #@$.#
         #####
         comment:
         unterminated block comment
-    "#;
+    ";
+    const INVALID_CHARACTER_LEVEL: &str = r"
+        ######
+        #@!$.#
+        ######
+    ";
+
+    assert!(Level::from_str(SIMPLEST).is_ok());
+    assert_eq!(
+        Level::from_str(DUPLICATE_METADATA_LEVEL).unwrap_err(),
+        ParseLevelError::DuplicateMetadata("unknown".to_string())
+    );
     assert_eq!(
         Level::from_str(UNTERMINATED_BLOCK_COMMENT_LEVEL).unwrap_err(),
         ParseLevelError::UnterminatedBlockComment
     );
-
-    const INVALID_CHARACTER_LEVEL: &str = r#"
-        ######
-        #@!$.#
-        ######
-    "#;
     assert_eq!(
         Level::from_str(INVALID_CHARACTER_LEVEL).unwrap_err(),
         ParseLevelError::ParseMapError(ParseMapError::InvalidCharacter('!'))
@@ -52,7 +50,7 @@ fn from_str() {
 
 #[test]
 fn display() {
-    let level_str = r#"
+    const LEVEL: &str = r"
         ; Level 1
         #####
         #@$.#
@@ -64,8 +62,8 @@ fn display() {
         comment
         comment-end:
         author: level author
-    "#;
-    let level = Level::from_str(level_str).unwrap();
+    ";
+    let level = Level::from_str(LEVEL).unwrap();
     assert_eq!(
         level.to_string(),
         indoc! {"
@@ -86,7 +84,7 @@ fn display() {
 
 #[test]
 fn metadata() {
-    let level_str = r#"
+    const LEVEL: &str = r"
         ; Level 1
         #####
         #@$.#
@@ -99,8 +97,8 @@ fn metadata() {
         comment
         comment-end:
         author: level author
-    "#;
-    let level = Level::from_str(level_str).unwrap();
+    ";
+    let level = Level::from_str(LEVEL).unwrap();
     assert_eq!(level.metadata()["tile"], "level title");
     assert_eq!(level.metadata()["author"], "level author");
     assert_eq!(
@@ -166,13 +164,13 @@ fn load_from_reader() {
 fn load_nth_from_reader() {
     // Microban #3
     const MICROBAN_3_RLE: &str = "--4#|3#--4#|#5-$-#|#-#--#$-#|#-.-.#@-#|9#";
+    // Microban II #132
+    const MICROBAN2_132_RLE: &str = "18-5#|12-5#-#3-#|12-#3-3#-#-#|6-5#-#-#7-#|5#-#3-#-#3-4#-##|#3-3#-#-#-3#-#--#-#|#-#4-@--#3-#-#--#-3#|#3-4#$6#-4#3-#|3#-#--#-.6-#4-#-#|--#-#--#--##--#4-#3-#|-##-5#--##4-#-5#|-#9-##--3#-#|-#-#-3#-#--5#--#-5#|-#3-#-#4-#-#4-#-#3-#|-5#-#--5#--#-3#-#-#|7-#-3#--##9-#|3-5#-#4-##--5#-##|3-#3-#4-#--##--#--#-#|3-#-#4-#8-#--#-3#|3-#3-4#-6#-4#3-#|3-3#-#--#-#3-#7-#-#|5-#-#--#-3#-#-#-3#3-#|4-##-4#3-#-#3-#-5#|4-#7-#-#-5#|4-#-#-3#3-#|4-#3-#-5#|4-5#";
+
     assert_eq!(
         Level::from_str(MICROBAN_3_RLE).unwrap(),
         load_level_from_file("assets/Microban_155.xsb", 3)
     );
-
-    // Microban II #132
-    const MICROBAN2_132_RLE: &str = "18-5#|12-5#-#3-#|12-#3-3#-#-#|6-5#-#-#7-#|5#-#3-#-#3-4#-##|#3-3#-#-#-3#-#--#-#|#-#4-@--#3-#-#--#-3#|#3-4#$6#-4#3-#|3#-#--#-.6-#4-#-#|--#-#--#--##--#4-#3-#|-##-5#--##4-#-5#|-#9-##--3#-#|-#-#-3#-#--5#--#-5#|-#3-#-#4-#-#4-#-#3-#|-5#-#--5#--#-3#-#-#|7-#-3#--##9-#|3-5#-#4-##--5#-##|3-#3-#4-#--##--#--#-#|3-#-#4-#8-#--#-3#|3-#3-4#-6#-4#3-#|3-3#-#--#-#3-#7-#-#|5-#-#--#-3#-#-#-3#3-#|4-##-4#3-#-#3-#-5#|4-#7-#-#-5#|4-#-#-3#3-#|4-#3-#-5#|4-5#";
     assert_eq!(
         Level::from_str(MICROBAN2_132_RLE).unwrap(),
         load_level_from_file("assets/Microban_II_135.xsb", 132)
@@ -181,16 +179,14 @@ fn load_nth_from_reader() {
 
 #[test]
 fn rotate_cw() {
-    let mut level = Level::from_str(
-        r#"
+    const LEVEL: &str = r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
-    )
-    .unwrap();
+    ";
+    let mut level = Level::from_str(LEVEL).unwrap();
     level.rotate_cw();
     assert_eq!(
         level.to_string(),
@@ -206,16 +202,14 @@ fn rotate_cw() {
 
 #[test]
 fn rotate_ccw() {
-    let mut level = Level::from_str(
-        r#"
+    const LEVEL: &str = r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
-    )
-    .unwrap();
+    ";
+    let mut level = Level::from_str(LEVEL).unwrap();
     level.rotate_ccw();
     assert_eq!(
         level.to_string(),
@@ -231,16 +225,14 @@ fn rotate_ccw() {
 
 #[test]
 fn flip_horizontal() {
-    let mut level = Level::from_str(
-        r#"
+    const LEVEL: &str = r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
-    )
-    .unwrap();
+    ";
+    let mut level = Level::from_str(LEVEL).unwrap();
     level.flip_horizontal();
     assert_eq!(
         level.to_string(),
@@ -256,16 +248,14 @@ fn flip_horizontal() {
 
 #[test]
 fn flip_vertical() {
-    let mut level = Level::from_str(
-        r#"
+    const LEVEL: &str = r"
         ###
         #.#
         #$###
         #  @#
         #####
-    "#,
-    )
-    .unwrap();
+    ";
+    let mut level = Level::from_str(LEVEL).unwrap();
     level.flip_vertical();
     assert_eq!(
         level.to_string(),
@@ -281,14 +271,14 @@ fn flip_vertical() {
 
 #[test]
 fn player_reachable_area() {
-    let level = Level::from_str(indoc! {"
-        #####
-        #@* #
-        # ###
-        # #
-        ###
-    "})
-    .unwrap();
+    const LEVEL: &str = r"
+         #####
+         #@* #
+         # ###
+         # #
+         ###
+     ";
+    let level = Level::from_str(LEVEL).unwrap();
     let actual = level.player_reachable_area();
     let expected = FxHashSet::from_iter([Point::new(1, 1), Point::new(1, 2), Point::new(1, 3)]);
     assert!(actual == expected);

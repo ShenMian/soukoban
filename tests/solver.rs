@@ -11,7 +11,7 @@ fn a_star_search() {
         let solver = Solver::new(level.map().clone(), strategy);
         let solution = solver.search(Algorithm::AStar).unwrap();
 
-        let directions = solution.iter().map(|action| action.direction());
+        let directions = solution.iter().map(Action::direction);
         level.execute_batch(directions).unwrap();
         assert!(level.is_solved());
 
@@ -113,7 +113,7 @@ fn ida_star_search() {
         let solver = Solver::new(level.map().clone(), strategy);
         let solution = solver.search(Algorithm::IDAStar).unwrap();
 
-        let directions = solution.iter().map(|action| action.direction());
+        let directions = solution.iter().map(Action::direction);
         level.execute_batch(directions).unwrap();
         assert!(level.is_solved());
 
@@ -208,7 +208,7 @@ fn bfs_search() {
         let solver = Solver::new(level.map().clone(), strategy);
         let solution = solver.search(Algorithm::Bfs).unwrap();
 
-        let directions = solution.iter().map(|action| action.direction());
+        let directions = solution.iter().map(Action::direction);
         level.execute_batch(directions).unwrap();
         assert!(level.is_solved());
 
