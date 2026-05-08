@@ -36,7 +36,7 @@ fn main() {
     let actions = Actions::from_str("R").unwrap();
 
     // Reconstruct the map from the actions
-    let map = Map::from_actions(actions.clone()).unwrap();
+    let map = Map::with_actions(&actions).unwrap();
 
     // Print the reconstructed map
     //

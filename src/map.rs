@@ -41,15 +41,15 @@ impl Map {
     /// # Errors
     ///
     /// Returns an error if the actions don't result in a valid map.
-    pub fn from_actions(actions: Actions) -> Result<Self, ParseMapError> {
-        let (dimensions, player_position) = compute_dimensions_and_player_position(&actions);
+    pub fn with_actions(actions: &Actions) -> Result<Self, ParseMapError> {
+        let (dimensions, player_position) = compute_dimensions_and_player_position(actions);
 
         let mut instance = Self::with_dimensions(dimensions);
 
         let mut initial_box_positions = FxHashSet::default();
         let mut current_box_positions = FxHashSet::default();
         let mut current_player_position = player_position;
-        for action in &*actions {
+        for action in actions.iter() {
             instance[current_player_position] = Tiles::Floor;
             current_player_position += &action.direction().into();
             if action.is_shift() {

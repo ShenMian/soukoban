@@ -66,24 +66,24 @@ fn from_str() {
 }
 
 #[test]
-fn from_actions() {
-    assert!(Map::from_actions(Actions::from_str("R").unwrap()).is_ok());
-    assert!(Map::from_actions(Actions::from_str("DuLLrUUdrR").unwrap()).is_ok());
+fn with_actions() {
+    assert!(Map::with_actions(&Actions::from_str("R").unwrap()).is_ok());
+    assert!(Map::with_actions(&Actions::from_str("DuLLrUUdrR").unwrap()).is_ok());
 
     assert_eq!(
-        Map::from_actions(Actions::from_str("RddrU").unwrap()).unwrap_err(),
+        Map::with_actions(&Actions::from_str("RddrU").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(Actions::from_str("RdU").unwrap()).unwrap_err(),
+        Map::with_actions(&Actions::from_str("RdU").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(Actions::from_str("RL").unwrap()).unwrap_err(),
+        Map::with_actions(&Actions::from_str("RL").unwrap()).unwrap_err(),
         ParseMapError::InvalidActions
     );
     assert_eq!(
-        Map::from_actions(Actions::from_str("llurldd").unwrap()).unwrap_err(),
+        Map::with_actions(&Actions::from_str("llurldd").unwrap()).unwrap_err(),
         ParseMapError::MissingBoxOrGoal
     );
 
@@ -91,7 +91,7 @@ fn from_actions() {
         Actions::from_str("uulLdlluRRllddlluuRRdrruRurDDulldldddllUdrruuluullddRluurrdrrurrdDldLrurrdLLuruulldlluRRRurDDullllllddrddrrUUddlluuluurrdRurrrdDldLrurrdLLuruullllllddrddrrUULuurrrrdddlLruruullllddrUluRRRurDDullllllddRddrrUUdrrrruLdllluUluRRRurDDDrdLL")
             .unwrap();
     assert_eq!(
-        Map::from_actions(actions).unwrap(),
+        Map::with_actions(&actions).unwrap(),
         Map::from_str(
             r"
             -----####-
