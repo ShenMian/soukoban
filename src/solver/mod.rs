@@ -58,6 +58,10 @@ impl Solver {
     }
 
     /// Searches for solution using the specified algorithm.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SearchError` if no solution is found or the search is interrupted.
     pub fn search(&self, algorithm: Algorithm) -> Result<Actions, SearchError> {
         self.stop_flag.store(false, Ordering::Relaxed);
         match algorithm {

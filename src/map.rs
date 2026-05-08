@@ -37,6 +37,10 @@ impl Map {
     ///
     /// Tries to restore the map with a complete solution. This method can only
     /// restore the parts of the map that are used by the solution.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the actions don't result in a valid map.
     pub fn from_actions(actions: Actions) -> Result<Self, ParseMapError> {
         let (dimensions, player_position) = compute_dimensions_and_player_position(&actions);
 

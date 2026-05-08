@@ -58,6 +58,10 @@ impl Level {
     }
 
     /// Moves the player in the specified direction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the move or push is blocked.
     pub fn execute(&mut self, direction: Direction) -> Result<(), ActionError> {
         // If the next move is opposite to the last one, treat it as an undo.
         if self.actions.last() == Some(&Action::Move(-direction)) {
@@ -90,6 +94,10 @@ impl Level {
     }
 
     /// Moves the player through a sequence of directions.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any of the moves or pushes is blocked.
     pub fn execute_batch<I: IntoIterator<Item = Direction>>(
         &mut self,
         directions: I,
@@ -101,6 +109,10 @@ impl Level {
     }
 
     /// Undoes the last action.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if there are no actions left to undo.
     pub fn undo(&mut self) -> Result<(), ActionError> {
         if let Some(last_action) = self.actions.pop() {
             if last_action.is_shift() {
@@ -118,6 +130,10 @@ impl Level {
     }
 
     /// Redoes the last action.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if there are no undone actions left to redo.
     pub fn redo(&mut self) -> Result<(), ActionError> {
         if let Some(last_undone_action) = self.undone_actions.pop() {
             let undone_actions = std::mem::take(&mut self.undone_actions);
@@ -187,6 +203,10 @@ impl Level {
 
     /// Loads the nth level from an XSB format string.
     ///
+    /// # Errors
+    ///
+    /// Returns an error if the level is not valid.
+    ///
     /// # Panics
     ///
     /// Panics if the index is out of bounds.
@@ -198,6 +218,10 @@ impl Level {
     }
 
     /// Loads the nth level from a buffer reader.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the level is not valid.
     ///
     /// # Panics
     ///
