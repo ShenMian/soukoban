@@ -11,7 +11,7 @@ fn compute_box_waypoints(c: &mut Criterion) {
                 path_finding::compute_box_waypoints(level.map(), Point::new(6, 4), Strategy::Quick)
             },
             criterion::BatchSize::SmallInput,
-        )
+        );
     });
 
     c.bench_function("path_finding::compute_box_waypoints 'beemaze'", |b| {
@@ -27,7 +27,7 @@ fn compute_box_waypoints(c: &mut Criterion) {
                 path_finding::compute_box_waypoints(level.map(), Point::new(4, 44), Strategy::Quick)
             },
             criterion::BatchSize::SmallInput,
-        )
+        );
     });
 }
 

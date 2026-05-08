@@ -17,7 +17,7 @@ fn a_star_search(c: &mut Criterion) {
                     || Solver::new(level.map().clone(), strategy),
                     |solver| solver.search(Algorithm::AStar).unwrap(),
                     BatchSize::SmallInput,
-                )
+                );
             },
         );
     };
@@ -43,7 +43,7 @@ fn ida_star_search(c: &mut Criterion) {
                     || Solver::new(level.map().clone(), strategy),
                     |solver| solver.search(Algorithm::IDAStar).unwrap(),
                     BatchSize::SmallInput,
-                )
+                );
             },
         );
     };
