@@ -2,7 +2,8 @@
 
 use std::{
     cmp::Ordering,
-    collections::{BinaryHeap, VecDeque},
+    collections::{BinaryHeap, HashMap, HashSet, VecDeque},
+    hash::BuildHasher,
 };
 
 use crate::{
@@ -233,10 +234,13 @@ pub fn compute_box_waypoints(
 }
 
 /// Constructs a path for the box to move to a target position.
-pub fn construct_box_path(
+pub fn construct_box_path<S>(
     to: DirectedPosition,
-    waypoints: &FxHashMap<DirectedPosition, DirectedPosition>,
-) -> Vec<Point> {
+    waypoints: &HashMap<DirectedPosition, DirectedPosition, S>,
+) -> Vec<Point>
+where
+    S: BuildHasher,
+{
     let mut path = Vec::new();
     let mut current = to;
     debug_assert!(waypoints.contains_key(&current));
@@ -326,7 +330,10 @@ pub fn compute_reachable_area(
 }
 
 /// Computes the anchor point (top-left) for a given positions.
-pub fn compute_area_anchor(area: &FxHashSet<Point>) -> Option<Point> {
+pub fn compute_area_anchor<S>(area: &HashSet<Point, S>) -> Option<Point>
+where
+    S: BuildHasher,
+{
     area.iter()
         .min_by(|a, b| (a.y, a.x).cmp(&(b.y, b.x)))
         .copied()
