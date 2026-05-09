@@ -78,20 +78,20 @@ impl Node {
                     continue;
                 }
 
-                let new_moves = self.moves
-                    + find_path(self.state.player_position, push_position, is_walkable)
-                        .unwrap()
-                        .len() as i32;
-                let new_pushes = self.pushes + 1;
-
                 // Slides the box through a tunnel
-                let (new_box_position, pushes) = Self::slide_through_tunnel(
+                let (new_box_position, mut pushes) = Self::slide_through_tunnel(
                     ctx,
                     &self.state.box_positions,
                     new_box_position,
                     push_direction,
                 );
-                let (new_pushes, new_moves) = (new_pushes + pushes, new_moves + pushes);
+
+                let moves = find_path(self.state.player_position, push_position, is_walkable)
+                    .unwrap()
+                    .len() as i32
+                    - 1;
+                pushes += 1;
+                let (new_pushes, new_moves) = (self.pushes + pushes, self.moves + moves + pushes);
 
                 let mut new_box_positions = self.state.box_positions.clone();
                 new_box_positions.remove(box_position);
