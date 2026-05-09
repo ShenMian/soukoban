@@ -108,6 +108,7 @@ impl Map {
     /// Warning: This will create an invalid map. Some associated functions will
     /// not work properly until the map becomes valid.
     #[allow(clippy::cast_sign_loss)]
+    #[must_use]
     pub fn with_dimensions(dimensions: Point) -> Self {
         debug_assert!(dimensions.x >= 0 && dimensions.y >= 0);
         Self {
@@ -120,11 +121,13 @@ impl Map {
     }
 
     /// Returns the dimensions of the map.
+    #[must_use]
     pub fn dimensions(&self) -> Point {
         self.dimensions
     }
 
     /// Returns the position of the player.
+    #[must_use]
     pub fn player_position(&self) -> Point {
         self.player_position
     }
@@ -137,11 +140,13 @@ impl Map {
     }
 
     /// Returns a reference to the positions of the boxes.
+    #[must_use]
     pub fn box_positions(&self) -> &FxHashSet<Point> {
         &self.box_positions
     }
 
     /// Returns a reference to the positions of the goals.
+    #[must_use]
     pub fn goal_positions(&self) -> &FxHashSet<Point> {
         &self.goal_positions
     }
@@ -158,6 +163,7 @@ impl Map {
     }
 
     /// Returns `true` if the map is solved.
+    #[must_use]
     pub fn is_solved(&self) -> bool {
         self.box_positions == self.goal_positions
     }
@@ -270,6 +276,7 @@ impl Map {
     }
 
     /// Returns tiles at the specified position or `None` if out of bounds.
+    #[must_use]
     pub fn get(&self, position: Point) -> Option<&Tiles> {
         if self.in_bounds(position) {
             Some(unsafe { self.get_unchecked(position) })
@@ -280,6 +287,7 @@ impl Map {
 
     /// Returns a mutable reference to tiles at the specified position or `None`
     /// if out of bounds.
+    #[must_use]
     pub fn get_mut(&mut self, position: Point) -> Option<&mut Tiles> {
         if self.in_bounds(position) {
             Some(unsafe { self.get_unchecked_mut(position) })
@@ -300,6 +308,7 @@ impl Map {
     /// [`get`]: Map::get
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     #[allow(clippy::cast_sign_loss)]
+    #[must_use]
     pub unsafe fn get_unchecked(&self, position: Point) -> &Tiles {
         debug_assert!(self.in_bounds(position));
         unsafe {
@@ -321,6 +330,7 @@ impl Map {
     /// [`get_mut`]: Map::get_mut
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     #[allow(clippy::cast_sign_loss)]
+    #[must_use]
     pub unsafe fn get_unchecked_mut(&mut self, position: Point) -> &mut Tiles {
         debug_assert!(self.in_bounds(position));
         unsafe {
@@ -330,6 +340,7 @@ impl Map {
     }
 
     /// Checks if a position is within the bounds of the map.
+    #[must_use]
     pub fn in_bounds(&self, position: Point) -> bool {
         0 <= position.x
             && position.x < self.dimensions.x
@@ -338,6 +349,7 @@ impl Map {
     }
 
     /// Checks if a position is traversable.
+    #[must_use]
     pub fn is_walkable(&self, position: Point) -> bool {
         self.in_bounds(position) && !self[position].intersects(Tiles::Wall | Tiles::Box)
     }
@@ -684,6 +696,7 @@ impl From<Map> for State {
     }
 }
 
+#[must_use]
 fn compute_dimensions_and_player_position(actions: &Actions) -> (Point, Point) {
     let mut min_position = Point::ZERO;
     let mut max_position = Point::ZERO;

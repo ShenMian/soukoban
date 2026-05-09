@@ -26,16 +26,19 @@ pub struct Actions(pub Vec<Action>);
 
 impl Actions {
     /// Creates an empty actions.
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Returns the number of move actions.
+    #[must_use]
     pub fn moves(&self) -> usize {
         self.len()
     }
 
     /// Returns the number of shift actions.
+    #[must_use]
     pub fn shifts(&self) -> usize {
         self.iter().filter(|action| action.is_shift()).count()
     }
@@ -69,6 +72,7 @@ impl Actions {
     }
 
     /// Returns the secondary values.
+    #[must_use]
     pub fn secondary_values(&self) -> SecondaryValues {
         let mut box_lines = 0;
         let mut box_changes = 0;

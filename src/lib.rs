@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![allow(clippy::op_ref)]
-#![deny(missing_docs, clippy::missing_panics_doc)]
+#![deny(missing_docs, clippy::missing_panics_doc, clippy::must_use_candidate)]
 
 pub mod action;
 pub mod actions;

@@ -13,21 +13,25 @@ pub struct Point {
 
 impl Point {
     /// Creates a new `Point`.
+    #[must_use]
     pub const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
 
     /// Returns a new `Point` with the absolute values of its coordinates.
+    #[must_use]
     pub fn abs(self) -> Self {
         self.map(i32::abs)
     }
 
     /// Returns the sum of the `x` and `y` coordinates.
+    #[must_use]
     pub const fn sum(self) -> i32 {
         self.x + self.y
     }
 
     /// Returns a new `Point` with the `x` and `y` coordinates swapped.
+    #[must_use]
     pub const fn yx(self) -> Self {
         Self {
             x: self.y,
@@ -37,6 +41,7 @@ impl Point {
 
     /// Returns a new `Point` containing the result of `f` applied to each
     /// of its entries.
+    #[must_use]
     pub fn map<F>(&self, mut f: F) -> Self
     where
         F: FnMut(i32) -> i32,
@@ -49,6 +54,7 @@ impl Point {
 
     /// Returns a new `Point` containing the result of `f` applied to each
     /// entries of `self` and `rhs`.
+    #[must_use]
     pub fn zip_map<F>(&self, rhs: &Point, mut f: F) -> Self
     where
         F: FnMut(i32, i32) -> i32,

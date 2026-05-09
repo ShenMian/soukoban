@@ -50,6 +50,7 @@ pub struct Solver {
 
 impl Solver {
     /// Creates a new `Solver`.
+    #[must_use]
     pub fn new(map: Map, strategy: Strategy) -> Self {
         Self {
             ctx: Context::new(map, strategy),
@@ -79,6 +80,7 @@ impl Solver {
     }
 
     /// Returns a reference to the context.
+    #[must_use]
     pub fn context(&self) -> &Context {
         &self.ctx
     }

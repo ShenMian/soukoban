@@ -23,6 +23,7 @@ pub struct Level {
 
 impl Level {
     /// Creates a new `Level` from map.
+    #[must_use]
     pub fn from_map(map: Map) -> Self {
         Self {
             map,
@@ -33,26 +34,31 @@ impl Level {
     }
 
     /// Returns a reference to the map of the level.
+    #[must_use]
     pub fn map(&self) -> &Map {
         &self.map
     }
 
     /// Returns a reference to the metadata of the level.
+    #[must_use]
     pub fn metadata(&self) -> &BTreeMap<String, String> {
         &self.metadata
     }
 
     /// Returns a reference to the actions of the level.
+    #[must_use]
     pub fn actions(&self) -> &Actions {
         &self.actions
     }
 
     /// Returns a reference to the undone actions of the level.
+    #[must_use]
     pub fn undone_actions(&self) -> &Actions {
         &self.undone_actions
     }
 
     /// Returns the current facing direction of the player.
+    #[must_use]
     pub fn player_direction(&self) -> Option<Direction> {
         self.actions.last().map(Action::direction)
     }
@@ -150,6 +156,7 @@ impl Level {
     }
 
     /// Returns `true` if the level is solved.
+    #[must_use]
     pub fn is_solved(&self) -> bool {
         self.map.box_positions() == self.map.goal_positions()
     }
@@ -183,6 +190,7 @@ impl Level {
     }
 
     /// Returns the reachable area for the player.
+    #[must_use]
     pub fn player_reachable_area(&self) -> FxHashSet<Point> {
         compute_reachable_area(self.map.player_position(), |position| {
             self.map.is_walkable(position)
@@ -490,15 +498,18 @@ trait GroupExt: BufRead {
 
 impl<T: BufRead> GroupExt for T {}
 
+#[must_use]
 fn is_xsb_string(str: &str) -> bool {
     str.chars().all(is_xsb_symbol)
         || (str.chars().all(is_xsb_symbol_with_rle) && str.chars().any(is_xsb_symbol))
 }
 
+#[must_use]
 const fn is_xsb_symbol(char: char) -> bool {
     matches!(char, ' ' | '-' | '_' | '#' | '$' | '.' | '@' | '*' | '+')
 }
 
+#[must_use]
 const fn is_xsb_symbol_with_rle(char: char) -> bool {
     is_xsb_symbol(char) || char::is_ascii_digit(&char) || char == '|'
 }

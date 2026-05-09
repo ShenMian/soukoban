@@ -38,6 +38,7 @@ impl<T: Eq> PartialOrd for Node<T> {
 /// This function uses the A* algorithm to find the shortest path from the
 /// starting position to the target position, based on the provided
 /// `is_walkable` function.
+#[must_use]
 pub fn find_path(
     from: Point,
     to: Point,
@@ -97,6 +98,7 @@ fn construct_path(from: Point, to: Point, came_from: &FxHashMap<Point, Point>) -
 /// This function finds a path using the A* algorithm from the player's current
 /// position to the target position, based on the provided `is_walkable`
 /// function.
+#[must_use]
 pub fn compute_player_move_directions(map: &Map, to: Point) -> Option<Vec<Direction>> {
     let path = find_path(map.player_position(), to, |position| {
         map.is_walkable(position)
@@ -115,6 +117,7 @@ pub fn compute_player_move_directions(map: &Map, to: Point) -> Option<Vec<Direct
 
 /// Calculates the waypoints for the box to move from their current position to
 /// reachable positions.
+#[must_use]
 pub fn compute_box_waypoints(
     map: &Map,
     initial_box_position: Point,
@@ -234,6 +237,7 @@ pub fn compute_box_waypoints(
 }
 
 /// Constructs a path for the box to move to a target position.
+#[must_use]
 pub fn construct_box_path<S>(
     to: DirectedPosition,
     waypoints: &HashMap<DirectedPosition, DirectedPosition, S>,
@@ -261,6 +265,7 @@ where
 /// # Panics
 ///
 /// Panics if parameters are invalid.
+#[must_use]
 pub fn construct_player_path(
     map: &Map,
     mut player_position: Point,
@@ -286,6 +291,7 @@ pub fn construct_player_path(
 }
 
 /// Returns a set of positions of the boxes that can be pushed by the player.
+#[must_use]
 pub fn compute_pushable_boxes(map: &Map) -> FxHashSet<Point> {
     let player_reachable_area =
         compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
@@ -310,6 +316,7 @@ pub fn compute_pushable_boxes(map: &Map) -> FxHashSet<Point> {
 /// This function performs a breadth-first search to determine all positions
 /// that can be reached from the starting position, based on the provided
 /// `is_walkable` function.
+#[must_use]
 pub fn compute_reachable_area(
     position: Point,
     is_walkable: impl Fn(Point) -> bool,
@@ -330,6 +337,7 @@ pub fn compute_reachable_area(
 }
 
 /// Computes the anchor point (top-left) for a given positions.
+#[must_use]
 pub fn compute_area_anchor<S>(area: &HashSet<Point, S>) -> Option<Point>
 where
     S: BuildHasher,
@@ -340,6 +348,7 @@ where
 }
 
 /// Calculates the Manhattan distance between two 2D vectors.
+#[must_use]
 fn manhattan_distance(a: Point, b: Point) -> i32 {
     (a - b).abs().sum()
 }

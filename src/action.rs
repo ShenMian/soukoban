@@ -24,6 +24,7 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.direction(), Direction::Up);
     /// ```
+    #[must_use]
     pub const fn direction(&self) -> Direction {
         match *self {
             Self::Move(direction) | Self::Push(direction) => direction,
@@ -40,6 +41,7 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert!(action.is_move());
     /// ```
+    #[must_use]
     pub const fn is_move(&self) -> bool {
         matches!(&self, Self::Move(_))
     }
@@ -54,6 +56,7 @@ impl Action {
     /// let action = Action::Push(Direction::Up);
     /// assert!(action.is_shift());
     /// ```
+    #[must_use]
     pub const fn is_shift(&self) -> bool {
         matches!(&self, Self::Push(_))
     }
@@ -68,6 +71,7 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.rotate_cw(), Action::Move(Direction::Right));
     /// ```
+    #[must_use]
     pub fn rotate_cw(self) -> Self {
         self.map(Direction::rotate_cw)
     }
@@ -82,6 +86,7 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.rotate_ccw(), Action::Move(Direction::Left));
     /// ```
+    #[must_use]
     pub fn rotate_ccw(self) -> Self {
         self.map(Direction::rotate_ccw)
     }
@@ -96,6 +101,7 @@ impl Action {
     /// let action = Action::Move(Direction::Left);
     /// assert_eq!(action.flip_horizontal(), Action::Move(Direction::Right));
     /// ```
+    #[must_use]
     pub fn flip_horizontal(self) -> Self {
         self.map(Direction::flip_horizontal)
     }
@@ -110,11 +116,13 @@ impl Action {
     /// let action = Action::Move(Direction::Up);
     /// assert_eq!(action.flip_vertical(), Action::Move(Direction::Down));
     /// ```
+    #[must_use]
     pub fn flip_vertical(self) -> Self {
         self.map(Direction::flip_vertical)
     }
 
     /// Applies a transformation function to the `Direction`.
+    #[must_use]
     fn map(self, f: impl Fn(Direction) -> Direction) -> Self {
         match self {
             Self::Move(direction) => Self::Move(f(direction)),

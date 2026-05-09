@@ -11,6 +11,7 @@ use crate::{FxHashSet, direction::Direction, map::Map, point::Point, tiles::Tile
 ///
 /// Consider using [`compute_static_deadlocks`] if you need to efficiently
 /// compute multiple static deadlock positions.
+#[must_use]
 pub fn is_static_deadlock<S>(
     map: &Map,
     box_position: Point,
@@ -28,6 +29,7 @@ where
     )
 }
 
+#[must_use]
 fn is_static_deadlock_inner<S>(
     map: &Map,
     box_position: Point,
@@ -70,6 +72,7 @@ where
 }
 
 /// Checks if the given box position is a freeze deadlock.
+#[must_use]
 pub fn is_freeze_deadlock<S>(
     map: &Map,
     box_position: Point,
@@ -87,6 +90,7 @@ where
     )
 }
 
+#[must_use]
 fn is_freeze_deadlock_inner<S>(
     map: &Map,
     box_position: Point,
@@ -137,6 +141,7 @@ where
 /// This function returns an **incomplete** set of dead positions independent
 /// of the player's position. Any box pushed to a point in the set will cause a
 /// deadlock, regardless of the player's position.
+#[must_use]
 pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
     let mut dead_positions = FxHashSet::default();
     for x in 1..map.dimensions().x - 1 {
@@ -189,6 +194,7 @@ pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
 }
 
 /// Computes the positions of the useless floors.
+#[must_use]
 pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
     let mut useless_floors = FxHashSet::default();
 
@@ -234,6 +240,7 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
 }
 
 /// Computes the positions of the useless boxes.
+#[must_use]
 pub fn compute_useless_boxes(map: &Map) -> FxHashSet<Point> {
     map.box_positions()
         .iter()

@@ -34,6 +34,7 @@ impl Direction {
     /// // Rotate the direction 90° counter-clockwise.
     /// assert_eq!(-Direction::Right.rotate_cw(), Direction::Up);
     /// ```
+    #[must_use]
     pub const fn rotate_cw(self) -> Self {
         match self {
             Self::Up => Self::Right,
@@ -51,6 +52,7 @@ impl Direction {
     /// # use soukoban::prelude::*;
     /// assert_eq!(Direction::Up.rotate_ccw(), Direction::Left);
     /// ```
+    #[must_use]
     pub fn rotate_ccw(self) -> Self {
         -self.rotate_cw()
     }
@@ -64,6 +66,7 @@ impl Direction {
     /// assert_eq!(Direction::Left.flip_horizontal(), Direction::Right);
     /// assert_eq!(Direction::Up.flip_horizontal(), Direction::Up);
     /// ```
+    #[must_use]
     pub const fn flip_horizontal(self) -> Self {
         match self {
             Self::Left => Self::Right,
@@ -81,6 +84,7 @@ impl Direction {
     /// assert_eq!(Direction::Up.flip_vertical(), Direction::Down);
     /// assert_eq!(Direction::Left.flip_vertical(), Direction::Left);
     /// ```
+    #[must_use]
     pub const fn flip_vertical(self) -> Self {
         match self {
             Self::Up => Self::Down,
@@ -136,6 +140,7 @@ pub struct DirectedPosition {
 
 impl DirectedPosition {
     /// Creates a new `DirectedPosition`.
+    #[must_use]
     pub const fn new(position: Point, direction: Direction) -> Self {
         Self {
             position,
