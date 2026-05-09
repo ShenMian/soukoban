@@ -91,7 +91,6 @@ impl Node {
                     .len() as i32
                     - 1;
                 pushes += 1;
-                let (new_pushes, new_moves) = (self.pushes + pushes, self.moves + moves + pushes);
 
                 let mut new_box_positions = self.state.box_positions.clone();
                 new_box_positions.remove(box_position);
@@ -108,8 +107,8 @@ impl Node {
                         player_position: new_player_position,
                         box_positions: new_box_positions,
                     },
-                    new_pushes,
-                    new_moves,
+                    self.pushes + pushes,
+                    self.moves + moves + pushes,
                     ctx,
                 ));
             }
