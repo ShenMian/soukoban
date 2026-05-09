@@ -82,8 +82,8 @@ impl Context {
 
         for goal_position in map.goal_positions() {
             for pull_direction in Direction::iter() {
-                let new_box_position = *goal_position + &pull_direction.into();
-                let new_player_position = new_box_position + &pull_direction.into();
+                let new_box_position = *goal_position + pull_direction.into();
+                let new_player_position = new_box_position + pull_direction.into();
 
                 if is_walkable(new_box_position) && is_walkable(new_player_position) {
                     let state = DirectedPosition::new(new_box_position, pull_direction);
@@ -100,11 +100,11 @@ impl Context {
 
         while let Some((state, cost)) = queue.pop_front() {
             let box_position = state.position;
-            let player_position = state.position + &state.direction.into();
+            let player_position = state.position + state.direction.into();
 
             for pull_direction in Direction::iter() {
-                let new_box_position = box_position + &pull_direction.into();
-                let new_player_position = new_box_position + &pull_direction.into();
+                let new_box_position = box_position + pull_direction.into();
+                let new_player_position = new_box_position + pull_direction.into();
 
                 // Check if the player can pull the box
                 if !is_walkable(new_box_position) || !is_walkable(new_player_position) {
@@ -162,22 +162,22 @@ impl Context {
                     let (up, right, down, left) =
                         (up.into(), right.into(), down.into(), left.into());
 
-                    let player_position = box_position + &down;
+                    let player_position = box_position + down;
 
                     // Tunnel template matching patterns:
                     //  .      .      .
                     // #$# or #$_ or _$#
                     // #@#    #@#    #@#
-                    if map[player_position + &left].intersects(Tiles::Wall)
-                        && map[player_position + &right].intersects(Tiles::Wall)
-                        && (map[box_position + &left].intersects(Tiles::Wall)
-                            && map[box_position + &right].intersects(Tiles::Wall)
-                            || map[box_position + &left].intersects(Tiles::Wall)
-                                && map[box_position + &right].intersects(Tiles::Floor)
-                            || map[box_position + &left].intersects(Tiles::Floor)
-                                && map[box_position + &right].intersects(Tiles::Wall))
+                    if map[player_position + left].intersects(Tiles::Wall)
+                        && map[player_position + right].intersects(Tiles::Wall)
+                        && (map[box_position + left].intersects(Tiles::Wall)
+                            && map[box_position + right].intersects(Tiles::Wall)
+                            || map[box_position + left].intersects(Tiles::Wall)
+                                && map[box_position + right].intersects(Tiles::Floor)
+                            || map[box_position + left].intersects(Tiles::Floor)
+                                && map[box_position + right].intersects(Tiles::Wall))
                         && map[player_position].intersects(Tiles::Floor)
-                        && map[box_position + &up].intersects(Tiles::Floor)
+                        && map[box_position + up].intersects(Tiles::Floor)
                         && !map[box_position].intersects(Tiles::Goal)
                     {
                         tunnels.insert(DirectedPosition::new(box_position, push_direction));

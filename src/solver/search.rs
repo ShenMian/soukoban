@@ -193,7 +193,7 @@ fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
         actions.extend(
             find_path(
                 from_state.player_position,
-                box_from_position - &push_direction.into(),
+                box_from_position - push_direction.into(),
                 |position| {
                     !ctx.map()[position].intersects(Tiles::Wall)
                         && !from_state.box_positions.contains(&position)
@@ -207,9 +207,9 @@ fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
 
         actions.push(Action::Push(push_direction));
 
-        let mut new_box_position = box_from_position + &push_direction.into();
+        let mut new_box_position = box_from_position + push_direction.into();
         while new_box_position != box_to_position {
-            new_box_position += &push_direction.into();
+            new_box_position += push_direction.into();
             actions.push(Action::Push(push_direction));
         }
         debug_assert_eq!(new_box_position, box_to_position);

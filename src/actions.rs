@@ -84,7 +84,7 @@ impl Actions {
         let mut prev_box_position = None;
         let mut prev_action: Option<Action> = None;
         for action in &self.0 {
-            player_position += &action.direction().into();
+            player_position += action.direction().into();
             if let Some(prev_action) = prev_action {
                 if action.direction() != prev_action.direction() {
                     player_lines += 1;
@@ -103,7 +103,7 @@ impl Actions {
                     } else {
                         box_changes += 1;
                     }
-                    prev_box_position = Some(player_position + &action.direction().into());
+                    prev_box_position = Some(player_position + action.direction().into());
                 }
             } else {
                 if action.is_shift() {

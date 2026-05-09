@@ -60,7 +60,7 @@ pub fn find_path(
         }
 
         for direction in Direction::iter() {
-            let new_position = node.state + &direction.into();
+            let new_position = node.state + direction.into();
             if !is_walkable(new_position) {
                 continue;
             }
@@ -140,13 +140,13 @@ pub fn compute_box_waypoints(
     for push_direction in Direction::iter() {
         let state = DirectedPosition::new(initial_box_position, push_direction);
         // Check if the box can be pushed
-        let new_box_position = state.position + &push_direction.into();
+        let new_box_position = state.position + push_direction.into();
         if !map.is_walkable(new_box_position) {
             continue;
         }
 
         // Check if the player can push the box
-        let new_player_position = state.position - &state.direction.into();
+        let new_player_position = state.position - state.direction.into();
         if !(map.is_walkable(new_player_position)) {
             continue;
         }
@@ -186,17 +186,17 @@ pub fn compute_box_waypoints(
     }) = queue.pop()
     {
         let box_position = state.position;
-        let player_position = state.position - &state.direction.into();
+        let player_position = state.position - state.direction.into();
 
         for push_direction in Direction::iter() {
             // Check if the box can be pushed
-            let new_box_position = box_position + &push_direction.into();
+            let new_box_position = box_position + push_direction.into();
             if !is_walkable(new_box_position) {
                 continue;
             }
 
             // Check if the player can push the box
-            let new_player_position = box_position - &push_direction.into();
+            let new_player_position = box_position - push_direction.into();
             if !is_walkable(new_player_position) {
                 continue;
             }
@@ -299,8 +299,8 @@ pub fn compute_pushable_boxes(map: &Map) -> FxHashSet<Point> {
     for box_position in map.box_positions() {
         // Check if the player can push the box from any direction
         for push_direction in Direction::iter() {
-            let player_position = box_position - &push_direction.into();
-            let new_box_position = box_position + &push_direction.into();
+            let player_position = *box_position - push_direction.into();
+            let new_box_position = *box_position + push_direction.into();
             if map.is_walkable(new_box_position) && player_reachable_area.contains(&player_position)
             {
                 pushable_boxes.insert(*box_position);
@@ -327,7 +327,7 @@ pub fn compute_reachable_area(
     deque.push_back(position);
     while let Some(position) = deque.pop_front() {
         for direction in Direction::iter() {
-            let neighbor = position + &direction.into();
+            let neighbor = position + direction.into();
             if is_walkable(neighbor) && reachable_area.insert(neighbor) {
                 deque.push_back(neighbor);
             }

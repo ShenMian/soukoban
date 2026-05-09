@@ -52,9 +52,9 @@ where
     .windows(3)
     {
         let neighbors = [
-            box_position + &direction[0].into(),
-            box_position + &direction[1].into(),
-            box_position + &direction[2].into(),
+            box_position + direction[0].into(),
+            box_position + direction[1].into(),
+            box_position + direction[2].into(),
         ];
         for neighbor in &neighbors {
             if map[*neighbor].intersects(Tiles::Wall) {
@@ -113,8 +113,8 @@ where
     .chunks(2)
     {
         let neighbors = [
-            box_position + &direction[0].into(),
-            box_position + &direction[1].into(),
+            box_position + direction[0].into(),
+            box_position + direction[1].into(),
         ];
 
         // Check if any immovable walls on the axis.
@@ -161,8 +161,8 @@ pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
             .windows(2)
             {
                 let neighbor = [
-                    position + &directions[0].into(),
-                    position + &directions[1].into(),
+                    position + directions[0].into(),
+                    position + directions[1].into(),
                 ];
 
                 // Check whether the current position is a corner
@@ -175,8 +175,8 @@ pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
 
                 // Detects grooves based on current position
                 let mut potential_dead_positions = FxHashSet::default();
-                let mut next_position = position - &(directions[0]).into();
-                while map[next_position + &directions[1].into()].intersects(Tiles::Wall) {
+                let mut next_position = position - (directions[0]).into();
+                while map[next_position + directions[1].into()].intersects(Tiles::Wall) {
                     if map[next_position].intersects(Tiles::Goal) {
                         break;
                     }
@@ -185,7 +185,7 @@ pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
                         break;
                     }
                     potential_dead_positions.insert(next_position);
-                    next_position -= &(directions[0]).into();
+                    next_position -= (directions[0]).into();
                 }
             }
         }
@@ -214,7 +214,7 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
         // `neighbor_floor`
         let mut neighbor_floor = None;
         for direction in Direction::iter() {
-            let neighbor = position + &direction.into();
+            let neighbor = position + direction.into();
             if !map[neighbor].intersects(Tiles::Wall) {
                 if neighbor_floor.is_some() {
                     neighbor_floor = None;

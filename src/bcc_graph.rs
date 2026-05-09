@@ -36,7 +36,7 @@ impl BccGraph {
                 let direction = directions[next_direction_idx];
                 next_direction_idx += 1;
 
-                let v = u + &direction.into();
+                let v = u + direction.into();
                 if !is_walkable(v) {
                     continue;
                 }

@@ -64,7 +64,7 @@ impl Node {
         for box_position in &self.state.box_positions {
             for push_direction in Direction::iter() {
                 // Check if the box can be pushed
-                let new_box_position = box_position + &push_direction.into();
+                let new_box_position = *box_position + push_direction.into();
                 if ctx.map()[new_box_position].intersects(Tiles::Wall)
                     || self.state.box_positions.contains(&new_box_position)
                     || ctx.is_dead_position(new_box_position)
@@ -73,7 +73,7 @@ impl Node {
                 }
 
                 // Check if the player can push the box
-                let push_position = box_position - &push_direction.into();
+                let push_position = *box_position - push_direction.into();
                 if !player_reachable_area.contains(&push_position) {
                     continue;
                 }
@@ -101,7 +101,7 @@ impl Node {
                     continue;
                 }
 
-                let new_player_position = new_box_position - &push_direction.into();
+                let new_player_position = new_box_position - push_direction.into();
                 successors.push(Self::new(
                     State {
                         player_position: new_player_position,
@@ -130,10 +130,10 @@ impl Node {
         while ctx
             .tunnels()
             .contains(&DirectedPosition::new(box_position, push_direction))
-            && !box_positions.contains(&(box_position + &push_direction.into()))
-            && !ctx.is_dead_position(box_position + &push_direction.into())
+            && !box_positions.contains(&(box_position + push_direction.into()))
+            && !ctx.is_dead_position(box_position + push_direction.into())
         {
-            box_position += &push_direction.into();
+            box_position += push_direction.into();
             pushes += 1;
         }
         (box_position, pushes)

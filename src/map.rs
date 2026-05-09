@@ -51,9 +51,9 @@ impl Map {
         let mut current_player_position = player_position;
         for action in actions.iter() {
             instance[current_player_position] = Tiles::Floor;
-            current_player_position += &action.direction().into();
+            current_player_position += action.direction().into();
             if action.is_shift() {
-                instance[current_player_position + &action.direction().into()] = Tiles::Floor;
+                instance[current_player_position + action.direction().into()] = Tiles::Floor;
                 // The player pushed the box when moving, which means there is a box at the
                 // player's current position
                 if !current_box_positions.contains(&current_player_position) {
@@ -61,7 +61,7 @@ impl Map {
                     initial_box_positions.insert(current_player_position);
                 }
                 current_box_positions.remove(&current_player_position);
-                current_box_positions.insert(current_player_position + &action.direction().into());
+                current_box_positions.insert(current_player_position + action.direction().into());
             }
         }
         instance[current_player_position] = Tiles::Floor;
@@ -551,7 +551,7 @@ impl Map {
             }
             self[position].insert(value);
             for direction in Direction::iter() {
-                let neighbor = position + &direction.into();
+                let neighbor = position + direction.into();
                 deque.push_back(neighbor);
             }
         }
@@ -704,9 +704,9 @@ fn compute_dimensions_and_player_position(actions: &Actions) -> (Point, Point) {
     // Calculate the dimensions of the player's and pushed box's movement range
     let mut player_position = Point::ZERO;
     for action in &**actions {
-        player_position += &action.direction().into();
+        player_position += action.direction().into();
         if action.is_shift() {
-            let box_position = player_position + &action.direction().into();
+            let box_position = player_position + action.direction().into();
             min_position = min_position.zip_map(&box_position, std::cmp::min);
             max_position = max_position.zip_map(&box_position, std::cmp::max);
         } else {

@@ -79,12 +79,12 @@ impl Level {
             return Ok(());
         }
 
-        let new_player_position = self.map.player_position() + &direction.into();
+        let new_player_position = self.map.player_position() + direction.into();
         if self.map[new_player_position].intersects(Tiles::Wall) {
             return Err(ActionError::MoveBlocked);
         }
         if self.map[new_player_position].intersects(Tiles::Box) {
-            let new_box_position = new_player_position + &direction.into();
+            let new_box_position = new_player_position + direction.into();
             if self.map[new_box_position].intersects(Tiles::Wall | Tiles::Box) {
                 return Err(ActionError::PushBlocked);
             }
@@ -122,11 +122,11 @@ impl Level {
     pub fn undo(&mut self) -> Result<(), ActionError> {
         if let Some(last_action) = self.actions.pop() {
             if last_action.is_shift() {
-                let box_position = self.map.player_position() + &last_action.direction().into();
+                let box_position = self.map.player_position() + last_action.direction().into();
                 let prev_box_position = self.map.player_position();
                 self.map.set_box_position(box_position, prev_box_position);
             }
-            let prev_player_position = self.map.player_position() - &last_action.direction().into();
+            let prev_player_position = self.map.player_position() - last_action.direction().into();
             self.map.set_player_position(prev_player_position);
             self.undone_actions.push(last_action);
             Ok(())
