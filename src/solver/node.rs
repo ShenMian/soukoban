@@ -53,13 +53,14 @@ impl Node {
 
     /// Returns the successors of the node.
     pub fn successors(&self, ctx: &Context) -> Vec<Self> {
-        let mut successors = Vec::new();
-        let player_reachable_area =
-            compute_reachable_area(self.state.player_position, |position| {
-                !ctx.map()[position].intersects(Tiles::Wall)
-                    && !self.state.box_positions.contains(&position)
-            });
+        let is_walkable = |position| {
+            !ctx.map()[position].intersects(Tiles::Wall)
+                && !self.state.box_positions.contains(&position)
+        };
+        let player_reachable_area = compute_reachable_area(self.state.player_position, is_walkable);
+
         // Creates successor states by pushing boxes
+        let mut successors = Vec::new();
         for box_position in &self.state.box_positions {
             for push_direction in Direction::iter() {
                 // Check if the box can be pushed
@@ -78,12 +79,9 @@ impl Node {
                 }
 
                 let new_moves = self.moves
-                    + find_path(self.state.player_position, push_position, |position| {
-                        !ctx.map()[position].intersects(Tiles::Wall)
-                            && !self.state.box_positions.contains(&position)
-                    })
-                    .unwrap()
-                    .len() as i32;
+                    + find_path(self.state.player_position, push_position, is_walkable)
+                        .unwrap()
+                        .len() as i32;
                 let new_pushes = self.pushes + 1;
 
                 // Slides the box through a tunnel
