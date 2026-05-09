@@ -270,15 +270,21 @@ impl Map {
 
     /// Returns tiles at the specified position or `None` if out of bounds.
     pub fn get(&self, position: Point) -> Option<&Tiles> {
-        self.data
-            .get((position.y * self.dimensions.x + position.x) as usize)
+        if self.in_bounds(position) {
+            Some(unsafe { self.get_unchecked(position) })
+        } else {
+            None
+        }
     }
 
     /// Returns a mutable reference to tiles at the specified position or `None`
     /// if out of bounds.
     pub fn get_mut(&mut self, position: Point) -> Option<&mut Tiles> {
-        self.data
-            .get_mut((position.y * self.dimensions.x + position.x) as usize)
+        if self.in_bounds(position) {
+            Some(unsafe { self.get_unchecked_mut(position) })
+        } else {
+            None
+        }
     }
 
     /// Returns tiles at the specified position, without doing bounds checking.
@@ -292,6 +298,7 @@ impl Map {
     ///
     /// [`get`]: Map::get
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[allow(clippy::cast_sign_loss)]
     pub unsafe fn get_unchecked(&self, position: Point) -> &Tiles {
         debug_assert!(self.in_bounds(position));
         unsafe {
@@ -312,6 +319,7 @@ impl Map {
     ///
     /// [`get_mut`]: Map::get_mut
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    #[allow(clippy::cast_sign_loss)]
     pub unsafe fn get_unchecked_mut(&mut self, position: Point) -> &mut Tiles {
         debug_assert!(self.in_bounds(position));
         unsafe {

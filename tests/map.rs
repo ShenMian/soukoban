@@ -121,6 +121,30 @@ fn get() {
             assert_eq!(tiles, unsafe { *map.get_unchecked_mut(position) });
         }
     }
+
+    assert_eq!(map.get(Point::new(-1, 0)), None);
+    assert_eq!(map.get(Point::new(0, -1)), None);
+    assert_eq!(map.get(Point::new(-1, -1)), None);
+    assert_eq!(map.get(Point::new(-1, 1)), None);
+    assert_eq!(map.get(Point::new(1, -1)), None);
+    assert_eq!(map.get(Point::new(map.dimensions().x, 0)), None);
+    assert_eq!(map.get(Point::new(0, map.dimensions().y)), None);
+    assert_eq!(
+        map.get(Point::new(map.dimensions().x, map.dimensions().y)),
+        None
+    );
+
+    assert_eq!(map.get_mut(Point::new(-1, 0)), None);
+    assert_eq!(map.get_mut(Point::new(0, -1)), None);
+    assert_eq!(map.get_mut(Point::new(-1, -1)), None);
+    assert_eq!(map.get_mut(Point::new(-1, 1)), None);
+    assert_eq!(map.get_mut(Point::new(1, -1)), None);
+    assert_eq!(map.get_mut(Point::new(map.dimensions().x, 0)), None);
+    assert_eq!(map.get_mut(Point::new(0, map.dimensions().y)), None);
+    assert_eq!(
+        map.get_mut(Point::new(map.dimensions().x, map.dimensions().y)),
+        None
+    );
 }
 
 #[test]
