@@ -239,9 +239,9 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
     useless_floors
 }
 
-/// Computes the positions of the useless boxes.
+/// Computes the positions of the deadlocked boxes.
 #[must_use]
-pub fn compute_useless_boxes(map: &Map) -> FxHashSet<Point> {
+pub fn compute_deadlocked_boxes(map: &Map) -> FxHashSet<Point> {
     map.box_positions()
         .iter()
         .copied()

@@ -170,13 +170,18 @@ impl Map {
 
     /// Canonicalizes the map.
     ///
-    /// Remove elements from the map that are not relevant to the solution.
-    /// The map's solution will not change.
+    /// Remove elements from the map that are not relevant to the solution. This
+    /// guarantees that the move‑optimal solution does not change.
     ///
-    /// This method can make different maps with the same solution more similar.
-    /// Therefore, it can be used for map deduplication.
+    /// This method simplifies the map in linear time and can be used for map
+    /// deduplication.
+    ///
+    /// # Time complexity
+    ///
+    /// Typically `O(N)` where `N` is the number of cells in the map. In the
+    /// worst case this may degrade to `O(N²)`.
     pub fn canonicalize(&mut self) {
-        self.set_useless_boxes_to_walls();
+        self.set_deadlocked_boxes_to_walls();
         self.set_useless_floors_to_walls();
         self.remove_unreachable_walls();
         self.remove_unreachable_boxes();
@@ -417,7 +422,7 @@ impl Map {
         assert!(removed, "goal position does not exist");
     }
 
-    /// Sets unused floors to walls.
+    /// Sets useless floors to walls.
     fn set_useless_floors_to_walls(&mut self) {
         for useless_floor in compute_useless_floors(self.clone()) {
             self[useless_floor].remove(Tiles::Floor);
@@ -425,14 +430,14 @@ impl Map {
         }
     }
 
-    /// Sets useless boxes to walls.
-    fn set_useless_boxes_to_walls(&mut self) {
+    /// Sets deadlocked boxes to walls.
+    fn set_deadlocked_boxes_to_walls(&mut self) {
         debug_assert!(
             self.goal_positions
-                .is_superset(&compute_useless_boxes(self))
+                .is_superset(&compute_deadlocked_boxes(self))
         );
 
-        for position in compute_useless_boxes(self) {
+        for position in compute_deadlocked_boxes(self) {
             self.remove_goal_position(position);
             self.remove_box_position(position);
             self[position].remove(Tiles::Floor);
@@ -440,7 +445,7 @@ impl Map {
         }
     }
 
-    /// Removes unused walls.
+    /// Removes unreachable walls.
     fn remove_unreachable_walls(&mut self) {
         self.data
             .iter_mut()
@@ -467,6 +472,10 @@ impl Map {
     }
 
     /// Canonicalizes the transformation of the map.
+    ///
+    /// Applies all 8 transformations of the dihedral group D₄ and keeps the one
+    /// with the smallest hash. This guarantees that symmetric maps obtain the
+    /// same representation.
     fn canonicalize_transform(&mut self) {
         let mut transformed_maps = FxHashMap::with_capacity_and_hasher(8, FxBuildHasher);
         let mut min_hash = u64::MAX;
@@ -487,7 +496,11 @@ impl Map {
         *self = transformed_maps.remove(&min_hash).unwrap();
     }
 
-    /// Canonicalizes the position of the player.
+    /// Canonicalizes the player position within the reachable area.
+    ///
+    /// Moves the player to the anchor (top‑leftmost cell) of the reachable
+    /// area. This guarantees that the player's location is described
+    /// identically whenever the same area is reachable.
     fn canonicalize_player(&mut self) {
         let player_reachable_area =
             compute_reachable_area(self.player_position, |position| self.is_walkable(position));
