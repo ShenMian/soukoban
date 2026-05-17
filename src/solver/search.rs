@@ -49,6 +49,16 @@ pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, S
     Err(SearchError::NoSolution)
 }
 
+/// The result of a depth-limited search.
+enum SearchResult {
+    /// The search was interrupted by the stop flag.
+    Interrupted,
+    /// No solution exists within the current threshold.
+    Exhausted,
+    /// The threshold was exceeded; contains the minimum f-value beyond it.
+    Exceeded(i32),
+}
+
 /// Searches for a solution using the IDA* algorithm.
 pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
     let state: State = ctx.map().clone().into();
@@ -61,15 +71,11 @@ pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions,
     loop {
         match ida_star_depth_search(ctx, stop_flag, &node, &mut path, &mut visited, threshold) {
             Ok(_state) => return Ok(construct_actions(ctx, &path)),
-            Err(new_threshold) => {
-                if new_threshold == i32::MIN {
-                    return Err(SearchError::Interrupted);
-                }
-                if new_threshold == i32::MAX {
-                    return Err(SearchError::NoSolution);
-                }
-                threshold = new_threshold;
-            }
+            Err(bound) => match bound {
+                SearchResult::Interrupted => return Err(SearchError::Interrupted),
+                SearchResult::Exhausted => return Err(SearchError::NoSolution),
+                SearchResult::Exceeded(new_threshold) => threshold = new_threshold,
+            },
         }
     }
 }
@@ -85,14 +91,14 @@ fn ida_star_depth_search(
     path: &mut Vec<State>,
     visited: &mut FxHashSet<u64>,
     threshold: i32,
-) -> Result<State, i32> {
+) -> Result<State, SearchResult> {
     if stop_flag.load(Ordering::Relaxed) {
-        return Err(i32::MIN);
+        return Err(SearchResult::Interrupted);
     }
 
     let estimated_cost = node.cost() + node.heuristic();
     if estimated_cost > threshold {
-        return Err(estimated_cost);
+        return Err(SearchResult::Exceeded(estimated_cost));
     }
 
     if node.is_solved() {
@@ -113,14 +119,22 @@ fn ida_star_depth_search(
 
         match ida_star_depth_search(ctx, stop_flag, &successor, path, visited, threshold) {
             Ok(state) => return Ok(state),
-            Err(new_threshold) => min_threshold = min_threshold.min(new_threshold),
+            Err(SearchResult::Interrupted) => return Err(SearchResult::Interrupted),
+            Err(SearchResult::Exhausted) => {}
+            Err(SearchResult::Exceeded(new_threshold)) => {
+                min_threshold = min_threshold.min(new_threshold);
+            }
         }
 
         path.pop();
         visited.remove(&hash);
     }
 
-    Err(min_threshold)
+    if min_threshold == i32::MAX {
+        Err(SearchResult::Exhausted)
+    } else {
+        Err(SearchResult::Exceeded(min_threshold))
+    }
 }
 
 /// Searches for a solution using the BFS algorithm.
