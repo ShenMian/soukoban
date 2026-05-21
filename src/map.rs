@@ -610,9 +610,9 @@ impl FromStr for Map {
         for (y, line) in buf.lines().enumerate() {
             // Trim map indentation
             let line = &line[indent..];
-            for (x, char) in line.chars().enumerate() {
+            for (x, (idx, ch)) in line.char_indices().enumerate() {
                 let position = Point::new(x as i32, y as i32);
-                instance[position] = match char {
+                instance[position] = match ch {
                     ' ' | '-' | '_' => Tiles::empty(),
                     '#' => Tiles::Wall,
                     '$' => {
@@ -643,7 +643,15 @@ impl FromStr for Map {
                         instance.goal_positions.insert(position);
                         Tiles::Player | Tiles::Goal
                     }
-                    _ => return Err(ParseMapError::InvalidCharacter(char)),
+                    _ => {
+                        let offset =
+                            buf.lines().take(y).map(|l| l.len() + 1).sum::<usize>() + indent + idx;
+                        return Err(ParseMapError::InvalidCharacter {
+                            ch,
+                            offset,
+                            src: buf.clone(),
+                        });
+                    }
                 };
             }
         }

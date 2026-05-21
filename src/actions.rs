@@ -132,8 +132,17 @@ impl FromStr for Actions {
             return Self::from_str(&rle_decode(lurd)?);
         }
         let mut instance = Self::default();
-        for char in lurd.chars() {
-            instance.push(Action::try_from(char)?);
+        for (idx, ch) in lurd.char_indices() {
+            match Action::try_from(ch) {
+                Ok(action) => instance.push(action),
+                Err(_) => {
+                    return Err(ParseActionsError::ParseActionError {
+                        ch,
+                        offset: idx,
+                        src: lurd.to_string(),
+                    });
+                }
+            }
         }
         Ok(instance)
     }

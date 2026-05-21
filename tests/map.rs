@@ -59,10 +59,10 @@ fn from_str() {
         Map::from_str(MISMATCH_BETWEEN_BOXS_AND_GOALS_MAP).unwrap_err(),
         ParseMapError::BoxGoalMismatch
     );
-    assert_eq!(
+    assert!(matches!(
         Map::from_str(INVALID_CHARACTER_MAP).unwrap_err(),
-        ParseMapError::InvalidCharacter('!')
-    );
+        ParseMapError::InvalidCharacter { ch: '!', .. }
+    ));
 }
 
 #[test]

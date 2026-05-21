@@ -42,10 +42,10 @@ fn from_str() {
         Level::from_str(UNTERMINATED_BLOCK_COMMENT_LEVEL).unwrap_err(),
         ParseLevelError::UnterminatedBlockComment
     );
-    assert_eq!(
+    assert!(matches!(
         Level::from_str(INVALID_CHARACTER_LEVEL).unwrap_err(),
-        ParseLevelError::ParseMapError(ParseMapError::InvalidCharacter('!'))
-    );
+        ParseLevelError::ParseMapError(ParseMapError::InvalidCharacter { ch: '!', .. })
+    ));
 }
 
 #[test]
