@@ -187,7 +187,7 @@ pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
 
                 // Detects grooves based on current position
                 let mut potential_dead_positions = FxHashSet::default();
-                let mut next_position = position - (directions[0]).into();
+                let mut next_position = position - directions[0].into();
                 while map[next_position + directions[1].into()].intersects(Tiles::Wall) {
                     if map[next_position].intersects(Tiles::Goal) {
                         break;
@@ -197,7 +197,7 @@ pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
                         break;
                     }
                     potential_dead_positions.insert(next_position);
-                    next_position -= (directions[0]).into();
+                    next_position -= directions[0].into();
                 }
             }
         }
