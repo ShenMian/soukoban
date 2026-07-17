@@ -158,7 +158,7 @@ impl Level {
     /// Returns `true` if the level is solved.
     #[must_use]
     pub fn is_solved(&self) -> bool {
-        self.map.box_positions() == self.map.goal_positions()
+        self.map.is_solved()
     }
 
     /// Rotates the level 90° clockwise.
