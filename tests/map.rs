@@ -48,6 +48,10 @@ fn from_str() {
         ParseMapError::MissingBoxOrGoal
     );
     assert_eq!(
+        Map::from_str("").unwrap_err(),
+        ParseMapError::MissingBoxOrGoal
+    );
+    assert_eq!(
         Map::from_str(MORE_THAN_ONE_PLAYER_MAP_1).unwrap_err(),
         ParseMapError::MultiplePlayers
     );

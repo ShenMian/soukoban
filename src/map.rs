@@ -581,8 +581,6 @@ impl FromStr for Map {
     /// Returning [`Ok`] does not mean the map is fully valid, as it is
     /// difficult or even impossible to verify that the map is fully valid.
     fn from_str(xsb: &str) -> Result<Self, Self::Err> {
-        debug_assert!(!xsb.trim().is_empty(), "string is empty");
-
         // Calculate map dimensions and indentation
         let mut indent = usize::MAX;
         let mut dimensions = Point::ZERO;
