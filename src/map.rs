@@ -109,7 +109,7 @@ impl Map {
     /// not work properly until the map becomes valid.
     #[allow(clippy::cast_sign_loss)]
     #[must_use]
-    pub fn with_dimensions(dimensions: Point) -> Self {
+    pub(crate) fn with_dimensions(dimensions: Point) -> Self {
         debug_assert!(dimensions.x >= 0 && dimensions.y >= 0);
         Self {
             data: vec![Tiles::empty(); (dimensions.x * dimensions.y) as usize],
