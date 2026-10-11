@@ -1,3 +1,5 @@
+//! A node in the search tree.
+
 use std::cmp::Ordering;
 
 use crate::{
@@ -13,15 +15,21 @@ use super::{Strategy, context::Context, state::State};
 /// A node in the search tree.
 #[derive(Clone, Eq, Debug)]
 pub struct Node {
+    /// The state.
     pub state: State,
+    /// Number of pushes from the start node to this node.
     pub pushes: i32,
+    /// Number of moves from the start node to this node.
     pub moves: i32,
+    /// Estimated remaining cost (h-value).
     heuristic: i32,
+    /// Strategy that determines how [`cost`](Self::cost) is computed.
     strategy: Strategy,
 }
 
 impl Node {
     /// Creates a new `Node`.
+    #[must_use]
     pub fn new(state: State, pushes: i32, moves: i32, ctx: &Context) -> Self {
         Self {
             heuristic: state.lower_bound(ctx),
@@ -33,6 +41,7 @@ impl Node {
     }
 
     /// Returns the actual cost from the start node to this node (g-value).
+    #[must_use]
     pub fn cost(&self) -> i32 {
         match self.strategy {
             Strategy::Quick => 0,
@@ -42,16 +51,19 @@ impl Node {
     }
 
     /// Returns the estimated cost from this node to the goal (h-value).
+    #[must_use]
     pub fn heuristic(&self) -> i32 {
         self.heuristic
     }
 
     /// Returns `true` if the state is solved.
+    #[must_use]
     pub fn is_solved(&self) -> bool {
         self.heuristic == 0
     }
 
     /// Returns the successors of the node.
+    #[must_use]
     pub fn successors(&self, ctx: &Context) -> Vec<Self> {
         let is_walkable = |position| {
             !ctx.map()[position].intersects(Tiles::Wall)
@@ -135,7 +147,7 @@ impl Node {
         (box_position, pushes)
     }
 
-    /// Returns `true` if the new box position is a deadlock.
+    /// Returns `true` if placing a box at `box_position` would create a deadlock.
     fn is_deadlock(ctx: &Context, box_position: Point, box_positions: &FxHashSet<Point>) -> bool {
         !ctx.map()[box_position].intersects(Tiles::Goal)
             && (ctx.is_dead_position(box_position)

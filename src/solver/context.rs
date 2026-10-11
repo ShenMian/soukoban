@@ -32,6 +32,7 @@ pub struct Context {
 impl Context {
     /// Creates a new `Context`, eagerly computing lower bounds and
     /// tunnels.
+    #[must_use]
     pub fn new(map: Map, strategy: Strategy) -> Self {
         Self {
             min_costs: Self::compute_minimum_push(&map),
@@ -42,21 +43,25 @@ impl Context {
     }
 
     /// Returns a reference to the map.
+    #[must_use]
     pub fn map(&self) -> &Map {
         &self.map
     }
 
     /// Returns the strategy.
+    #[must_use]
     pub fn strategy(&self) -> Strategy {
         self.strategy
     }
 
     /// Returns a reference to the set of minimum costs.
+    #[must_use]
     pub fn min_costs(&self) -> &FxHashMap<Point, i32> {
         &self.min_costs
     }
 
     /// Returns a reference to the set of tunnels.
+    #[must_use]
     pub fn tunnels(&self) -> &FxHashSet<DirectedPosition> {
         &self.tunnels
     }
@@ -65,6 +70,7 @@ impl Context {
     ///
     /// Pushing a box onto a dead position inevitably leads to an unsolvable
     /// state.
+    #[must_use]
     pub fn is_dead_position(&self, position: Point) -> bool {
         !self.min_costs.contains_key(&position)
     }

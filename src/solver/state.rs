@@ -1,3 +1,5 @@
+//! A search state.
+
 use std::hash::{Hash, Hasher};
 
 use rustc_hash::FxHasher;
@@ -9,9 +11,12 @@ use crate::{
     solver::{Strategy, context::Context},
 };
 
+/// A search state.
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct State {
+    /// Position of the player.
     pub player_position: Point,
+    /// Positions of all boxes.
     pub box_positions: FxHashSet<Point>,
 }
 
@@ -24,6 +29,7 @@ impl State {
     ///
     /// A value of 0 means every box is already on a goal, i.e. the state is a
     /// final state.
+    #[must_use]
     pub fn lower_bound(&self, ctx: &Context) -> i32 {
         self.box_positions
             .iter()
@@ -32,6 +38,7 @@ impl State {
     }
 
     /// Computes the hash of the canonicalized state.
+    #[must_use]
     pub fn canonicalized_hash(&self, ctx: &Context) -> u64 {
         let mut hasher = FxHasher::default();
         match ctx.strategy() {
