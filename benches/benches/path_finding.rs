@@ -31,4 +31,33 @@ fn compute_box_waypoints(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, compute_box_waypoints);
+fn construct_player_path(c: &mut Criterion) {
+    let map = load_level_from_file("assets/Benchmark_3.xsb", 1).into();
+    let (waypoints, costs) =
+        path_finding::compute_box_waypoints(&map, Point::new(6, 4), Strategy::Quick);
+    let goal_position = *map.goal_positions().iter().next().unwrap();
+    let to = find_best_waypoint(&costs, goal_position).unwrap();
+    let box_path = path_finding::construct_box_path(to, &waypoints);
+
+    c.bench_function("path_finding::construct_player_path '一箭十万'", |b| {
+        b.iter(|| path_finding::construct_player_path(&map, map.player_position(), &box_path));
+    });
+}
+
+/// Finds the cheapest reachable box state at `target`.
+fn find_best_waypoint(
+    costs: &FxHashMap<DirectedPosition, i32>,
+    target: Point,
+) -> Option<DirectedPosition> {
+    let mut best = None;
+    let mut min_cost = i32::MAX;
+    for (&state, &cost) in costs {
+        if state.position == target && cost < min_cost {
+            min_cost = cost;
+            best = Some(state);
+        }
+    }
+    best
+}
+
+criterion_group!(benches, compute_box_waypoints, construct_player_path);
