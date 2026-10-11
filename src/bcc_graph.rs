@@ -27,13 +27,18 @@ impl BccGraph {
         low.insert(start, time);
         stack.push((start, None::<Point>, 0));
 
-        let directions = Direction::iter().collect::<Vec<_>>();
+        const DIRECTIONS: [Direction; 4] = [
+            Direction::Up,
+            Direction::Right,
+            Direction::Down,
+            Direction::Left,
+        ];
         while let Some((u, p, direction_idx)) = stack.pop() {
             let mut next_direction_idx = direction_idx;
             let mut pushed_child = false;
 
-            while next_direction_idx < directions.len() {
-                let direction = directions[next_direction_idx];
+            while next_direction_idx < DIRECTIONS.len() {
+                let direction = DIRECTIONS[next_direction_idx];
                 next_direction_idx += 1;
 
                 let v = u + direction.into();
