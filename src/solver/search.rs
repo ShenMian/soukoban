@@ -12,31 +12,43 @@ use crate::{
     path_finding::find_path, solver::Strategy,
 };
 
-use super::{context::Context, node::Node, state::State};
+use super::{Context, Node, Observer, State};
 
 /// Searches for a solution using the A* algorithm.
-pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
+pub fn a_star_search<O: Observer>(
+    ctx: &Context,
+    stop_flag: &AtomicBool,
+    observer: &mut O,
+) -> Result<Actions, SearchError> {
     let mut queue = BinaryHeap::new();
     let mut costs = FxHashMap::default();
     let mut came_from = FxHashMap::default();
 
     let state: State = ctx.map().clone().into();
     costs.insert(state.canonicalized_hash(ctx), 0);
-    queue.push(Node::new(state, 0, 0, ctx));
+    let root = Node::new(state, 0, 0, ctx);
+    observer.on_search_start(&root);
+    queue.push(root);
 
     while let Some(node) = queue.pop() {
         if stop_flag.load(Ordering::Relaxed) {
+            observer.on_search_end(&Err(SearchError::Interrupted));
             return Err(SearchError::Interrupted);
         }
 
+        observer.on_node_expanded(&node);
+
         if node.is_solved() {
-            return Ok(construct_actions(
+            let result = Ok(construct_actions(
                 ctx,
                 &construct_path(node.state, &came_from),
             ));
+            observer.on_search_end(&result);
+            return result;
         }
 
         for successor in node.successors(ctx) {
+            observer.on_successor(&node, &successor);
             let hash = successor.state.canonicalized_hash(ctx);
             let current_cost = costs.entry(hash).or_insert(i32::MAX);
             if successor.cost() < *current_cost {
@@ -46,6 +58,7 @@ pub fn a_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, S
             }
         }
     }
+    observer.on_search_end(&Err(SearchError::NoSolution));
     Err(SearchError::NoSolution)
 }
 
@@ -60,21 +73,47 @@ enum SearchResult {
 }
 
 /// Searches for a solution using the IDA* algorithm.
-pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
+pub fn ida_star_search<O: Observer>(
+    ctx: &Context,
+    stop_flag: &AtomicBool,
+    observer: &mut O,
+) -> Result<Actions, SearchError> {
     let state: State = ctx.map().clone().into();
     let node = Node::new(state.clone(), 0, 0, ctx);
+
+    observer.on_search_start(&node);
 
     let mut path = vec![state];
     let mut visited = FxHashSet::default();
     visited.insert(node.state.canonicalized_hash(ctx));
     let mut threshold = node.heuristic();
     loop {
-        match ida_star_depth_search(ctx, stop_flag, &node, &mut path, &mut visited, threshold) {
-            Ok(_state) => return Ok(construct_actions(ctx, &path)),
+        match ida_star_depth_search(
+            ctx,
+            stop_flag,
+            &node,
+            &mut path,
+            &mut visited,
+            threshold,
+            observer,
+        ) {
+            Ok(_state) => {
+                let result = Ok(construct_actions(ctx, &path));
+                observer.on_search_end(&result);
+                return result;
+            }
             Err(bound) => match bound {
-                SearchResult::Interrupted => return Err(SearchError::Interrupted),
-                SearchResult::Exhausted => return Err(SearchError::NoSolution),
-                SearchResult::Exceeded(new_threshold) => threshold = new_threshold,
+                SearchResult::Interrupted => {
+                    observer.on_search_end(&Err(SearchError::Interrupted));
+                    return Err(SearchError::Interrupted);
+                }
+                SearchResult::Exhausted => {
+                    observer.on_search_end(&Err(SearchError::NoSolution));
+                    return Err(SearchError::NoSolution);
+                }
+                SearchResult::Exceeded(new_threshold) => {
+                    threshold = new_threshold;
+                }
             },
         }
     }
@@ -84,17 +123,20 @@ pub fn ida_star_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions,
 ///
 /// Returns `Ok(State)` if solution found, `Err(i32)` with the minimum
 /// f-value exceeding threshold.
-fn ida_star_depth_search(
+fn ida_star_depth_search<O: Observer>(
     ctx: &Context,
     stop_flag: &AtomicBool,
     node: &Node,
     path: &mut Vec<State>,
     visited: &mut FxHashSet<u64>,
     threshold: i32,
+    observer: &mut O,
 ) -> Result<State, SearchResult> {
     if stop_flag.load(Ordering::Relaxed) {
         return Err(SearchResult::Interrupted);
     }
+
+    observer.on_node_expanded(node);
 
     let estimated_cost = node.cost() + node.heuristic();
     if estimated_cost > threshold {
@@ -107,6 +149,7 @@ fn ida_star_depth_search(
 
     let mut min_threshold = i32::MAX;
     for successor in node.successors(ctx) {
+        observer.on_successor(node, &successor);
         let hash = successor.state.canonicalized_hash(ctx);
 
         // Skips if this state is already in the current search path
@@ -117,7 +160,9 @@ fn ida_star_depth_search(
         path.push(successor.state.clone());
         visited.insert(hash);
 
-        match ida_star_depth_search(ctx, stop_flag, &successor, path, visited, threshold) {
+        match ida_star_depth_search(
+            ctx, stop_flag, &successor, path, visited, threshold, observer,
+        ) {
             Ok(state) => return Ok(state),
             Err(SearchResult::Interrupted) => return Err(SearchResult::Interrupted),
             Err(SearchResult::Exhausted) => {}
@@ -146,7 +191,11 @@ fn ida_star_depth_search(
 /// # Panics
 ///
 /// Panics if the context's strategy is [`Strategy::MoveOptimal`].
-pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, SearchError> {
+pub fn bfs_search<O: Observer>(
+    ctx: &Context,
+    stop_flag: &AtomicBool,
+    observer: &mut O,
+) -> Result<Actions, SearchError> {
     assert!(ctx.strategy() != Strategy::MoveOptimal);
 
     let mut queue = std::collections::VecDeque::new();
@@ -156,21 +205,29 @@ pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, Sear
     let state: State = ctx.map().clone().into();
     visited.insert(state.canonicalized_hash(ctx));
 
-    queue.push_back(Node::new(state, 0, 0, ctx));
+    let root = Node::new(state, 0, 0, ctx);
+    observer.on_search_start(&root);
+    queue.push_back(root);
 
     while let Some(node) = queue.pop_front() {
         if stop_flag.load(Ordering::Relaxed) {
+            observer.on_search_end(&Err(SearchError::Interrupted));
             return Err(SearchError::Interrupted);
         }
 
+        observer.on_node_expanded(&node);
+
         if node.is_solved() {
-            return Ok(construct_actions(
+            let result = Ok(construct_actions(
                 ctx,
                 &construct_path(node.state, &came_from),
             ));
+            observer.on_search_end(&result);
+            return result;
         }
 
         for successor in node.successors(ctx) {
+            observer.on_successor(&node, &successor);
             let hash = successor.state.canonicalized_hash(ctx);
             if visited.insert(hash) {
                 came_from.insert(successor.state.clone(), node.state.clone());
@@ -179,6 +236,7 @@ pub fn bfs_search(ctx: &Context, stop_flag: &AtomicBool) -> Result<Actions, Sear
         }
     }
 
+    observer.on_search_end(&Err(SearchError::NoSolution));
     Err(SearchError::NoSolution)
 }
 
