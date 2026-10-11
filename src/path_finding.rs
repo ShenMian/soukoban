@@ -80,6 +80,56 @@ pub fn find_path(
     None
 }
 
+/// Finds the cost (number of steps) of the shortest path from one position to
+/// another on the map.
+///
+/// This function uses the A* algorithm to find the shortest path from the
+/// starting position to the target position, based on the provided
+/// `is_walkable` function.
+///
+/// Unlike [`find_path`], this function does not construct the full path.
+#[must_use]
+pub fn find_path_cost(from: Point, to: Point, is_walkable: impl Fn(Point) -> bool) -> Option<i32> {
+    if from == to {
+        return Some(0);
+    }
+
+    let mut open_set = BinaryHeap::new();
+    let mut cost = FxHashMap::default();
+
+    cost.insert(from, 0);
+    open_set.push(Node {
+        state: from,
+        priority: manhattan_distance(from, to),
+    });
+
+    while let Some(node) = open_set.pop() {
+        if node.state == to {
+            return Some(cost[&node.state]);
+        }
+
+        let curr_cost = cost[&node.state];
+        for direction in Direction::iter() {
+            let new_position = node.state + direction.into();
+            if !is_walkable(new_position) {
+                continue;
+            }
+
+            let new_cost = curr_cost + 1;
+            let current_cost = cost.entry(new_position).or_insert(i32::MAX);
+            if new_cost < *current_cost {
+                *current_cost = new_cost;
+                open_set.push(Node {
+                    state: new_position,
+                    priority: new_cost + manhattan_distance(new_position, to),
+                });
+            }
+        }
+    }
+
+    None
+}
+
 fn construct_path(from: Point, to: Point, came_from: &FxHashMap<Point, Point>) -> Vec<Point> {
     let mut path = Vec::new();
     let mut current = to;
@@ -202,12 +252,12 @@ pub fn compute_box_waypoints(
                 + match strategy {
                     Strategy::PushOptimal | Strategy::Quick => 1,
                     Strategy::MoveOptimal => {
-                        find_path(player_position, new_player_position, |position| {
+                        find_path_cost(player_position, new_player_position, |position| {
                             (position == initial_box_position || map.is_walkable(position))
                                 && position != box_position
                         })
                         .unwrap()
-                        .len() as i32
+                            + 1
                     }
                 };
             let new_state = DirectedPosition::new(new_box_position, push_direction);
