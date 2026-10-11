@@ -396,6 +396,36 @@ pub fn compute_reachable_area(
     reachable_area
 }
 
+/// Computes the reachable positions and their shortest step distances starting
+/// from a given position.
+///
+/// This function performs a breadth-first search to determine all positions
+/// and their distances that can be reached from the starting position, based on
+/// the provided `is_walkable` function.
+#[must_use]
+pub fn compute_reachable_distances(
+    position: Point,
+    is_walkable: impl Fn(Point) -> bool,
+) -> FxHashMap<Point, i32> {
+    let mut distances = FxHashMap::default();
+    let mut deque = VecDeque::new();
+    distances.insert(position, 0);
+    deque.push_back((position, 0));
+    while let Some((curr_pos, curr_dist)) = deque.pop_front() {
+        let next_dist = curr_dist + 1;
+        for direction in Direction::iter() {
+            let neighbor = curr_pos + direction.into();
+            if is_walkable(neighbor)
+                && let hash_map::Entry::Vacant(entry) = distances.entry(neighbor)
+            {
+                entry.insert(next_dist);
+                deque.push_back((neighbor, next_dist));
+            }
+        }
+    }
+    distances
+}
+
 /// Computes the anchor point (top-left) for a given positions.
 #[must_use]
 pub fn compute_area_anchor<S>(area: &HashSet<Point, S>) -> Option<Point>

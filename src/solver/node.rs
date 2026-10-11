@@ -4,7 +4,7 @@ use crate::{
     FxHashSet, Tiles,
     deadlock::is_freeze_deadlock,
     direction::{DirectedPosition, Direction},
-    path_finding::{compute_reachable_area, find_path},
+    path_finding::compute_reachable_distances,
     point::Point,
 };
 
@@ -57,7 +57,7 @@ impl Node {
             !ctx.map()[position].intersects(Tiles::Wall)
                 && !self.state.box_positions.contains(&position)
         };
-        let player_reachable_area = compute_reachable_area(self.state.player_position, is_walkable);
+        let player_distances = compute_reachable_distances(self.state.player_position, is_walkable);
 
         // Creates successor states by pushing boxes
         let mut successors = Vec::new();
@@ -74,9 +74,9 @@ impl Node {
 
                 // Check if the player can push the box
                 let push_position = *box_position - push_direction.into();
-                if !player_reachable_area.contains(&push_position) {
+                let Some(&moves) = player_distances.get(&push_position) else {
                     continue;
-                }
+                };
 
                 // Slides the box through a tunnel
                 let (new_box_position, mut pushes) = Self::slide_through_tunnel(
@@ -86,10 +86,6 @@ impl Node {
                     push_direction,
                 );
 
-                let moves = find_path(self.state.player_position, push_position, is_walkable)
-                    .unwrap()
-                    .len() as i32
-                    - 1;
                 pushes += 1;
 
                 let mut new_box_positions = self.state.box_positions.clone();
