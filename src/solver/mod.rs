@@ -2,7 +2,9 @@
 
 mod context;
 mod node;
+mod observer;
 mod search;
+
 pub(crate) mod state;
 
 use std::sync::{
@@ -13,6 +15,10 @@ use std::sync::{
 use crate::{Actions, Map, SearchError};
 
 use context::Context;
+
+pub use node::Node;
+pub use observer::Observer;
+pub use state::State;
 
 /// The strategy to use when searching for a solution.
 #[derive(Clone, Copy, Eq, PartialEq, Debug, Default)]
@@ -65,11 +71,25 @@ impl Solver {
     /// Returns a `SearchError` if no solution is found or the search is
     /// interrupted.
     pub fn search(&self, algorithm: Algorithm) -> Result<Actions, SearchError> {
+        self.search_with_observer(algorithm, &mut ())
+    }
+
+    /// Searches for a solution while reporting progress to `observer`.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SearchError` if no solution is found or the search is
+    /// interrupted.
+    pub fn search_with_observer<O: Observer>(
+        &self,
+        algorithm: Algorithm,
+        observer: &mut O,
+    ) -> Result<Actions, SearchError> {
         self.stop_flag.store(false, Ordering::Relaxed);
         match algorithm {
-            Algorithm::AStar => search::a_star_search(&self.ctx, &self.stop_flag),
-            Algorithm::IDAStar => search::ida_star_search(&self.ctx, &self.stop_flag),
-            Algorithm::Bfs => search::bfs_search(&self.ctx, &self.stop_flag),
+            Algorithm::AStar => search::a_star_search(&self.ctx, &self.stop_flag, observer),
+            Algorithm::IDAStar => search::ida_star_search(&self.ctx, &self.stop_flag, observer),
+            Algorithm::Bfs => search::bfs_search(&self.ctx, &self.stop_flag, observer),
         }
     }
 
