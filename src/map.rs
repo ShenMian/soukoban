@@ -54,8 +54,8 @@ impl Map {
             current_player_position += action.direction().into();
             if action.is_shift() {
                 instance[current_player_position + action.direction().into()] = Tiles::Floor;
-                // The player pushed the box when moving, which means there is a box at the
-                // player's current position
+                // The player pushed the box when moving, which means there is a
+                // box at the player's current position
                 if !current_box_positions.contains(&current_player_position) {
                     current_box_positions.insert(current_player_position);
                     initial_box_positions.insert(current_player_position);
@@ -66,8 +66,8 @@ impl Map {
         }
         instance[current_player_position] = Tiles::Floor;
 
-        // The current positions of the boxes are their final positions, which are the
-        // target positions
+        // The current positions of the boxes are their final positions, which
+        // are the target positions
         let box_positions = initial_box_positions;
         let goal_positions = current_box_positions;
         if box_positions.is_empty() {

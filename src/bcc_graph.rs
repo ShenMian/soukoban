@@ -115,8 +115,8 @@ impl BccGraph {
         debug_assert_eq!((from - obstacle).abs().sum(), 1);
         debug_assert_eq!((to - obstacle).abs().sum(), 1);
 
-        // If the obstacle is not located at a cut vertex, it indicates that the entire
-        // graph remains connected
+        // If the obstacle is not located at a cut vertex, it indicates that the
+        // entire graph remains connected
         if !self.cut_vertices.contains(&obstacle) {
             return true;
         }

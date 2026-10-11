@@ -203,7 +203,8 @@ fn construct_actions(ctx: &Context, path: &[State]) -> Actions {
         let delta = box_to_position - box_from_position;
         let push_direction = Direction::try_from(delta.map(i32::signum)).unwrap();
 
-        // Find the path for the player to reach the box position before pushing it
+        // Find the path for the player to reach the box position before pushing
+        // it
         actions.extend(
             find_path(
                 from_state.player_position,
