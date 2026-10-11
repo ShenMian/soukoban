@@ -135,8 +135,8 @@ pub fn compute_box_waypoints(
     let mut costs = FxHashMap::default();
     let mut came_from = FxHashMap::default();
 
-    let player_reachable_area =
-        compute_reachable_area(map.player_position(), |position| map.is_walkable(position));
+    let player_distances =
+        compute_reachable_distances(map.player_position(), |position| map.is_walkable(position));
     for push_direction in Direction::iter() {
         let state = DirectedPosition::new(initial_box_position, push_direction);
         // Check if the box can be pushed
@@ -150,23 +150,13 @@ pub fn compute_box_waypoints(
         if !(map.is_walkable(new_player_position)) {
             continue;
         }
-        if !player_reachable_area.contains(&new_player_position) {
+        if !player_distances.contains_key(&new_player_position) {
             continue;
         }
 
-        #[expect(
-            clippy::missing_panics_doc,
-            reason = "infallible: path is guaranteed to exist"
-        )]
         let cost = match strategy {
             Strategy::PushOptimal | Strategy::Quick => 0,
-            Strategy::MoveOptimal => {
-                find_path(map.player_position(), new_player_position, |position| {
-                    map.is_walkable(position)
-                })
-                .unwrap()
-                .len() as i32
-            }
+            Strategy::MoveOptimal => player_distances[&new_player_position] + 1,
         };
         came_from.insert(state, state);
         queue.push(Node {
