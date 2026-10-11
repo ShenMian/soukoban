@@ -226,8 +226,8 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
     }
 
     while let Some(position) = unchecked_floors.pop_front() {
-        // Check if the current floor is in a dead end and store the exit position in
-        // `neighbor_floor`
+        // Check if the current floor is in a dead end and store the exit
+        // position in `neighbor_floor`
         let mut neighbor_floor = None;
         for direction in Direction::iter() {
             let neighbor = position + direction.into();
@@ -244,8 +244,9 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
             useless_floors.insert(position);
             map[position].remove(Tiles::Floor);
             map[position].insert(Tiles::Wall);
-            // As the only floor affected by terrain changes, `free_neighbor` may become a
-            // new unused floor and needs to be rechecked.
+            // As the only floor affected by terrain changes, `free_neighbor`
+            // may become a new unused floor and needs to be
+            // rechecked.
             if map[free_neighbor] == Tiles::Floor && !map[free_neighbor].intersects(Tiles::Wall) {
                 unchecked_floors.push_back(free_neighbor);
             }
