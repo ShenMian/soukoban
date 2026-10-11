@@ -2,7 +2,7 @@
 
 use std::{
     cmp::Ordering,
-    collections::{BinaryHeap, HashMap, HashSet, VecDeque},
+    collections::{BinaryHeap, HashMap, HashSet, VecDeque, hash_map},
     hash::BuildHasher,
 };
 
@@ -271,20 +271,80 @@ pub fn construct_player_path(
     mut player_position: Point,
     box_path: &[Point],
 ) -> Vec<Point> {
-    let mut path = Vec::new();
     let initial_box_position = *box_path.first().unwrap();
+
+    let mut path = Vec::new();
+
+    // Reuse BFS data structures across all iterations to avoid repeated
+    // allocation. `came_from` maps each visited position to the position it
+    // was reached from. We clear it each iteration but keep the allocation.
+    let mut came_from = FxHashMap::default();
+    let mut queue = VecDeque::new();
+
     for box_positions in box_path.windows(2) {
+        let current_box_position = box_positions[0];
         let push_direction = box_positions[1] - box_positions[0];
-        let new_player_position = box_positions[0] - push_direction;
-        path.append(
-            &mut find_path(player_position, new_player_position, |position| {
-                (position == initial_box_position
-                    || !map[position].intersects(Tiles::Wall | Tiles::Box))
-                    && position != box_positions[0]
-            })
-            .unwrap(),
-        );
-        player_position = box_positions[0];
+        let target = current_box_position - push_direction;
+
+        // Fast path: player is already at the push position.
+        if player_position == target {
+            path.push(player_position);
+            player_position = current_box_position;
+            continue;
+        }
+
+        // BFS from player_position to target.
+        // The map is bounded by walls, so all positions encountered during BFS
+        // are guaranteed to be in-bounds — use unchecked access.
+        came_from.clear();
+        queue.clear();
+
+        came_from.insert(player_position, player_position);
+        queue.push_back(player_position);
+
+        let mut found = false;
+        'bfs: while let Some(position) = queue.pop_front() {
+            for direction in Direction::iter() {
+                let neighbor = position + direction.into();
+
+                // Skip the current box position (it's an obstacle).
+                if neighbor == current_box_position {
+                    continue;
+                }
+
+                // Walkability: either the cell is the initial box position
+                // (which has been vacated) or it must not have wall/box tiles.
+                // SAFETY: BFS expands only from walkable positions adjacent to
+                // walls; the map always has a wall border so we never go out of
+                // bounds.
+                let walkable = neighbor == initial_box_position
+                    || !unsafe { map.get_unchecked(neighbor) }.intersects(Tiles::Wall | Tiles::Box);
+
+                if walkable && let hash_map::Entry::Vacant(entry) = came_from.entry(neighbor) {
+                    entry.insert(position);
+                    if neighbor == target {
+                        found = true;
+                        break 'bfs;
+                    }
+                    queue.push_back(neighbor);
+                }
+            }
+        }
+
+        assert!(found, "no path found for player to reach push position");
+
+        // Trace back the path from `target` to `player_position` and append
+        // it directly into `path` in reverse, then flip the segment in-place.
+        let segment_start = path.len();
+        let mut current = target;
+        while current != player_position {
+            path.push(current);
+            current = came_from[&current];
+        }
+        path.push(player_position);
+        path[segment_start..].reverse();
+
+        player_position = current_box_position;
     }
     path.push(player_position);
     path
