@@ -147,7 +147,8 @@ impl Node {
         (box_position, pushes)
     }
 
-    /// Returns `true` if placing a box at `box_position` would create a deadlock.
+    /// Returns `true` if placing a box at `box_position` would create a
+    /// deadlock.
     fn is_deadlock(ctx: &Context, box_position: Point, box_positions: &FxHashSet<Point>) -> bool {
         !ctx.map()[box_position].intersects(Tiles::Goal)
             && (ctx.is_dead_position(box_position)
