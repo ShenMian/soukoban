@@ -34,6 +34,36 @@ impl Observer for BestHeuristic {
     }
 }
 
+#[derive(Default, Debug, Eq, PartialEq)]
+struct EventLog {
+    started: u64,
+    root_heuristic: i32,
+    expanded: u64,
+    generated: u64,
+    finished: u64,
+    solution_len: Option<usize>,
+}
+
+impl Observer for EventLog {
+    fn on_search_start(&mut self, root: &Node) {
+        self.started += 1;
+        self.root_heuristic = root.heuristic();
+    }
+
+    fn on_node_expanded(&mut self, _node: &Node) {
+        self.expanded += 1;
+    }
+
+    fn on_successor(&mut self, _parent: &Node, _child: &Node) {
+        self.generated += 1;
+    }
+
+    fn on_search_end(&mut self, result: &Result<Actions, SearchError>) {
+        self.finished += 1;
+        self.solution_len = result.as_ref().ok().map(|actions| actions.len());
+    }
+}
+
 #[test]
 fn noop_observer_matches_plain_search() {
     let level = load_level_from_file("assets/BoxWorld_100.xsb", 1);
@@ -106,4 +136,45 @@ fn on_search_end_receives_result() {
     assert_eq!(recorder.solved, Some(true));
     assert_eq!(recorder.action_len, Some(solution.len()));
     assert_eq!(recorder.error, None);
+}
+
+#[test]
+fn observer_by_mut_reference_forwards() {
+    let level = load_level_from_file("assets/BoxWorld_100.xsb", 1);
+    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    let mut direct = EventLog::default();
+    let solution = solver
+        .search_with_observer(Algorithm::AStar, &mut direct)
+        .unwrap();
+
+    let mut forwarded = EventLog::default();
+    let mut observer = &mut forwarded;
+    solver
+        .search_with_observer(Algorithm::AStar, &mut observer)
+        .unwrap();
+
+    assert_eq!(forwarded, direct);
+    assert_eq!(direct.started, 1);
+    assert_eq!(direct.finished, 1);
+    assert_eq!(direct.solution_len, Some(solution.len()));
+    assert!(direct.expanded > 0);
+    assert!(direct.generated >= direct.expanded);
+}
+
+#[test]
+fn observer_trait_object_forwards() {
+    let level = load_level_from_file("assets/BoxWorld_100.xsb", 1);
+    let solver = Solver::new(level.map().clone(), Strategy::Quick);
+    let mut direct = EventLog::default();
+    solver
+        .search_with_observer(Algorithm::AStar, &mut direct)
+        .unwrap();
+
+    let mut forwarded = EventLog::default();
+    let mut observer: &mut dyn Observer = &mut forwarded;
+    solver
+        .search_with_observer(Algorithm::AStar, &mut observer)
+        .unwrap();
+
+    assert_eq!(forwarded, direct);
 }
