@@ -11,11 +11,11 @@ pub mod level;
 pub mod map;
 pub mod path_finding;
 pub mod point;
+pub mod run_length;
 pub mod solver;
 pub mod tiles;
 
 mod bcc_graph;
-mod run_length;
 
 use action::*;
 use actions::*;
