@@ -1,16 +1,21 @@
-//! Utilities for run-length encoding encoding and decoding.
+//! Utilities for run-length encoding and decoding.
 
 use crate::error::{DecodeRleError, EncodeRleError};
 
 /// Encodes a string using run-length encoding (RLE).
 ///
+/// # Errors
+///
+/// Returns an error if the string contains an ASCII digit, which cannot be
+/// encoded.
+///
 /// # Examples
 ///
-/// ```ignore
+/// ```
 /// # use std::error::Error;
 /// #
 /// # fn main() -> Result<(), Box<dyn Error>> {
-/// use crate::run_length::rle_encode;
+/// use soukoban::run_length::rle_encode;
 ///
 /// assert_eq!(rle_encode("aaabbbcdd")?, "3a3bc2d");
 /// #
@@ -18,7 +23,7 @@ use crate::error::{DecodeRleError, EncodeRleError};
 /// # }
 /// ```
 #[allow(dead_code)]
-pub(crate) fn rle_encode(str: &str) -> Result<String, EncodeRleError> {
+pub fn rle_encode(str: &str) -> Result<String, EncodeRleError> {
     let mut result = String::new();
     let mut chars = str.chars().peekable();
     let mut count = 0;
@@ -40,13 +45,18 @@ pub(crate) fn rle_encode(str: &str) -> Result<String, EncodeRleError> {
 
 /// Decodes a string encoded with run-length encoding (RLE).
 ///
+/// # Errors
+///
+/// Returns an error if the string is malformed, e.g. it ends with digits or
+/// contains unmatched parentheses.
+///
 /// # Examples
 ///
-/// ```ignore
+/// ```
 /// # use std::error::Error;
 /// #
 /// # fn main() -> Result<(), Box<dyn Error>> {
-/// use crate::run_length::rle_decode;
+/// use soukoban::run_length::rle_decode;
 ///
 /// assert_eq!(rle_decode("-#$.*+@")?, "-#$.*+@");
 /// assert_eq!(rle_decode("3-##3(.$2(+*))-#")?, "---##.$+*+*.$+*+*.$+*+*-#");
@@ -54,7 +64,7 @@ pub(crate) fn rle_encode(str: &str) -> Result<String, EncodeRleError> {
 /// #     Ok(())
 /// # }
 /// ```
-pub(crate) fn rle_decode(str: &str) -> Result<String, DecodeRleError> {
+pub fn rle_decode(str: &str) -> Result<String, DecodeRleError> {
     let mut result = String::new();
 
     let mut length_string = String::new();
