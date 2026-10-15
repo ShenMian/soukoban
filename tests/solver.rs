@@ -296,3 +296,31 @@ fn tunnels() {
     let solver = Solver::new(level.into(), Strategy::Quick);
     assert_eq!(solver.context().tunnels().len(), 4);
 }
+
+#[test]
+fn unsolvable_initial_state() {
+    // The box can never leave the top row.
+    let dead_box = r"
+        ######
+        # $  #
+        #@  .#
+        #    #
+        ######
+    ";
+    // The box can move inside its own region but can never reach the goal,
+    // which is separated by walls.
+    let sealed_region = r"
+        #########
+        # $ # . #
+        #@  #   #
+        #########
+    ";
+
+    for level in [dead_box, sealed_region] {
+        let map = Map::from_str(level).unwrap();
+        for algorithm in [Algorithm::AStar, Algorithm::IDAStar, Algorithm::Bfs] {
+            let solver = Solver::new(map.clone(), Strategy::Quick);
+            assert_eq!(solver.search(algorithm), Err(SearchError::NoSolution),);
+        }
+    }
+}

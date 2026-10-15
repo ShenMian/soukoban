@@ -25,6 +25,10 @@ pub fn a_star_search<O: Observer>(
     let mut came_from = FxHashMap::default();
 
     let state: State = ctx.map().clone().into();
+    if state.is_deadlocked(ctx) {
+        observer.on_search_end(&Err(SearchError::NoSolution));
+        return Err(SearchError::NoSolution);
+    }
     costs.insert(state.canonicalized_hash(ctx), 0);
     let root = Node::new(state, 0, 0, ctx);
     observer.on_search_start(&root);
@@ -79,6 +83,10 @@ pub fn ida_star_search<O: Observer>(
     observer: &mut O,
 ) -> Result<Actions, SearchError> {
     let state: State = ctx.map().clone().into();
+    if state.is_deadlocked(ctx) {
+        observer.on_search_end(&Err(SearchError::NoSolution));
+        return Err(SearchError::NoSolution);
+    }
     let node = Node::new(state.clone(), 0, 0, ctx);
 
     observer.on_search_start(&node);
@@ -203,6 +211,10 @@ pub fn bfs_search<O: Observer>(
     let mut visited = FxHashSet::default();
 
     let state: State = ctx.map().clone().into();
+    if state.is_deadlocked(ctx) {
+        observer.on_search_end(&Err(SearchError::NoSolution));
+        return Err(SearchError::NoSolution);
+    }
     visited.insert(state.canonicalized_hash(ctx));
 
     let root = Node::new(state, 0, 0, ctx);
