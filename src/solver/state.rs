@@ -29,12 +29,27 @@ impl State {
     ///
     /// A value of 0 means every box is already on a goal, i.e. the state is a
     /// final state.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a box is on a position from which it can never be pushed to a
+    /// goal. A search rejects such an initial state with
+    /// [`is_deadlocked`](Self::is_deadlocked) before it computes any lower
+    /// bound, and its successors never push a box onto a dead position.
     #[must_use]
     pub fn lower_bound(&self, ctx: &Context) -> i32 {
         self.box_positions
             .iter()
             .map(|box_position| ctx.min_costs()[box_position])
             .sum()
+    }
+
+    /// Returns `true` if the state is deadlocked.
+    #[must_use]
+    pub(crate) fn is_deadlocked(&self, ctx: &Context) -> bool {
+        self.box_positions
+            .iter()
+            .any(|box_position| ctx.is_dead_position(*box_position))
     }
 
     /// Computes the hash of the canonicalized state.
