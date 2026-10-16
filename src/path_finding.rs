@@ -451,15 +451,15 @@ pub fn compute_reachable_distances(
     let mut deque = VecDeque::new();
     distances.insert(position, 0);
     deque.push_back((position, 0));
-    while let Some((curr_pos, curr_dist)) = deque.pop_front() {
-        let next_dist = curr_dist + 1;
+    while let Some((position, distance)) = deque.pop_front() {
+        let new_distance = distance + 1;
         for direction in Direction::iter() {
-            let neighbor = curr_pos + direction.into();
+            let neighbor = position + direction.into();
             if is_walkable(neighbor)
                 && let hash_map::Entry::Vacant(entry) = distances.entry(neighbor)
             {
-                entry.insert(next_dist);
-                deque.push_back((neighbor, next_dist));
+                entry.insert(new_distance);
+                deque.push_back((neighbor, new_distance));
             }
         }
     }
