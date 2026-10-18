@@ -5,20 +5,20 @@ use utils::*;
 
 #[test]
 fn is_freeze_deadlock() {
-    let mut map: Map = load_level_from_file("assets/Deadlock_3.xsb", 2).into();
-    map.set_box_position(Point::new(3, 2), Point::new(3, 1));
+    let mut level = load_level_from_file("assets/Deadlock_3.xsb", 2);
+    level.execute(Direction::Up).unwrap();
     assert!(deadlock::is_freeze_deadlock(
-        &map,
+        level.map(),
         Point::new(3, 1),
-        map.box_positions(),
+        level.map().box_positions(),
     ));
 
-    let mut map: Map = load_level_from_file("assets/Deadlock_3.xsb", 3).into();
-    map.set_box_position(Point::new(5, 2), Point::new(4, 2));
+    let mut level = load_level_from_file("assets/Deadlock_3.xsb", 3);
+    level.execute(Direction::Left).unwrap();
     assert!(deadlock::is_freeze_deadlock(
-        &map,
+        level.map(),
         Point::new(4, 2),
-        map.box_positions(),
+        level.map().box_positions(),
     ));
 }
 
