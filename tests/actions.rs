@@ -4,18 +4,18 @@ use soukoban::prelude::*;
 
 #[test]
 fn from_str() {
-    assert_eq!(
+    assert!(matches!(
         Actions::from_str("lUrDL!uRd").unwrap_err(),
-        ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
-    );
-    assert_eq!(
+        ParseActionsError::ParseActionError { ch: '!', .. }
+    ));
+    assert!(matches!(
         Actions::from_str("!lUrDLuRd").unwrap_err(),
-        ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
-    );
-    assert_eq!(
+        ParseActionsError::ParseActionError { ch: '!', .. }
+    ));
+    assert!(matches!(
         Actions::from_str("lUrDLuRd!").unwrap_err(),
-        ParseActionsError::ParseActionError(ParseActionError::InvalidCharacter('!'))
-    );
+        ParseActionsError::ParseActionError { ch: '!', .. }
+    ));
 }
 
 #[test]

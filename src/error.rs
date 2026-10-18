@@ -35,8 +35,15 @@ pub enum ParseMapError {
     #[error("no box or goal")]
     MissingBoxOrGoal,
     /// Contains non-XSB format character.
-    #[error("invalid character: `{0}`")]
-    InvalidCharacter(char),
+    #[error("invalid character: `{ch}`")]
+    InvalidCharacter {
+        /// The invalid character.
+        ch: char,
+        /// Offset pointing to the invalid character in the source.
+        offset: usize,
+        /// The XSB format string.
+        src: String,
+    },
     /// An error occurred during RLE decoding.
     #[error(transparent)]
     DecodeRleError(#[from] DecodeRleError),
@@ -46,11 +53,18 @@ pub enum ParseMapError {
 }
 
 /// An error which can be returned when parsing actions.
-#[derive(Error, Clone, Eq, PartialEq, Debug)]
+#[derive(Error, Debug)]
 pub enum ParseActionsError {
-    /// An error which can be returned when parsing a action.
-    #[error(transparent)]
-    ParseActionError(#[from] ParseActionError),
+    /// Contains non-LURD format character.
+    #[error("invalid character: `{ch}`")]
+    ParseActionError {
+        /// The invalid character.
+        ch: char,
+        /// Offset pointing to the invalid character in the source.
+        offset: usize,
+        /// The LURD format string.
+        src: String,
+    },
     /// An error occurred during RLE decoding.
     #[error(transparent)]
     DecodeRleError(#[from] DecodeRleError),

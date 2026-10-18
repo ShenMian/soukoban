@@ -388,12 +388,15 @@ impl FromStr for Level {
             // Discard line that are not map data (with RLE)
             if !is_xsb_string(trimmed_line) {
                 if map_len != 0 {
-                    return Err(ParseMapError::InvalidCharacter(
-                        trimmed_line
-                            .chars()
-                            .find(|&c| !is_xsb_symbol_with_rle(c))
-                            .unwrap(),
-                    )
+                    let (idx, invalid_char) = trimmed_line
+                        .char_indices()
+                        .find(|(_, c)| !is_xsb_symbol_with_rle(*c))
+                        .unwrap();
+                    return Err(ParseMapError::InvalidCharacter {
+                        ch: invalid_char,
+                        offset: idx,
+                        src: trimmed_line.to_string(),
+                    }
                     .into());
                 }
                 continue;
