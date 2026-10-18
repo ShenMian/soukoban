@@ -12,8 +12,11 @@ included as crate-level docs, so its example code must keep compiling.
 
 ## Workflow
 
-- Edit the working tree only; do not stage, commit, or push unless the user
-  explicitly asks.
+- Edit the working tree only; do not modify the git index (staging area)
+  unless the user explicitly asks, including `git add`, `git reset`,
+  `git restore --staged`, `git rm --cached`, `git stash`, or any other command
+  that writes to the index.
+- Do not commit or push unless the user explicitly asks.
 - Do not add dependencies without asking. The dependency set is deliberately
   small.
 - Do not modify files under `assets/`.
