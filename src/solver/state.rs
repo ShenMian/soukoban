@@ -33,9 +33,7 @@ impl State {
     /// # Panics
     ///
     /// Panics if a box is on a position from which it can never be pushed to a
-    /// goal. A search rejects such an initial state with
-    /// [`is_deadlocked`](Self::is_deadlocked) before it computes any lower
-    /// bound, and its successors never push a box onto a dead position.
+    /// goal.
     #[must_use]
     pub fn lower_bound(&self, ctx: &Context) -> i32 {
         self.box_positions
