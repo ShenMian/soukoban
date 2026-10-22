@@ -25,7 +25,8 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/cache@v6
+      - name: Cache Cargo artifacts
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/bin/
