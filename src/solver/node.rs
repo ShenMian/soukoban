@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 
 use crate::{
     FxHashSet, Tiles,
-    deadlock::is_freeze_deadlock,
+    deadlock::is_frozen,
     direction::{DirectedPosition, Direction},
     path_finding::compute_reachable_distances,
     point::Point,
@@ -152,7 +152,9 @@ impl Node {
     fn is_deadlock(ctx: &Context, box_position: Point, box_positions: &FxHashSet<Point>) -> bool {
         !ctx.map()[box_position].intersects(Tiles::Goal)
             && (ctx.is_dead_position(box_position)
-                || is_freeze_deadlock(ctx.map(), box_position, box_positions))
+                // The box is off a goal, so the goal check performed by
+                // `is_freeze_deadlock` is always satisfied.
+                || is_frozen(ctx.map(), box_position, box_positions))
     }
 
     /// Returns the priority tuple.

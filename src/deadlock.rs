@@ -90,6 +90,24 @@ where
     S: BuildHasher + Default,
 {
     debug_assert!(box_positions.contains(&box_position));
+    let mut visited = HashSet::default();
+    // A frozen group is only a deadlock if at least one box is off a goal.
+    is_freeze_deadlock_inner(map, box_position, box_positions, &mut visited)
+        && visited
+            .iter()
+            .any(|position| !map[*position].intersects(Tiles::Goal))
+}
+
+/// Checks if the given box position is frozen, regardless of goals.
+#[must_use]
+pub(crate) fn is_frozen<S>(
+    map: &Map,
+    box_position: Point,
+    box_positions: &HashSet<Point, S>,
+) -> bool
+where
+    S: BuildHasher + Default,
+{
     is_freeze_deadlock_inner(
         map,
         box_position,
@@ -267,6 +285,6 @@ pub fn compute_deadlocked_boxes(map: &Map) -> FxHashSet<Point> {
     map.box_positions()
         .iter()
         .copied()
-        .filter(|&position| is_freeze_deadlock(map, position, map.box_positions()))
+        .filter(|&position| is_frozen(map, position, map.box_positions()))
         .collect()
 }

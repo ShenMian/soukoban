@@ -5,7 +5,7 @@ use super::utils::*;
 
 fn is_freeze_deadlock(c: &mut Criterion) {
     c.bench_function("deadlock::is_freeze_deadlock", |b| {
-        let map = load_level_from_file("assets/Deadlock_3.xsb", 2)
+        let map = load_level_from_file("assets/Deadlock_4.xsb", 2)
             .map()
             .clone();
         b.iter_batched(
