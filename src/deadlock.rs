@@ -274,14 +274,17 @@ pub fn compute_useless_floors(mut map: Map) -> FxHashSet<Point> {
     useless_floors
 }
 
-/// Computes the positions of the deadlocked boxes.
+/// Computes the positions of the frozen boxes.
+///
+/// A box is frozen when both of its axes are blocked by walls or other
+/// frozen boxes, which means it can never be pushed again.
 ///
 /// # Time complexity
 ///
-/// Typically `O(B)` where `B` is the number of boxes. In the worst case this
-/// may degrades to `O(B²)`.
+/// Typically `O(B)` where `B` is the number of boxes. In the worst case
+/// this may degrade to `O(B²)`.
 #[must_use]
-pub fn compute_deadlocked_boxes(map: &Map) -> FxHashSet<Point> {
+pub(crate) fn compute_frozen_boxes(map: &Map) -> FxHashSet<Point> {
     map.box_positions()
         .iter()
         .copied()

@@ -246,6 +246,20 @@ fn canonicalize() {
 }
 
 #[test]
+fn canonicalize_unsolvable_map() {
+    let mut level = load_level_from_file("assets/Deadlock_4.xsb", 3);
+    level.execute(Direction::Left).unwrap();
+    let mut map = level.map().clone();
+    map.canonicalize();
+
+    // The frozen box off a goal makes the map unsolvable, so it must
+    // survive canonicalization
+    assert_eq!(map.box_positions().len(), 1);
+    let position = map.box_positions().iter().next().copied().unwrap();
+    assert!(!map[position].intersects(Tiles::Goal));
+}
+
+#[test]
 fn shrink_to_fit() {
     let mut oversize_map = Map::from_str(
         r"

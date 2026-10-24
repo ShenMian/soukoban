@@ -181,7 +181,7 @@ impl Map {
     /// Typically `O(N)` where `N` is the number of cells in the map. In the
     /// worst case this may degrade to `O(N²)`.
     pub fn canonicalize(&mut self) {
-        self.set_deadlocked_boxes_to_walls();
+        self.set_frozen_boxes_to_walls();
         self.set_useless_floors_to_walls();
         self.remove_unreachable_walls();
         self.remove_unreachable_boxes();
@@ -430,14 +430,17 @@ impl Map {
         }
     }
 
-    /// Sets deadlocked boxes to walls.
-    fn set_deadlocked_boxes_to_walls(&mut self) {
-        debug_assert!(
-            self.goal_positions
-                .is_superset(&compute_deadlocked_boxes(self))
-        );
+    /// Sets frozen boxes on goals to walls.
+    ///
+    /// A box can only be removed together with the goal beneath it to keep
+    /// the number of boxes and goals equal.
+    fn set_frozen_boxes_to_walls(&mut self) {
+        let positions: Vec<_> = compute_frozen_boxes(self)
+            .intersection(&self.goal_positions)
+            .copied()
+            .collect();
 
-        for position in compute_deadlocked_boxes(self) {
+        for position in positions {
             self.remove_goal_position(position);
             self.remove_box_position(position);
             self[position].remove(Tiles::Floor);
