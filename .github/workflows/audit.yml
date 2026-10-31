@@ -1,0 +1,39 @@
+name: Audit
+
+on:
+  schedule:
+    - cron: "0 2 * * 1"
+  push:
+    branches: [main]
+    paths: [Cargo.toml, .github/workflows/audit.yml]
+  pull_request:
+    paths: [Cargo.toml, .github/workflows/audit.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  issues: write
+
+jobs:
+  audit:
+    name: Security audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Generate Cargo.lock
+        run: cargo generate-lockfile
+
+      - name: Run cargo-audit
+        uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

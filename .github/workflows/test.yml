@@ -1,51 +1,97 @@
-name: Test
+name: CI
 
-on: [pull_request, push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
 
 jobs:
-  test:
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  lint:
+    name: Lint (fmt + clippy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Cache Cargo artifacts
-        uses: actions/cache@v6
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          persist-credentials: false
 
-      - name: Install Rust toolchain
+      # rustfmt.toml uses nightly-only options; install nightly first so stable stays default.
+      - name: Install nightly toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
 
-      - name: Clippy
-        run: cargo clippy --workspace --all-targets --all-features -- --deny warnings
-      
-      - name: Install cargo-audit
-        run: cargo install --force cargo-audit
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
 
-      - name: Audit
-        run: cargo audit
+      - name: Check formatting
+        run: cargo +nightly fmt --all -- --check
 
-      - name: Test
-        run: |
-          cargo test --workspace --all-features --all-targets
-          # Workaround for https://github.com/rust-lang/cargo/issues/6669
-          cargo test --workspace --all-features --doc
+      - name: Run clippy
+        run: cargo +stable clippy --workspace --all-targets --all-features -- --deny warnings
+
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run tests
+        run: cargo test --workspace --all-features --all-targets
+
+      - name: Run doctests
+        run: cargo test --workspace --all-features --doc
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
@@ -58,3 +104,25 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: lcov.info
+
+  doc:
+    name: Docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RUSTDOCFLAGS: --deny warnings
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check documentation
+        run: cargo doc --workspace --all-features --document-private-items --no-deps
