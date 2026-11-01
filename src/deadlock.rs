@@ -76,9 +76,12 @@ where
 
 /// Checks if the given box position is a freeze deadlock.
 ///
+/// A frozen group is only a deadlock if at least one of its boxes is off a
+/// goal.
+///
 /// # Time complexity
 ///
-/// Typically `O(B)` where `B` is the number of boxes.
+/// Typically `O(B²)` where `B` is the number of boxes.
 #[must_use]
 pub fn is_freeze_deadlock<S>(
     map: &Map,
@@ -89,12 +92,30 @@ where
     S: BuildHasher + Default,
 {
     debug_assert!(box_positions.contains(&box_position));
-    let mut visited = HashSet::default();
-    // A frozen group is only a deadlock if at least one box is off a goal.
-    is_freeze_deadlock_inner(map, box_position, box_positions, &mut visited)
-        && visited
-            .iter()
-            .any(|position| !map[*position].intersects(Tiles::Goal))
+    if !is_frozen(map, box_position, box_positions) {
+        return false;
+    }
+
+    let mut group = FxHashSet::default();
+    let mut stack = vec![box_position];
+    while let Some(position) = stack.pop() {
+        if !group.insert(position) {
+            continue;
+        }
+        for direction in Direction::iter() {
+            let neighbor = position + direction.into();
+            if box_positions.contains(&neighbor)
+                && !group.contains(&neighbor)
+                && is_frozen(map, neighbor, box_positions)
+            {
+                stack.push(neighbor);
+            }
+        }
+    }
+
+    group
+        .iter()
+        .any(|position| !map[*position].intersects(Tiles::Goal))
 }
 
 /// Checks if the given box position is frozen, regardless of goals.
@@ -107,7 +128,7 @@ pub(crate) fn is_frozen<S>(
 where
     S: BuildHasher + Default,
 {
-    is_freeze_deadlock_inner(
+    is_frozen_inner(
         map,
         box_position,
         box_positions,
@@ -116,7 +137,7 @@ where
 }
 
 #[must_use]
-fn is_freeze_deadlock_inner<S>(
+fn is_frozen_inner<S>(
     map: &Map,
     box_position: Point,
     box_positions: &HashSet<Point, S>,
@@ -149,9 +170,9 @@ where
 
         // Check if any immovable boxes on the axis.
         if (box_positions.contains(&neighbors[0])
-            && is_freeze_deadlock_inner(map, neighbors[0], box_positions, visited))
+            && is_frozen_inner(map, neighbors[0], box_positions, visited))
             || (box_positions.contains(&neighbors[1])
-                && is_freeze_deadlock_inner(map, neighbors[1], box_positions, visited))
+                && is_frozen_inner(map, neighbors[1], box_positions, visited))
         {
             continue;
         }

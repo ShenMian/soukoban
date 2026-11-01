@@ -33,6 +33,50 @@ fn is_freeze_deadlock() {
 }
 
 #[test]
+fn is_freeze_deadlock_detects_mixed_frozen_groups() {
+    let map: Map = indoc! {"
+        ######
+        #*$  #
+        #  @ #
+        #.   #
+        ######
+    "}
+    .parse()
+    .unwrap();
+    assert!(deadlock::is_freeze_deadlock(
+        &map,
+        Point::new(1, 1),
+        map.box_positions(),
+    ));
+    assert!(deadlock::is_freeze_deadlock(
+        &map,
+        Point::new(2, 1),
+        map.box_positions(),
+    ));
+
+    let map: Map = indoc! {"
+        ######
+        #**  #
+        #  @ #
+        #    #
+        ######
+    "}
+    .parse()
+    .unwrap();
+
+    assert!(!deadlock::is_freeze_deadlock(
+        &map,
+        Point::new(1, 1),
+        map.box_positions(),
+    ));
+    assert!(!deadlock::is_freeze_deadlock(
+        &map,
+        Point::new(2, 1),
+        map.box_positions(),
+    ));
+}
+
+#[test]
 fn compute_dead_positions_detects_non_corner_dead_positions() {
     let map: Map = indoc! {"
         ######
