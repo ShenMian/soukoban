@@ -1,3 +1,4 @@
+use indoc::indoc;
 use soukoban::{deadlock, prelude::*};
 
 mod utils;
@@ -32,13 +33,19 @@ fn is_freeze_deadlock() {
 }
 
 #[test]
-fn compute_static_deadlocks() {
-    let map: Map = load_level_from_file("assets/Deadlock_4.xsb", 1).into();
-    assert_eq!(deadlock::compute_static_deadlocks(&map).len(), 9);
+fn compute_dead_positions_detects_non_corner_dead_positions() {
+    let map: Map = indoc! {"
+        ######
+        #  # #
+        #  $ #
+        ##@ ##
+        #.  ##
+        ######
+    "}
+    .parse()
+    .unwrap();
 
-    let map = load_level_from_file("assets/Microban_155.xsb", 3).into();
-    assert_eq!(deadlock::compute_static_deadlocks(&map).len(), 9);
-
-    let map = load_level_from_file("assets/BoxWorld_100.xsb", 9).into();
-    assert_eq!(deadlock::compute_static_deadlocks(&map).len(), 17);
+    let dead_positions = deadlock::compute_dead_positions(&map);
+    assert!(dead_positions.contains(&Point::new(3, 2)));
+    assert!(dead_positions.contains(&Point::new(3, 3)));
 }

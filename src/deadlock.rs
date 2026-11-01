@@ -5,12 +5,11 @@ use std::{
     hash::BuildHasher,
 };
 
-use crate::{FxHashSet, direction::Direction, map::Map, point::Point, tiles::Tiles};
+use crate::{
+    FxHashSet, direction::Direction, map::Map, point::Point, solver::Context, tiles::Tiles,
+};
 
 /// Checks if the given box position is a static deadlock.
-///
-/// Consider using [`compute_static_deadlocks`] if you need to efficiently
-/// compute multiple static deadlock positions.
 ///
 /// # Time complexity
 ///
@@ -162,61 +161,20 @@ where
     true
 }
 
-/// Calculates static deadlock positions independent of the player's position.
-///
-/// This function returns an **incomplete** set of dead positions independent
-/// of the player's position. Any box pushed to a point in the set will cause a
-/// deadlock, regardless of the player's position.
+/// Computes the positions from which a box can never be pushed to a goal.
 ///
 /// # Time complexity
 ///
 /// `O(N)` where `N` is the number of cells in the map.
 #[must_use]
-pub fn compute_static_deadlocks(map: &Map) -> FxHashSet<Point> {
+pub fn compute_dead_positions(map: &Map) -> FxHashSet<Point> {
+    let min_costs = Context::compute_minimum_push(map);
     let mut dead_positions = FxHashSet::default();
-    for x in 1..map.dimensions().x - 1 {
-        for y in 1..map.dimensions().y - 1 {
+    for x in 0..map.dimensions().x {
+        for y in 0..map.dimensions().y {
             let position = Point::new(x, y);
-            // Check if current position may be a new corner
-            if !map[position].intersects(Tiles::Floor) || map[position].intersects(Tiles::Goal) {
-                continue;
-            }
-            for directions in [
-                Direction::Up,
-                Direction::Right,
-                Direction::Down,
-                Direction::Left,
-                Direction::Up,
-            ]
-            .windows(2)
-            {
-                let neighbor = [
-                    position + directions[0].into(),
-                    position + directions[1].into(),
-                ];
-
-                // Check whether the current position is a corner
-                if !(map[neighbor[0]].intersects(Tiles::Wall)
-                    && map[neighbor[1]].intersects(Tiles::Wall))
-                {
-                    continue;
-                }
+            if map[position].intersects(Tiles::Floor) && !min_costs.contains_key(&position) {
                 dead_positions.insert(position);
-
-                // Detects grooves based on current position
-                let mut potential_dead_positions = FxHashSet::default();
-                let mut next_position = position - directions[0].into();
-                while map[next_position + directions[1].into()].intersects(Tiles::Wall) {
-                    if map[next_position].intersects(Tiles::Goal) {
-                        break;
-                    }
-                    if map[next_position].intersects(Tiles::Wall) {
-                        dead_positions.extend(potential_dead_positions);
-                        break;
-                    }
-                    potential_dead_positions.insert(next_position);
-                    next_position -= directions[0].into();
-                }
             }
         }
     }

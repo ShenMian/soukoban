@@ -14,7 +14,7 @@ use std::sync::{
 
 use crate::{Actions, Map, SearchError};
 
-use context::Context;
+pub(crate) use context::Context;
 
 pub use node::Node;
 pub use observer::Observer;

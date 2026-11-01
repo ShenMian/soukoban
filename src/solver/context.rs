@@ -77,7 +77,7 @@ impl Context {
 
     /// Computes and returns the minimum number of pushes to push the box to
     /// the nearest goal.
-    fn compute_minimum_push(map: &Map) -> FxHashMap<Point, i32> {
+    pub(crate) fn compute_minimum_push(map: &Map) -> FxHashMap<Point, i32> {
         let mut min_costs = FxHashMap::default();
         let mut costs = FxHashMap::default();
         let mut queue = VecDeque::new();

@@ -31,10 +31,10 @@ fn compute_useless_floors(c: &mut Criterion) {
     });
 }
 
-fn compute_static_deadlocks(c: &mut Criterion) {
-    c.bench_function("deadlock::compute_static_deadlocks", |b| {
+fn compute_dead_positions(c: &mut Criterion) {
+    c.bench_function("deadlock::compute_dead_positions", |b| {
         let level = load_level_from_file("assets/Benchmark_3.xsb", 3);
-        b.iter(|| deadlock::compute_static_deadlocks(level.map()));
+        b.iter(|| deadlock::compute_dead_positions(level.map()));
     });
 }
 
@@ -42,5 +42,5 @@ criterion_group!(
     benches,
     is_freeze_deadlock,
     compute_useless_floors,
-    compute_static_deadlocks
+    compute_dead_positions
 );
